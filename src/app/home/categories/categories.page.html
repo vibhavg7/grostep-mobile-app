@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button menu="m1"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Grostep</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size-md="8" offset-md="2" text-center *ngIf="isLoading">
+        <ion-spinner color="primary"></ion-spinner>
+      </ion-col>
+      <ion-col *ngIf="!isLoading" size="12" size-xl="8" offset-xl="2">
+        <ion-slides *ngIf="bannerImages.length > 0" #mySlider (ionSlidesDidLoad)="slidesDidLoad(mySlider)" pager>
+          <ion-slide size="12" *ngFor="let item of bannerImages" (click)="selectItem(item)">
+            <img *ngIf="item?.image_url" [src]="item.image_url" />
+            <ion-img *ngIf="!item?.image_url" src="assets/images/default_image.jpg"></ion-img>
+          </ion-slide>
+        </ion-slides>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="ion-text-center" size="4" offset-xl="2" style="background-color: whitesmoke;" 
+        *ngFor="let item of categoryImages"
+        [routerLink]="['/','categories',item?.store_category_id,'stores']">
+        <ion-img *ngIf="item?.image_url" [src]="item?.image_url"></ion-img>
+        <ion-img src="assets/images/default_image.jpg"></ion-img>
+        <ion-text style="display: block;">{{item?.store_category_name}}</ion-text>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

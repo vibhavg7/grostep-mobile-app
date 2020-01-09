@@ -1,0 +1,64 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Choose Address</ion-title>
+        <ion-buttons slot="start">
+            <ion-back-button defaultHref=""></ion-back-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content style="font-weight:bold;background-color:#f5f5f5 !important;height:100%">
+    <ion-grid>
+        <ion-row *ngIf="!prevPage">
+            <ion-col size="12">
+                <ion-col size="12">
+                    <ion-button (click)="addNewAddress()" color="primary" expand="block" fill="outline">
+                        Add New Address
+                    </ion-button>
+                </ion-col>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col size="12">
+                <div *ngFor="let item of addressList">
+                    <ion-card>
+                        <ion-card-header>
+                            <span style="color:black">
+                                <input style=" width: 1.1em; height: 1.1em;" type="radio" name="status" [checked]="item.status == 1" (click)="addressSelected(item)">
+                                <span (click)="addressSelected(item)">
+                                    {{item.customer_name}}
+                                </span>
+
+                                <ion-icon style="border-left: 1px solid black;float: right;
+                                             padding-left: 10px;color:black !important" name="trash" (click)="deleteDeliveryAddress(item)">
+                                </ion-icon>
+
+                                <ion-icon style="padding-right:9px;float: right;color:black !important" name="create" (click)="editDeliveryAddress(item)">
+                                </ion-icon>
+
+                            </span>
+                        </ion-card-header>
+                        <ion-card-content (click)="addressSelected(item)">
+                            <h5>Address:
+                                <b>{{item?.address}}</b>
+                            </h5>
+                            <h5 style="padding-top:2px">Name:
+                                <b>{{item?.customer_name}}</b>
+                            </h5>
+                            <h5 style="padding-top:2px">
+                                Pincode:
+                                <b>{{item?.pincode}}</b>
+                                <span *ngIf="item?.address_type_id" style="float:right">
+                                    <ion-icon *ngIf="item?.address_type_id == 1" name="home"></ion-icon>
+                                    <ion-icon *ngIf="item?.address_type_id == 2" name="business"></ion-icon>
+                                    {{item?.type}}
+                                </span>
+                            </h5>
+                        </ion-card-content>
+
+                    </ion-card>
+                </div>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+</ion-content>

@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button menu="m1"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Discover</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <form [formGroup]="searchCriteriaForm">
+          <ion-item style="border:1px solid black">
+            <ion-label position="floating">Search in stores</ion-label>
+            <ion-input type="text" (keyup)="onChanges()" autocomplete="off" formControlName="searchCriteria"></ion-input>
+            <ion-icon name="search" slot="end" style="padding-top: 8px;"></ion-icon>
+          </ion-item>
+        </form>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-list>
+          <ion-item (click)="clickStore(store?.store_id)" *ngFor="let store of loadedStores">
+            <ion-thumbnail slot="start">
+              <ion-img *ngIf="store?.image_url" [src]="store.image_url"></ion-img>
+              <ion-img *ngIf="!store?.image_url" src="assets/images/default_image.jpg"></ion-img>
+            </ion-thumbnail>
+            <ion-label>
+              <h2>{{store.store_name}}</h2>
+              <p>{{store.address}}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

@@ -1,0 +1,97 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Add Delivery Address</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form (ngSubmit)="addDelievryAddress()" [formGroup]="addAddressForm">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-sm="6" offset-sm="3">
+          <ion-item>
+            <input style=" width: 1.1em; height: 1.1em;" type="radio" value="1" [formControl]="addAddressForm.controls['address_type']"
+              id="home" name="address_type" checked [(ngModel)]="registerCredentials.address_type">
+            <label for="home">
+              <ion-icon name="home"></ion-icon>Home</label>
+          </ion-item>
+        </ion-col>
+        <ion-col size-sm="6" offset-sm="3">
+          <ion-item>
+            <input style=" width: 1.1em; height: 1.1em;" type="radio" value="2" [formControl]="addAddressForm.controls['address_type']"
+              name="address_type" id="work" [(ngModel)]="registerCredentials.address_type">
+            <label for="work">
+              <ion-icon name="business"></ion-icon>Work</label>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Name</ion-label>
+            <ion-input #myinput type="text" name="customer_name" [formControl]="addAddressForm.controls['customer_name']" 
+                [(ngModel)]="registerCredentials.customer_name"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Pincode</ion-label>
+            <ion-input type="number" name="pincode" [(ngModel)]="registerCredentials.pincode" [formControl]="addAddressForm.controls['pincode']"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">House No./Building/Apartment</ion-label>
+            <ion-input type="text" name="flatNumber" [(ngModel)]="registerCredentials.flatNumber" [formControl]="addAddressForm.controls['flatNumber']"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Area/Locality/Sector</ion-label>
+            <ion-input type="text" name="address2" [(ngModel)]="registerCredentials.address2" [formControl]="addAddressForm.controls['address2']"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Landmark</ion-label>
+            <ion-input type="text" name="landmark" [(ngModel)]="registerCredentials.landmark" [formControl]="addAddressForm.controls['landmark']"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Address</ion-label>
+            <ion-textarea type="text" name="address" [(ngModel)]="registerCredentials.address" autocomplete="on" autocorrect="on" [formControl]="addAddressForm.controls['address']"></ion-textarea>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Phone Number</ion-label>
+            <ion-input type="number" name="phone" [(ngModel)]="registerCredentials.phone" [formControl]="addAddressForm.controls['phone']"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-button type="submit" color="primary" expand="block">
+            ADD ADDRESS
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
+</ion-content>

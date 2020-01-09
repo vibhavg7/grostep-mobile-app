@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Delivery Options</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref=""></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid no-padding style="background-color: lightgrey; display: flex; flex-flow: column;">
+    <ion-row>
+      <ion-col size="12" size-sm="8" offset-sm="2" text-center style="background-color: #fff;">
+        <ion-list>
+          <ion-item (click)="deliveryInstructions()" lines="none" style="background-color:whitesmoke">
+            <ion-icon slot="start" name="paper"></ion-icon>
+            <ion-label>Any Delivery Instructions</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+    <hr>
+    <ion-row style="background-color: #fff;" justify-content-center align-items-center>
+      <ion-col size="6">
+        <ion-item>
+          <input style=" width: 1.1em;font-size: 1.2em;height: 1.1em;" (click)="deliverNow(30)" type="radio" value="1"
+            id="deliver_now" name="delivery_type" checked>
+          <label for="deliver_now" style="padding-left:10px">Deliver Now</label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="6">
+        <ion-label>Delivery Charge : Rs 30</ion-label>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="slotsCount > 0" style="background-color: #fff;" justify-content-center align-items-center>
+      <ion-col size="6">
+        <ion-item lines="none">
+          <input (click)="deliveryLater(20)" style=" width: 1.1em;font-size: 1.2em;height: 1.1em;" type="radio" value="1" id="deliver_later"
+            name="delivery_type">
+          <label for="deliver_later" style="padding-left:10px">Deliver Later</label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="6">
+        <ion-label>Delivery Charge : Rs 20</ion-label>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-list *ngIf="enableDeliveryLaterDiv">
+    <ion-list-header>Select Delivery Slot</ion-list-header>
+    <ion-item>
+      <ion-label>Select Delivery Date and Time</ion-label>
+      <ion-select [(ngModel)]="selectedSlot" style="max-width: 100% !important;" placeholder="Select Delivery Date and Time">
+        <ion-select-option *ngFor="let item of deliverySlots" value="{{item?.slot_id}}">
+          {{item?.delivery_date | date: 'dd/MM/yyyy'}} {{item?.start_time %12}} {{item?.openingTimeClock}} - {{item?.end_time %12}}
+          {{item?.closingTimeClock}}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+</ion-content>
+<ion-footer>
+  <ion-row class="footer_color">
+    <ion-col size="12">
+      <ion-button expand="block" (click)="proceedToPay()" fill="clear" style="color:#fff !important">
+        PROCEED TO PAY
+        <ion-icon name="arrow-forward"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</ion-footer>

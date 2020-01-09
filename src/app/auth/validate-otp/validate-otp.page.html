@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+      <ion-buttons slot="start">
+          <ion-back-button defaultHref="/auth/login"></ion-back-button>
+        </ion-buttons>
+    <ion-title>Validate OTP</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12">
+        <span style="font-weight:bold;">Verify Mobile Number</span>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <span>
+          Enter the six digit OTP sent to your number
+        </span>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <table style="margin-left:auto;margin-right:auto;">
+          <tr>
+            <td>
+              <ion-input type="text" #otp1 name="otp1" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp1)">
+              </ion-input>
+            </td>
+            <td>
+              <ion-input type="text" #otp2 name="otp2" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp2)">
+              </ion-input>
+            </td>
+            <td>
+              <ion-input type="text" #otp3  name="otp3" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp3)">
+              </ion-input>
+            </td>
+            <td>
+              <ion-input type="text" #otp4 name="otp4" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp4)">
+              </ion-input>
+            </td>
+            <td>
+              <ion-input type="text" #otp5 name="otp5" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp5)">
+              </ion-input>
+            </td>
+            <td>
+              <ion-input type="text" #otp6 name="otp6" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp6)">
+              </ion-input>
+            </td>
+          </tr>
+        </table>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<ion-footer class="footer_color" (click)="validateOTP()">
+    <ion-button expand="block" (click)="validateOTP()" fill="clear" style="color:#fff !important">
+        Verify and Continue
+        <ion-icon name="arrow-forward"></ion-icon>
+    </ion-button>
+  </ion-footer>

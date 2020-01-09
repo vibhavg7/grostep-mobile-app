@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Payment Status</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <img src="assets/images/success.jpg">
+    </ion-item>
+    <ion-item>
+      <p style="font-weight:bold;" text-wrap>
+        Order # {{orderId}} placed successfully.</p>
+    </ion-item>
+    <ion-item>
+      <p text-wrap>
+        You will recieve notification shortly.Please check your order list for more details.
+      </p>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-footer class="footer_color" (click)="continueShopping()">
+  <ion-button expand="block" fill="clear" style="color:#fff !important">
+    CONTINUE SHOPPING
+    <ion-icon slot="end" name="arrow-forward"></ion-icon>
+  </ion-button>
+</ion-footer>
