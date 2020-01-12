@@ -13,7 +13,7 @@ export class AddUserInfoPage implements OnInit {
   storeId: number;
   public addUserInfoForm: FormGroup;
   registerCredentials = {
-    customer_name: '', email: '', customer_dob: '', customer_id: ''
+    customer_name: '', email: '', customer_dob: '', customer_id: '', personal_info_added: 0
   };
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -41,26 +41,15 @@ export class AddUserInfoPage implements OnInit {
       return;
     }
     this.registerCredentials.customer_id = localStorage.getItem('customerid');
-    console.log(this.registerCredentials);
+    this.registerCredentials.personal_info_added = 1;
     this.authService.editUserInfo(this.registerCredentials).subscribe(data => {
       console.log(data);
       if (data.status === 200) {
         if (this.authService.redirectUrl === 'cartpage') {
-          this.router.navigate([`/cart/${this.storeId}`]);
+          this.navCtrl.navigateBack([`/cart/${this.storeId}`]);
         } else {
-          this.router.navigate(['/home/tabs/profile']);
+          this.navCtrl.navigateRoot(['/home/tabs/profile']);
         }
-      //   if (this.prevPage === 'cartpage') {
-      //     this.navCtrl.navigateBack('/cart');
-      //   } else {
-      //     this.navCtrl.navigateRoot('/home/tabs/profile');
-      //   }
-      // } else {
-      //   if (this.prevPage === 'cartpage') {
-      //     this.navCtrl.navigateBack('/cart');
-      //   } else {
-      //     this.navCtrl.navigateRoot('/home/tabs/profile');
-      //   }
       }
     });
   }

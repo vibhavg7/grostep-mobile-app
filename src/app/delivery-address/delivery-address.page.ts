@@ -10,6 +10,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class DeliveryAddressPage implements OnInit {
 
+  errorMessage: any;
   storeId: string;
   prevPage: any = '';
   addressList: any = [];
@@ -25,9 +26,15 @@ export class DeliveryAddressPage implements OnInit {
 
   ionViewWillEnter() {
     this.addressList = this.auth.CustomerdeliveryInfo;
+    if (this.addressList.length < 1) {
+      this.auth.getUserProfile().subscribe((data) => {
+        this.addressList = data.customer_delivery_addresses;
+      }, (error) => {
+        this.errorMessage = error;
+      });
+    }
     this.prevPage = this.activatedRoute.snapshot.paramMap.get('prevPage');
     this.storeId = this.activatedRoute.snapshot.paramMap.get('storeId');
-    console.log(this.prevPage);
   }
 
   addressSelected(address: any) {

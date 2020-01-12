@@ -23,11 +23,11 @@
       </ion-col>
     </ion-row>
     <ion-row>
-      <ion-col class="ion-text-center" size="4" offset-xl="2" style="background-color: whitesmoke;" 
+      <ion-col class="ion-text-center" size="4" offset-xl="2" style="background-color: #fafafa;border:1px solid lightgrey" 
         *ngFor="let item of categoryImages"
         [routerLink]="['/','categories',item?.store_category_id,'stores']">
-        <ion-img *ngIf="item?.image_url" [src]="item?.image_url"></ion-img>
-        <ion-img src="assets/images/default_image.jpg"></ion-img>
+        <ion-img  style="height: 104px !important;" *ngIf="item?.image_url" [src]="item?.image_url"></ion-img>
+        <ion-img  style="height: 104px !important;" *ngIf="!item?.image_url"src="assets/images/default_image.jpg"></ion-img>
         <ion-text style="display: block;">{{item?.store_category_name}}</ion-text>
       </ion-col>
     </ion-row>

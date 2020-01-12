@@ -35,12 +35,17 @@ export class CartPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.currentuser = this.auth.isauthenticated;
-    console.log(this.currentuser);
     this.storeId = +this.activatedRoute.snapshot.paramMap.get('storeId');
     this.categoryId = this.activatedRoute.snapshot.paramMap.get('categoryId');
-    this.voucher = this.cartService.getAppliedVoucher();
+    this.currentuser = this.auth.isauthenticated;
     this.cartList = this.cartService.getAllCartItems();
+    console.log(this.cartList);
+    this.voucher = this.cartService.getAppliedVoucher();
+    this.voucher = this.cartService.getAppliedVoucher();
+    if (this.storeId === 0) {
+      this.storeId = this.cartList[0].store_id;
+    }
+    console.log(this.storeId);
     this.auth.getCustomerAddressesById().subscribe((data: any) => {
       this.selectedAddress = data.filter((address: any) => {
         return address.status === 1;
@@ -85,7 +90,6 @@ export class CartPage implements OnInit {
   }
 
   getTotal(): number {
-    // console.log('hi');
     this.totalAmount = this.cartService.getGrandTotal();
     return this.totalAmount;
   }
@@ -112,7 +116,6 @@ export class CartPage implements OnInit {
   }
 
   login() {
-    // this.router.navigate(['/cart', { storeId: this.storeId, categoryId: this.categoryId, storecategoryId: this.storecategoryId }]);
     this.auth.redirectUrl = 'cartpage';
     this.router.navigate(['/auth/login', { storeId: this.storeId}]);
   }
@@ -138,6 +141,10 @@ export class CartPage implements OnInit {
               console.log(item.id);
               this.cartService.removeItemById(item.id);
               this.cartList = this.cartService.getAllCartItems();
+              if ((this.cartList.length < 1) || (this.cartService.getGrandTotal() < this.voucher.voucher_cart_amount)) {
+                this.voucher = {} as Voucher;
+                this.cartService.removeVoucher();
+              }
             }
           }
         ]

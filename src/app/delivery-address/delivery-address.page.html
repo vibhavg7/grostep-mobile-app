@@ -20,7 +20,7 @@
         <ion-row>
             <ion-col size="12">
                 <div *ngFor="let item of addressList">
-                    <ion-card>
+                    <ion-card style="background-color:#fff">
                         <ion-card-header>
                             <span style="color:black">
                                 <input style=" width: 1.1em; height: 1.1em;" type="radio" name="status" [checked]="item.status == 1" (click)="addressSelected(item)">

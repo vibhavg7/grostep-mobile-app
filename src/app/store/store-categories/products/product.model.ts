@@ -22,4 +22,6 @@ export class Product {
     quantity_added: any;
     // tslint:disable-next-line:variable-name
     weight_text: any;
+    // tslint:disable-next-line:variable-name
+    store_name: any;
 }

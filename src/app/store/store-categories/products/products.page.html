@@ -34,8 +34,8 @@
             <ion-list>
               <ion-item *ngFor="let product of storeProducts1">
                 <ion-thumbnail slot="start">
-                  <ion-img *ngIf="product?.image_url" [src]="product.product_image_url"></ion-img>
-                  <ion-img *ngIf="!product?.image_url" src="../../../../assets/images/default_image.jpg"></ion-img>
+                  <ion-img *ngIf="product?.image_url" [src]="product?.image_url"></ion-img>
+                  <ion-img *ngIf="!product?.image_url" src="assets/images/default_image.jpg"></ion-img>
                 </ion-thumbnail>
                 <ion-label>
                   <h2>{{product?.product_name}}</h2>
@@ -79,7 +79,8 @@
   <ion-row>
     <ion-col size="6">
       <ion-button expand="full" (click)="viewCart()" fill="clear" style="color:#fff !important">
-        {{cartList?.length}} Items
+          {{cartList[0]?.store_name}} - 
+          {{cartList?.length}} Items
       </ion-button>
     </ion-col>
 

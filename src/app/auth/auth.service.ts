@@ -56,6 +56,7 @@ export class AuthService {
         tap(data => {
         })
         , map((data) => {
+          console.log(data);
           return this.authenticate(data);
           // return data;
         })
@@ -78,12 +79,14 @@ export class AuthService {
   }
 
   getDelievryAddressById(addressId) {
+    console.log(addressId);
     return this.httpClient.get<any>(`${this.customerServiceUrl}customeraddress/${addressId}`)
       .pipe(
         tap(data => {
           // console.log(data);
         })
         , map((data) => {
+          console.log(data);
           return data.addressInfo[0];
         })
         , catchError(this.handleError)
@@ -92,7 +95,7 @@ export class AuthService {
 
   getCustomerAddressesById() {
     const customerId = +localStorage.getItem(this.CUSTOMER_ID);
-    return this.httpClient.get<any>(`${this.customerServiceUrl}customeraddress/${customerId}`)
+    return this.httpClient.get<any>(`${this.customerServiceUrl}customeraddressoncart/${customerId}`)
       .pipe(
         tap(data => {
           // console.log(data);
@@ -189,12 +192,12 @@ export class AuthService {
       if (token) {
         localStorage.setItem(this.TOKEN_KEY, token);
         localStorage.setItem(this.CUSTOMER_ID, customer_id);
-        return true;
+        return response;
       } else {
-        return false;
+        return response;
       }
     } else {
-      return false;
+      return response;
     }
   }
 

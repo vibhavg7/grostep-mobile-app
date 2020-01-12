@@ -18,6 +18,10 @@
     visibility: hidden;
   }
 
+  ion-content{
+    --ion-background-color: #F8F8F8;
+}
+
   .imageclass {
     height: 125px !important;
     // width: 125px !important;

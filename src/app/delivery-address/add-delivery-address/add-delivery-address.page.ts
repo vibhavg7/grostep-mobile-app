@@ -42,10 +42,11 @@ export class AddDeliveryAddressPage implements OnInit {
   ionViewWillEnter() {
     this.addressId = this.activatedRoute.snapshot.paramMap.get('addressId');
     this.prevPage = this.activatedRoute.snapshot.paramMap.get('prevPage');
-    console.log(this.addressId);
-    console.log(this.prevPage);
+    // console.log(this.addressId);
+    // console.log(this.prevPage);
     if (this.addressId !== '') {
       this.authService.getDelievryAddressById(this.addressId).subscribe(addressinfo => {
+        console.log(addressinfo);
         this.registerCredentials.customer_name = addressinfo.customer_name;
         this.registerCredentials.address_type = addressinfo.address_type;
         this.registerCredentials.landmark = addressinfo.landmark;

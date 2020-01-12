@@ -65,6 +65,17 @@ ion-col.thumbWrap.col {
     border-radius: 5px 5px;
 }
 
+ion-content{
+    --ion-background-color: #F8F8F8;
+}
+
+ion-item{
+    --ion-background-color:#fff;
+    padding-bottom:10px;
+    border-radius: 5px;
+ }
+
+
 .innerCartWrap {
     width: 200px;
     text-align: center;

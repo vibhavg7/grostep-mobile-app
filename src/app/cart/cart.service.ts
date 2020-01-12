@@ -13,6 +13,8 @@ export class CartItem {
   weight_text: string;
   // tslint:disable-next-line:variable-name
   product_img: string;
+  // tslint:disable-next-line:variable-name
+  store_name: string;
   quantity: number;
   constructor(item: Product, quantity: number) {
       this.id = item.store_product_mapping_id;
@@ -20,6 +22,7 @@ export class CartItem {
       this.price = item.store_selling_price;
       this.product_img = item.image_url;
       this.weight = item.weight;
+      this.store_name = item.store_name;
       this.weight_text = item.weight_text;
       this.quantity = quantity;
       this.store_id = item.store_id;
@@ -93,6 +96,7 @@ export class CartService {
   }
 
   addItem(item: Product, quantity: number) {
+    console.log(item);
     let isExists = false;
     const id = item.store_product_mapping_id;
     // tslint:disable-next-line:prefer-for-of

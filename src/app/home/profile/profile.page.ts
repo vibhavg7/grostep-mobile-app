@@ -4,6 +4,7 @@ import { NavController } from '@ionic/angular';
 import { OnEnter } from '../on-enter';
 import { Subscription } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
+import { CartService } from '../../cart/cart.service';
 
 @Component({
   selector: 'app-profile',
@@ -16,10 +17,11 @@ export class ProfilePage implements OnInit, OnEnter, OnDestroy {
   subscription: Subscription;
   private NAME_KEY = 'name';
   private TOKEN_KEY = 'token';
-  private user: any;
+  public user: any;
   constructor(
     private router: Router,
     private navCtrl: NavController,
+    private cartService: CartService,
     private auth: AuthService) { }
 
   public async ngOnInit(): Promise<void> {
@@ -69,6 +71,8 @@ export class ProfilePage implements OnInit, OnEnter, OnDestroy {
 
   logout() {
     this.auth.logout();
+    this.cartService.removeAllCartItems();
+    this.cartService.removeVoucher();
     this.navCtrl.navigateRoot(['/home/tabs/categories']);
   }
 

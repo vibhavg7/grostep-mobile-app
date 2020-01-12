@@ -12,6 +12,7 @@ export class OrderPage implements OnInit {
 
   customerordercount: number;
   ordersList: any;
+  isLoading: boolean;
   constructor(
     private orderService: OrderService,
     private navCtrl: NavController,
@@ -21,10 +22,18 @@ export class OrderPage implements OnInit {
   }
 
   ionViewWillEnter() {
+    this.isLoading = true;
     this.orderService.fetchAllCustomerOrders().subscribe((data: any) => {
+      this.isLoading = false;
       this.customerordercount = data.customer_order_count[0].customer_orders_count;
       this.ordersList = data.customer_orders_info;
+      console.log(this.ordersList);
     });
+  }
+
+  orderdetails(id) {
+    console.log(id);
+    this.router.navigate([`/order/order-detail/${id}`]);
   }
 
   startShopping() {

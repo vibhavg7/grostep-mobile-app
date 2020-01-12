@@ -20,6 +20,7 @@ export class ValidateOtpPage implements OnInit {
               private navCtrl: NavController) { }
 
   ngOnInit() {
+    this.otp = '';
     this.activatedRoute.paramMap.subscribe((data: any) => {
       if (!data.has('customerId')) {
         this.navCtrl.navigateBack('/auth/login');
@@ -30,6 +31,7 @@ export class ValidateOtpPage implements OnInit {
   }
 
   ionViewWillEnter() {
+    this.otp = '';
     this.storeId = +this.activatedRoute.snapshot.paramMap.get('storeId');
   }
 
@@ -41,24 +43,25 @@ export class ValidateOtpPage implements OnInit {
     this.otp = '';
     for (const prop in this.obj) {
       if (Object.prototype.hasOwnProperty.call(this.obj, prop)) {
-          this.otp += this.obj[prop];
+        this.otp += this.obj[prop];
       }
     }
+    console.log(this.otp);
     this.authService.loginCustomer(this.authService.customerInfo.phone, this.otp)
-    .subscribe((data: any) => {
+      .subscribe((data: any) => {
         this.otp = '';
-        if (data) {
-          this.router.navigate(['/auth/add-user-info', { storeId: this.storeId}]);
-          // if (this.authService.redirectUrl === 'productpage') {
-          //   this.router.navigate(['/home/tabs/categories/1/stores/1/storecategories/1/storeproducts']);
-          // } else if (this.authService.redirectUrl === 'cartpage') {
-          //   this.router.navigate(['/cart']);
-          // } else {
-          //   this.router.navigate(['/auth/add-user-info']);
-          //   // this.router.navigate(['/home/tabs/profile']);
-          // }
+        if (data.status === 200) {
+          if (data.customerData.personal_info_added === 1) {
+            if (this.authService.redirectUrl === 'cartpage') {
+              this.navCtrl.navigateBack([`/cart/${this.storeId}`]);
+            } else {
+              this.navCtrl.navigateRoot(['/home/tabs/profile']);
+            }
+          } else {
+            this.router.navigate(['/auth/add-user-info', { storeId: this.storeId}]);
+          }
         }
-    });
+      });
   }
 
 }

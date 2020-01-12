@@ -42,6 +42,9 @@ export class CategoriesPage implements OnInit, OnEnter, OnDestroy {
     });
   }
 
+  selectItem(item) {
+  }
+
   public ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }

@@ -11,6 +11,7 @@ export class OrderService {
   constructor(private httpClient: HttpClient) { }
   private orderServiceUrl = 'http://ec2-18-188-251-155.us-east-2.compute.amazonaws.com:3000/ordersapi/';
   private CUSTOMER_ID = 'customerid';
+  public ordersInfo: any = [];
 
   placeOrder(obj) {
     console.log(obj);
@@ -32,10 +33,10 @@ export class OrderService {
     obj.page_number = 1;
     obj.page_size = 1000;
     obj.filterBy = '';
-    console.log(obj);
     return this.httpClient.post<any[]>(`${this.orderServiceUrl}customerorders`, obj)
     .pipe(
       tap((data: any) => {
+        this.ordersInfo = data.customer_orders_info;
       })
       , map((data) => {
         return data;

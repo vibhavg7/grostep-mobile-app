@@ -10,7 +10,7 @@ export class DeliveryAddressService {
 
   private deliveryInstructions: string;
   constructor(private httpClient: HttpClient) { }
-  // private deliveryServiceUrl = 'http://localhost:3000/deliveryapi/';
+  // private deliveryServiceUrl = 'http://ec2-18-188-251-155.us-east-2.compute.amazonaws.com:3000/deliveryapi/';
 
   addDeliveryInstructions(value) {
     this.deliveryInstructions = value;

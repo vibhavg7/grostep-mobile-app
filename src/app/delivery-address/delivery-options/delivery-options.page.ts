@@ -16,6 +16,7 @@ export class DeliveryOptionsPage implements OnInit {
   storeId: number;
   deliverySlots: any = [];
   selectedSlot: any;
+  isLoading = false;
   slotsCount: number;
   constructor(
     private router: Router,
@@ -38,8 +39,10 @@ export class DeliveryOptionsPage implements OnInit {
 
   ionViewWillEnter() {
     this.cartService.setDeliveryCharge(30);
+    this.isLoading = true;
     this.storeService.fetchStoreDeliverySlots(this.storeId).subscribe((data: any) => {
       if (data.status === 200) {
+        this.isLoading = false;
         this.slotsCount = data.slots.length;
         if (this.slotsCount > 0) {
           data.slots.forEach(slot => {

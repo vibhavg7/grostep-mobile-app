@@ -23,8 +23,8 @@
     <ion-row style="background-color: #fff;" justify-content-center align-items-center>
       <ion-col size="6">
         <ion-item>
-          <input style=" width: 1.1em;font-size: 1.2em;height: 1.1em;" (click)="deliverNow(30)" type="radio" value="1"
-            id="deliver_now" name="delivery_type" checked>
+          <input style=" width: 1.1em;font-size: 1.2em;height: 1.1em;" (click)="deliverNow(30)" type="radio" value="1" id="deliver_now"
+            name="delivery_type" checked>
           <label for="deliver_now" style="padding-left:10px">Deliver Now</label>
         </ion-item>
       </ion-col>
@@ -32,16 +32,22 @@
         <ion-label>Delivery Charge : Rs 30</ion-label>
       </ion-col>
     </ion-row>
-    <ion-row *ngIf="slotsCount > 0" style="background-color: #fff;" justify-content-center align-items-center>
-      <ion-col size="6">
+    <ion-row style="background-color: #fff;" justify-content-center align-items-center>
+      <ion-col size="12" size-md="8" offset-md="2" text-center *ngIf="isLoading">
+        <ion-spinner color="primary"></ion-spinner>
+      </ion-col>
+      <ion-col *ngIf="slotsCount > 0" size="6">
         <ion-item lines="none">
           <input (click)="deliveryLater(20)" style=" width: 1.1em;font-size: 1.2em;height: 1.1em;" type="radio" value="1" id="deliver_later"
             name="delivery_type">
           <label for="deliver_later" style="padding-left:10px">Deliver Later</label>
         </ion-item>
       </ion-col>
-      <ion-col size="6">
+      <ion-col size="6" *ngIf="slotsCount > 0">
         <ion-label>Delivery Charge : Rs 20</ion-label>
+      </ion-col>
+      <ion-col size="12" size-md="8" offset-md="2" *ngIf="!slotsCount && !isLoading" text-center>
+        <ion-text>No available delivery slots</ion-text>
       </ion-col>
     </ion-row>
   </ion-grid>

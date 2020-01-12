@@ -15,6 +15,7 @@ export class OfferPage implements OnInit {
   cartAmount: number;
   prevPage: string;
   offers: any = [];
+  isLoading = false;
   constructor(
       private activatedRoute: ActivatedRoute,
       private navCtrl: NavController,
@@ -28,9 +29,11 @@ export class OfferPage implements OnInit {
     this.prevPage = this.activatedRoute.snapshot.paramMap.get('prevPage');
     this.storeId = this.activatedRoute.snapshot.paramMap.get('storeId');
     this.cartAmount = this.cartService.getGrandTotal();
+    this.isLoading = true;
     this.offerService.fetchAllOffers().subscribe((data) => {
       if (data.status === 200) {
         this.offers = data.vouchers;
+        this.isLoading = false;
         this.offers.forEach((offerData: any) => {
           if (this.cartAmount >= offerData.voucher_cart_amount &&
               (this.prevPage === 'cartpage' || this.prevPage === 'paymentoptionspage') ) {

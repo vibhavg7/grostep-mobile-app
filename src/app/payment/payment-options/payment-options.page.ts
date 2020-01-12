@@ -38,6 +38,7 @@ export class PaymentOptionsPage implements OnInit {
     // 'PayZapp',
     // 'Pay using MobiKwiK Wallet'
   ];
+  couponCode: any;
   constructor(
     private cartService: CartService,
     private alertCtrl: AlertController,
@@ -119,7 +120,7 @@ export class PaymentOptionsPage implements OnInit {
     obj.discountamount = this.cartService.getvoucherAmount();
     obj.deliveryfee = this.cartService.getDeliveryCharge();
     obj.payableamount = this.cartService.getGrandTotal() + this.getDeliveryCharge() - this.getVoucherAmount();
-    obj.paymentmode = this.checkedIdx;
+    obj.paymentmode = this.checkedIdx + 1;
     obj.delivernow = this.storeService.delivernow;
     obj.deliverydate = this.selectedeliverydate;
     obj.deliveryslot = this.selectedeliverytime;
@@ -190,6 +191,9 @@ export class PaymentOptionsPage implements OnInit {
 
   availableCouponCode() {
     this.router.navigate(['/offer', { prevPage: 'paymentoptionspage' }]);
+  }
+
+  applyCouponCode() {
   }
 
   removeVoucher(voucherid) {

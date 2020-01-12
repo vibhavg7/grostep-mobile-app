@@ -18,6 +18,7 @@ export class HomePage {
 
   ionViewWillEnter() {
     this.cartCount =  this.cartService.getCartCount();
+    console.log(this.cartCount);
    }
 
 }

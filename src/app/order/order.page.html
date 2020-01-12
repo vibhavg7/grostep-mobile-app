@@ -8,22 +8,36 @@
 </ion-header>
 
 <ion-content>
-    <div *ngIf="!customerordercount" class="outer_empty_cart_wrap">
+    <div *ngIf="!customerordercount && !isLoading" class="outer_empty_cart_wrap">
         <div class="innerCartWrap">
             <ion-icon name="ios-clock-outline" style="zoom:3.0;"></ion-icon>
             <span style="color:#b61671;display:block;">You haven't placed any orders yet.</span>
         </div>
     </div>
-    <div *ngIf="!customerordercount" class="outer_continue_shopping_button">
+    <div *ngIf="!customerordercount && !isLoading" class="outer_continue_shopping_button">
         <ion-button fill="clear" (click)="startShopping()" class="inner_continue_shopping_button">START SHOPPING</ion-button>
     </div>
 
-    <div *ngFor="let item of ordersList" style="padding-bottom :10px;">
-        <div (click)="orderdetails(item)" style="border:1px solid grey;padding-bottom :10px; background:white">
-            <ion-grid>
+    <ion-grid>
+        <ion-row>
+            <ion-col size-md="8" offset-md="2" text-center *ngIf="isLoading">
+                <ion-spinner color="primary"></ion-spinner>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col size="12" *ngIf="!isLoading">
+                <ion-text>
+                        Total order count : {{ordersList?.length}}
+                </ion-text>
+            </ion-col>
+        </ion-row>
+        <div *ngIf="ordersList?.length > 0">
+            <div *ngFor="let item of ordersList" (click)="orderdetails(item.order_id)" style="border:1px solid grey;margin-bottom :10px; background:white">
                 <ion-row>
                     <ion-col size="4" class="item-text-wrap" text-wrap>
-                        <strong> {{item?.order_placing_date| date : "EEE, dd-MM-y"}}</strong>
+                        <strong>
+                            {{item?.store_name}}
+                        </strong>
                     </ion-col>
                     <ion-col size="4">
                         <span>
@@ -34,52 +48,39 @@
                         <span style="color:#b61671">View Details</span>
                     </ion-col>
                 </ion-row>
-                <!-- <ion-row>
+                <ion-row>
                     <ion-col size="4">
-                        <span style="color:#b61671">{{item?.delivery_date| date : "dd-MM-y"}}</span>
+                        <span style="color:#b61671">
+                            {{item?.order_placing_date| date : "EEE, dd-MM-y"}}
+                        </span>
                     </ion-col>
                     <ion-col size="4">
-                        <span *ngIf="item?.paid == 0">UnPaid</span>
-                        <span *ngIf="item?.paid == 1">Paid</span>
+                        <!-- this needs to be worked later -->
+                        <span>Paid</span>
                     </ion-col>
                     <ion-col size="4">
-                        <span style="color:#99c655" *ngIf="item?.payment_mode == '0'"> Cash on Delivery</span>
-                        <span style="color:#99c655" *ngIf="item?.payment_mode == '1'"> Card On Delivery</span>
-                        <span style="color:#99c655" *ngIf="item?.payment_mode == '2'"> Paytm on Delivery</span>
-                        <span style="color:#99c655" *ngIf="item?.payment_mode == '3'"> Sodexo</span>
-                        <span style="color:#99c655" *ngIf="item?.payment_mode == '4'"> Online Payment</span>
+                        <span style="color:#99c655" *ngIf="item?.payment_mode">{{item?.payment_mode_type}}</span>
                     </ion-col>
-                </ion-row> -->
-                <!-- <ion-row style="font-size:0.7em;color:#606060">
-                    <ion-col col-4>
+                </ion-row>
+                <ion-row style="font-size:0.7em;color:#606060">
+                    <ion-col size="4">
                         Delivery Date
                     </ion-col>
-                    <ion-col col-4>
+                    <ion-col size="4">
                         Payment Status
                     </ion-col>
-                    <ion-col col-4>
+                    <ion-col size="4">
                         Payment Mode
                     </ion-col>
                 </ion-row>
                 <ion-row style="font-size:0.8em;text-align: center;display: flex;
-                      justify-content: center;">
-                    <span *ngIf="item?.status == 0">
-                        Order has been cancelled by Grostep
+                              justify-content: center;">
+                    <span>
+                        Order has been {{item?.order_status}} by Grostep
                     </span>
-                    <span *ngIf="item?.status == 1">
-                        Order has been confirmed by Grostep
-                    </span>
-                    <span *ngIf="item?.status == 2">
-                        Order has been ready for Shipping
-                    </span>
-                    <span *ngIf="item?.status == 3">
-                        Order has been shipped by Grostep
-                    </span>
-                    <span *ngIf="item?.status == 4">
-                        Order has been delivered successfully by Grostep
-                    </span>
-                </ion-row> -->
-            </ion-grid>
+                </ion-row>
+            </div>
         </div>
-    </div>
+    </ion-grid>
+
 </ion-content>

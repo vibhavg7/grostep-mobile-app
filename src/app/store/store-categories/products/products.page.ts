@@ -14,6 +14,7 @@ import { CartService, CartItem } from '../../../cart/cart.service';
 })
 export class ProductsPage implements OnInit {
 
+  loadedStore: any;
   pet: string;
   getGrandTotal: number;
   cartList: Array<CartItem>;
@@ -58,6 +59,7 @@ export class ProductsPage implements OnInit {
   ionViewWillEnter() {
     this.getStoreProducts();
     this.cartList = this.cartService.getAllCartItems();
+    // console.log(this.cartList);
     this.getGrandTotal = this.cartService.getGrandTotal();
   }
 
@@ -80,6 +82,7 @@ export class ProductsPage implements OnInit {
     this.isLoading = true;
     this.storeService.fetchStoreProducts(this.storecategoryId, this.storeId)
       .subscribe((data: any) => {
+        console.log(data);
         this.isLoading = false;
         this.storeProducts = data.store_products_info;
         this.storeProducts1 = JSON.parse(JSON.stringify(data.store_products_info));
@@ -101,15 +104,16 @@ export class ProductsPage implements OnInit {
               cssClass: 'cancelcss',
               handler: () => {
                 console.log('Cancel clicked');
-                this.cartService.addItem(product, 1);
-                this.getGrandTotal = this.cartService.getGrandTotal();
-                const itemIndex = this.storeProducts1.findIndex(item => item.store_product_mapping_id === product.store_product_mapping_id);
-                this.storeProducts1[itemIndex].added = true;
-                if (this.storeProducts1[itemIndex].quantity_added == null ||
-                  this.storeProducts1[itemIndex].quantity_added === undefined ||
-                  this.storeProducts1[itemIndex].quantity_added === 0) {
-                  this.storeProducts1[itemIndex].quantity_added = 1;
-                }
+                // this.cartService.addItem(product, 1);
+                // this.getGrandTotal = this.cartService.getGrandTotal();
+                // const itemIndex = this.storeProducts1
+                // .findIndex(item => item.store_product_mapping_id === product.store_product_mapping_id);
+                // this.storeProducts1[itemIndex].added = true;
+                // if (this.storeProducts1[itemIndex].quantity_added == null ||
+                //   this.storeProducts1[itemIndex].quantity_added === undefined ||
+                //   this.storeProducts1[itemIndex].quantity_added === 0) {
+                //   this.storeProducts1[itemIndex].quantity_added = 1;
+                // }
               }
             },
             {
@@ -118,6 +122,7 @@ export class ProductsPage implements OnInit {
               handler: () => {
                 this.cartList = this.cartService.removeAllCartItems();
                 this.cartService.addItem(product, 1);
+                this.cartService.removeVoucher();
                 this.getGrandTotal = this.cartService.getGrandTotal();
                 const itemIndex = this.storeProducts1.findIndex(item => item.store_product_mapping_id === product.store_product_mapping_id);
                 this.storeProducts1[itemIndex].added = true;
