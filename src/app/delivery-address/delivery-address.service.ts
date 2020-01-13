@@ -8,9 +8,8 @@ import { throwError } from 'rxjs';
 })
 export class DeliveryAddressService {
 
-  private deliveryInstructions: string;
+  private deliveryInstructions = '';
   constructor(private httpClient: HttpClient) { }
-  // private deliveryServiceUrl = 'http://ec2-18-188-251-155.us-east-2.compute.amazonaws.com:3000/deliveryapi/';
 
   addDeliveryInstructions(value) {
     this.deliveryInstructions = value;

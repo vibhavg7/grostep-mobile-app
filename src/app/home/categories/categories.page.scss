@@ -5,29 +5,12 @@
   .flex-warp-list {
     flex-wrap: nowrap;
   }
-  .background-color-grid {
-    background-color: white !important;
-  }
+
   img {
     width: 100vw !important;
-  }
-  .size-img {
-    width: 50px !important;
-  }
-  .custom-swiper-pagination {
-    visibility: hidden;
   }
 
   ion-content{
     --ion-background-color: #F8F8F8;
 }
 
-  .imageclass {
-    height: 125px !important;
-    // width: 125px !important;
-    // background-color: whitesmoke;
-  }
-
-  // <ion-img class="imageclass" *ngIf="item?.image_url" [src]="item?.image_url"></ion-img>
-  // <ion-img class="imageclass" *ngIf="!item?.image_url" src="../../../../assets/images/default_image.jpg"></ion-img>
-  // <ion-text style="display: block;">{{item?.store_category_name}}</ion-text>

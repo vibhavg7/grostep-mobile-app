@@ -32,8 +32,7 @@
         <ion-col size="12">
           <ion-item>
             <ion-label position="floating">Name</ion-label>
-            <ion-input #myinput type="text" name="customer_name" [formControl]="addAddressForm.controls['customer_name']" 
-                [(ngModel)]="registerCredentials.customer_name"></ion-input>
+            <ion-input #myinput type="text" name="customer_name" [formControl]="addAddressForm.controls['customer_name']" [(ngModel)]="registerCredentials.customer_name"></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -88,7 +87,12 @@
       <ion-row>
         <ion-col size="12">
           <ion-button type="submit" color="primary" expand="block">
-            ADD ADDRESS
+            <span *ngIf="addressId == ''">
+              ADD ADDRESS
+            </span>
+            <span *ngIf="addressId != ''">
+              EDIT ADDRESS
+            </span>
           </ion-button>
         </ion-col>
       </ion-row>

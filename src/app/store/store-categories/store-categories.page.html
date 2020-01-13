@@ -29,7 +29,7 @@
       <ion-col size-md="8" offset-md="2" text-center *ngIf="isLoading">
         <ion-spinner color="primary"></ion-spinner>
       </ion-col>
-      <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center">
+      <ion-col *ngIf="!isLoading" size="12" size-sm="8" offset-sm="2" class="ion-text-center">
         <ion-card style="background-color: white;">
           <ion-card-header>
             <ion-card-title>Categories</ion-card-title>
@@ -39,12 +39,17 @@
           <ion-card-content>
             <div>
               <ion-grid>
-                <ion-row>
+                <ion-row *ngIf="storeCategories?.length > 0 && !isLoading">
                   <ion-col style="background-color: #fafafa;border:1px solid lightgrey"
                     class="ion-text-center" size="4" (click)="clickStoreCategory(item.store_category_mapping_id)" *ngFor="let item of storeCategories">
                     <ion-img style="height: 104px !important;" *ngIf="item?.image_url" [src]="item?.image_url"></ion-img>
                     <ion-img style="height: 104px !important;" *ngIf="!item?.image_url" src="assets/images/default_image.jpg"></ion-img>
                     <ion-text style="height:30px">{{item?.name}}</ion-text>
+                  </ion-col>
+                </ion-row>
+                <ion-row  *ngIf="storeCategories?.length == 0 && !isLoading" class="ion-text-center">
+                  <ion-col style="background-color: #fafafa;border:1px solid lightgrey"> 
+                    <p>No Store Categories Found</p>
                   </ion-col>
                 </ion-row>
               </ion-grid>

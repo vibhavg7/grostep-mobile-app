@@ -5,6 +5,7 @@ import { AuthService } from '../../auth/auth.service';
 import { StoreService } from '../../store/store.service';
 import { AlertController } from '@ionic/angular';
 import { OrderService } from '../../order/order.service';
+import { DeliveryAddressService } from '../../delivery-address/delivery-address.service';
 
 @Component({
   selector: 'app-payment-options',
@@ -41,6 +42,7 @@ export class PaymentOptionsPage implements OnInit {
   couponCode: any;
   constructor(
     private cartService: CartService,
+    private deliveryService: DeliveryAddressService,
     private alertCtrl: AlertController,
     private orderService: OrderService,
     private storeService: StoreService,
@@ -126,6 +128,7 @@ export class PaymentOptionsPage implements OnInit {
     obj.deliveryslot = this.selectedeliverytime;
     obj.deliveryaddressid = this.addressinfo.delivery_address_id;
     obj.totalitemcount = this.cartList.length;
+    obj.instructions = this.deliveryService.getDeliveryInstructions();
     obj.products = this.cartList;
     this.orderService.placeOrder(obj).subscribe((data: any) => {
       if (data.status === 200) {

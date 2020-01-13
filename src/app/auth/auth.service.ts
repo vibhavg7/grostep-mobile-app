@@ -16,7 +16,7 @@ export class AuthService {
   private CUSTOMER_ID = 'customerid';
   private customerdeliveryInfo: any = [];
   customerProfile: any;
-  private customerServiceUrl = 'http://ec2-18-188-251-155.us-east-2.compute.amazonaws.com:3000/customerapi/';
+  private customerServiceUrl = 'http://ec2-18-224-29-78.us-east-2.compute.amazonaws.com:3000/customerapi/';
   constructor(private httpClient: HttpClient, private cartService: CartService) { }
 
   get isLoggedIn() {
@@ -149,6 +149,7 @@ export class AuthService {
   selectDeliveryAddress(addressId) {
     const obj: any = {};
     obj.status = 1;
+    obj.customerId = localStorage.getItem(this.CUSTOMER_ID);
     return this.httpClient.put<any[]>(`${this.customerServiceUrl}customeraddress/selectaddress/${addressId}`, obj)
       .pipe(
         tap(data => {

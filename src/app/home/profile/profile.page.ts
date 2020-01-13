@@ -62,7 +62,7 @@ export class ProfilePage implements OnInit, OnEnter, OnDestroy {
   }
 
   getAddress() {
-    this.router.navigate(['/', 'delivery-address']);
+    this.router.navigate(['/', 'delivery-address', { prevPage: 'profilepage'}]);
   }
 
   myFavouriteStores() {

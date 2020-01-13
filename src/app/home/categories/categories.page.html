@@ -8,28 +8,37 @@
 </ion-header>
 
 <ion-content>
-  <ion-grid>
-    <ion-row>
-      <ion-col size-md="8" offset-md="2" text-center *ngIf="isLoading">
-        <ion-spinner color="primary"></ion-spinner>
-      </ion-col>
-      <ion-col *ngIf="!isLoading" size="12" size-xl="8" offset-xl="2">
-        <ion-slides *ngIf="bannerImages.length > 0" #mySlider (ionSlidesDidLoad)="slidesDidLoad(mySlider)" pager>
-          <ion-slide size="12" *ngFor="let item of bannerImages" (click)="selectItem(item)">
-            <img *ngIf="item?.image_url" [src]="item.image_url" />
-            <ion-img *ngIf="!item?.image_url" src="assets/images/default_image.jpg"></ion-img>
-          </ion-slide>
-        </ion-slides>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col class="ion-text-center" size="4" offset-xl="2" style="background-color: #fafafa;border:1px solid lightgrey" 
-        *ngFor="let item of categoryImages"
-        [routerLink]="['/','categories',item?.store_category_id,'stores']">
-        <ion-img  style="height: 104px !important;" *ngIf="item?.image_url" [src]="item?.image_url"></ion-img>
-        <ion-img  style="height: 104px !important;" *ngIf="!item?.image_url"src="assets/images/default_image.jpg"></ion-img>
-        <ion-text style="display: block;">{{item?.store_category_name}}</ion-text>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <div>
+    <ion-grid>
+      <ion-row>
+        <ion-col size-md="8" offset-md="2" text-center *ngIf="isLoading">
+          <ion-spinner color="primary"></ion-spinner>
+        </ion-col>
+        <ion-col *ngIf="!isLoading" size="12" size-xl="8" offset-xl="2">
+          <ion-slides *ngIf="bannerImages.length > 0" #mySlider (ionSlidesDidLoad)="slidesDidLoad(mySlider)" pager>
+            <ion-slide size="12" *ngFor="let item of bannerImages" (click)="selectItem(item)">
+              <img *ngIf="item?.image_url" [src]="item.image_url" />
+              <ion-img *ngIf="!item?.image_url" src="assets/images/default_image.jpg"></ion-img>
+            </ion-slide>
+          </ion-slides>
+        </ion-col>
+      </ion-row>
+      <hr *ngIf="!isLoading" style="border-width: 1px;">
+      <ion-row *ngIf="!isLoading" style="background-color:#e8fbe8;border:1px solid lightgrey;height:70px">
+        <ion-col no-padding size="12" size-xl="8" offset-xl="2">
+          <p style="font-weight: bold;font:19px Times, sans-serif;margin: 7px 6px;font-style: italic;line-height: 26px;">
+            Hey Folks! Feeling exited.. What would you like to order today?
+          </p>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col class="ion-text-center" size="4" offset-xl="2" style="background-color: #fafafa;border:1px solid lightgrey" *ngFor="let item of categoryImages"
+          [routerLink]="['/','categories',item?.store_category_id,'stores']">
+          <ion-img style="height: 104px !important;" *ngIf="item?.image_url" [src]="item?.image_url"></ion-img>
+          <ion-img style="height: 104px !important;" *ngIf="!item?.image_url" src="assets/images/default_image.jpg"></ion-img>
+          <ion-text style="display: block;">{{item?.store_category_name}}</ion-text>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
 </ion-content>

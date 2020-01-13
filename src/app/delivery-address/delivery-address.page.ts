@@ -14,6 +14,7 @@ export class DeliveryAddressPage implements OnInit {
   storeId: string;
   prevPage: any = '';
   addressList: any = [];
+  isLoading = false;
   constructor(
     private alertCtrl: AlertController,
     private navCtrl: NavController,
@@ -25,19 +26,20 @@ export class DeliveryAddressPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.addressList = this.auth.CustomerdeliveryInfo;
-    if (this.addressList.length < 1) {
-      this.auth.getUserProfile().subscribe((data) => {
-        this.addressList = data.customer_delivery_addresses;
-      }, (error) => {
-        this.errorMessage = error;
-      });
-    }
+    this.isLoading = true;
+    this.auth.getCustomerAddressesById().subscribe((data) => {
+      this.isLoading = false;
+      this.addressList = data;
+      console.log(this.addressList);
+    }, (error) => {
+      this.errorMessage = error;
+    });
     this.prevPage = this.activatedRoute.snapshot.paramMap.get('prevPage');
     this.storeId = this.activatedRoute.snapshot.paramMap.get('storeId');
   }
 
   addressSelected(address: any) {
+    console.log(address);
     this.auth.selectDeliveryAddress(address.delivery_address_id)
       .subscribe((data: any) => {
         if (data.status === 200) {
@@ -85,11 +87,12 @@ export class DeliveryAddressPage implements OnInit {
   }
 
   addNewAddress() {
-    this.router.navigate(['/delivery-address/add-delivery-address', { addressId: ''}]);
+    this.router.navigate(['/delivery-address/add-delivery-address', { addressId: '', prevPage: 'cartpage', storeId: this.storeId }]);
   }
 
   editDeliveryAddress(address) {
-    this.router.navigate(['/delivery-address/add-delivery-address', { addressId: address.delivery_address_id }]);
+    this.router.navigate(['/delivery-address/add-delivery-address', { addressId: address.delivery_address_id,
+                          prevPage: this.prevPage, storeId: this.storeId }]);
   }
 
 }

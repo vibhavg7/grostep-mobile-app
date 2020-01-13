@@ -21,7 +21,8 @@
   <div style="height:78% !important">
     <div *ngIf="!storeProducts1?.length && !isLoading" class="outer_empty_cart_wrap">
       <div class="innerCartWrap">
-        <span style="color:#b61671">No Product Found!</span>
+        <!-- <ion-icon name="albums"></ion-icon> -->
+        <span style="color:#b61671">No Products Found!</span>
       </div>
     </div>
     <ion-grid>
@@ -79,8 +80,7 @@
   <ion-row>
     <ion-col size="6">
       <ion-button expand="full" (click)="viewCart()" fill="clear" style="color:#fff !important">
-          {{cartList[0]?.store_name}} - 
-          {{cartList?.length}} Items
+        {{cartList[0]?.store_name}} - {{cartList?.length}} Items
       </ion-button>
     </ion-col>
 

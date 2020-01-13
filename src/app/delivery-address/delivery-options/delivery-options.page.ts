@@ -4,6 +4,7 @@ import { AuthService } from '../../auth/auth.service';
 import { StoreService } from '../../store/store.service';
 import { NavController } from '@ionic/angular';
 import { CartService } from '../../cart/cart.service';
+import { DeliveryAddressService } from '../delivery-address.service';
 
 @Component({
   selector: 'app-delivery-options',
@@ -12,6 +13,7 @@ import { CartService } from '../../cart/cart.service';
 })
 export class DeliveryOptionsPage implements OnInit {
 
+  deliveryIntructions = '';
   enableDeliveryLaterDiv = false;
   storeId: number;
   deliverySlots: any = [];
@@ -21,6 +23,7 @@ export class DeliveryOptionsPage implements OnInit {
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    private deliveryService: DeliveryAddressService,
     private cartService: CartService,
     private navCtrl: NavController,
     private auth: AuthService,
@@ -39,6 +42,8 @@ export class DeliveryOptionsPage implements OnInit {
 
   ionViewWillEnter() {
     this.cartService.setDeliveryCharge(30);
+    this.deliveryIntructions =  this.deliveryService.getDeliveryInstructions();
+    console.log(this.deliveryIntructions);
     this.isLoading = true;
     this.storeService.fetchStoreDeliverySlots(this.storeId).subscribe((data: any) => {
       if (data.status === 200) {
@@ -54,8 +59,13 @@ export class DeliveryOptionsPage implements OnInit {
       }
     });
   }
-  deliveryInstructions() {
+  adddeliveryInstructions() {
     this.router.navigate(['/delivery-address/delivery-instructions', { storeId: this.storeId }]);
+  }
+
+  removeInstructions() {
+    this.deliveryIntructions = '';
+    this.deliveryService.addDeliveryInstructions('');
   }
 
   deliveryLater(charge) {
@@ -71,7 +81,6 @@ export class DeliveryOptionsPage implements OnInit {
   }
 
   proceedToPay() {
-    console.log(this.storeService.delivernow);
     this.storeService.selectedDeliverySlotId = this.selectedSlot;
     this.router.navigate(['/payment/payment-options']);
   }

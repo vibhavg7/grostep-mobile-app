@@ -9,7 +9,7 @@ import { throwError } from 'rxjs';
 export class OrderService {
 
   constructor(private httpClient: HttpClient) { }
-  private orderServiceUrl = 'http://ec2-18-188-251-155.us-east-2.compute.amazonaws.com:3000/ordersapi/';
+  private orderServiceUrl = 'http://ec2-18-224-29-78.us-east-2.compute.amazonaws.com:3000/ordersapi/';
   private CUSTOMER_ID = 'customerid';
   public ordersInfo: any = [];
 

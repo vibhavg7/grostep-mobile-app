@@ -39,17 +39,18 @@ export class CartPage implements OnInit {
     this.categoryId = this.activatedRoute.snapshot.paramMap.get('categoryId');
     this.currentuser = this.auth.isauthenticated;
     this.cartList = this.cartService.getAllCartItems();
-    console.log(this.cartList);
+    // console.log(this.storeId);
     this.voucher = this.cartService.getAppliedVoucher();
     this.voucher = this.cartService.getAppliedVoucher();
-    if (this.storeId === 0) {
+    if (this.storeId === 0 && this.cartList.length > 0) {
       this.storeId = this.cartList[0].store_id;
     }
-    console.log(this.storeId);
+    // console.log(this.storeId);
     this.auth.getCustomerAddressesById().subscribe((data: any) => {
       this.selectedAddress = data.filter((address: any) => {
         return address.status === 1;
       })[0];
+      console.log(this.selectedAddress);
       this.addressCount = data.length;
     });
   }

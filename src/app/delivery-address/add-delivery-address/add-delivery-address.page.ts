@@ -11,6 +11,7 @@ import { NavController } from '@ionic/angular';
 })
 export class AddDeliveryAddressPage implements OnInit {
 
+  storeId: string;
   prevPage: string;
   public addAddressForm: FormGroup;
   registerCredentials = {
@@ -42,11 +43,11 @@ export class AddDeliveryAddressPage implements OnInit {
   ionViewWillEnter() {
     this.addressId = this.activatedRoute.snapshot.paramMap.get('addressId');
     this.prevPage = this.activatedRoute.snapshot.paramMap.get('prevPage');
-    // console.log(this.addressId);
-    // console.log(this.prevPage);
+    this.storeId = this.activatedRoute.snapshot.paramMap.get('storeId');
+    console.log(this.prevPage);
+    console.log(this.addressId);
     if (this.addressId !== '') {
       this.authService.getDelievryAddressById(this.addressId).subscribe(addressinfo => {
-        console.log(addressinfo);
         this.registerCredentials.customer_name = addressinfo.customer_name;
         this.registerCredentials.address_type = addressinfo.address_type;
         this.registerCredentials.landmark = addressinfo.landmark;
@@ -67,7 +68,7 @@ export class AddDeliveryAddressPage implements OnInit {
   }
 
   addDelievryAddress() {
-    console.log(this.addAddressForm.valid);
+    // console.log(this.addAddressForm.valid);
     if (!this.addAddressForm.valid) {
       return;
     }
@@ -76,13 +77,15 @@ export class AddDeliveryAddressPage implements OnInit {
         console.log(data);
         if (data.status === 200) {
           if (this.prevPage === 'cartpage') {
-            this.navCtrl.navigateBack('/cart');
+            this.navCtrl.navigateBack(`/cart/${this.storeId}`);
+          //   // this.navCtrl.navigateBack('/cart');
           } else {
             this.navCtrl.navigateRoot('/home/tabs/profile');
           }
         } else {
           if (this.prevPage === 'cartpage') {
-            this.navCtrl.navigateBack('/cart');
+            this.navCtrl.navigateBack(`/cart/${this.storeId}`);
+            //   this.navCtrl.navigateBack('/cart');
           } else {
             this.navCtrl.navigateRoot('/home/tabs/profile');
           }
@@ -93,7 +96,8 @@ export class AddDeliveryAddressPage implements OnInit {
       this.authService.addDelievryAddress(this.registerCredentials).subscribe(data => {
         if (data.status === 200) {
           if (this.prevPage === 'cartpage') {
-            this.navCtrl.navigateBack('/cart');
+            console.log('dssdssd');
+            // this.navCtrl.navigateBack('/cart');
           } else {
             this.navCtrl.navigateRoot('/home/tabs/profile');
           }
