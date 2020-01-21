@@ -70,7 +70,7 @@ export class CartPage implements OnInit {
   }
 
   addAddress() {
-    this.router.navigate(['/', 'delivery-address', 'add-delivery-address', { addressId: '', prevPage: 'cartpage'}]);
+    this.router.navigate(['/', 'delivery-address', 'add-delivery-address', { addressId: '', storeId: this.storeId, prevPage: 'cartpage'}]);
   }
 
   removeVoucher(voucherid) {

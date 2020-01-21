@@ -8,8 +8,8 @@ import { tap, catchError, map } from 'rxjs/operators';
 })
 export class CategoriesService {
 
-  private categoryServiceUrl = 'http://ec2-18-224-29-78.us-east-2.compute.amazonaws.com:3000/categoryapi';
-  private bannerServiceUrl = 'http://ec2-18-224-29-78.us-east-2.compute.amazonaws.com:3000/bannerapi';
+  private categoryServiceUrl = 'http://ec2-13-58-49-153.us-east-2.compute.amazonaws.com:3000/categoryapi';
+  private bannerServiceUrl = 'http://ec2-13-58-49-153.us-east-2.compute.amazonaws.com:3000/bannerapi';
   private storecategories: any = [];
   constructor(private httpClient: HttpClient) { }
 

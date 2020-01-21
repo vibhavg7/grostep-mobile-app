@@ -26,6 +26,7 @@ export class PaymentOptionsPage implements OnInit {
   cartList: CartItem[];
   checkedIdx = 0;
   private CUSTOMER_ID = 'customerid';
+  private CUSTOMER_PHONE = 'customerphone';
   options = [
     'Cash On Delivery',
     'Card On Delivery',
@@ -113,6 +114,7 @@ export class PaymentOptionsPage implements OnInit {
   }
 
   confirmOrder() {
+    // console.log(this.storeService.StoreInfo.token)
     const obj: any = {};
     obj.customerid = +localStorage.getItem(this.CUSTOMER_ID);
     obj.storeid = this.cartList[0].store_id;
@@ -124,7 +126,9 @@ export class PaymentOptionsPage implements OnInit {
     obj.payableamount = this.cartService.getGrandTotal() + this.getDeliveryCharge() - this.getVoucherAmount();
     obj.paymentmode = this.checkedIdx + 1;
     obj.delivernow = this.storeService.delivernow;
+    obj.storeToken = this.storeService.StoreInfo.token;
     obj.deliverydate = this.selectedeliverydate;
+    obj.phone = +localStorage.getItem(this.CUSTOMER_PHONE);
     obj.deliveryslot = this.selectedeliverytime;
     obj.deliveryaddressid = this.addressinfo.delivery_address_id;
     obj.totalitemcount = this.cartList.length;

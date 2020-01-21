@@ -3,29 +3,37 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home/tabs/categories"></ion-back-button>
     </ion-buttons>
-    <!-- <ion-buttons slot="start">
-      <ion-menu-button menu="m1"></ion-menu-button>
-    </ion-buttons> -->
     <ion-title>Login</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div style="height:85%;">
+  <div style="height:90%;">
     <table id="wrapper">
       <tr>
         <td>
-          <img style="height:40%;width:50%" src="assets/images/applogo.png" alt="" />
-          <h3 style="text-align:center;color:#84c225">Deliver grocery at your doorstep </h3>
+          <img style="width:50%;height:38%" src="assets/images/applogo.png" alt="" />
+          <h3 style="text-align:center;color:#000;font-weight:540;font-family: Georgia;">Deliver grocery at your doorstep </h3>
         </td>
       </tr>
     </table>
   </div>
-  <div style="height:15%;width:100%;background-color:whitesmoke">
+</ion-content>
+<ion-footer class="footer_color">
+  <ion-row>
+    <ion-col size="8">
+      <input type="number" placeholder="Enter your phone number" #phoneNumber style="height: 42px;width: 230px;font-size: 17px;padding-left:11px">
+    </ion-col>
+    <ion-col size="4">
+      <button type="submit" style="height: 42px;width: 78px;margin-left: 18px;background-color: #6fa833;color: #fff;font-size: 17px;" (click)="login(phoneNumber.value)">
+        Login</button>
+    </ion-col>
+  </ion-row>
+  <!-- <div style="height:10%;width:100%;background-color:whitesmoke">
     <div style="position: relative;top: 50%;transform: translateY(-50%);">
       <input type="number" placeholder="Enter your phone number" #phoneNumber style="height: 42px;margin-left: 22px;width: 220px;font-size: 20px;border-radius: 8px;">
       <button type="submit" style="height: 42px;width: 78px;margin-left: 27px;border-radius: 12px;" (click)="login(phoneNumber.value)">
         Login</button>
     </div>
-  </div>
-</ion-content>
+  </div> -->
+</ion-footer>

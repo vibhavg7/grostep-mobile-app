@@ -92,6 +92,7 @@ export class StorePage implements OnInit {
 
   clickStore(storeId: number) {
     const loadedStore = this.loadedStores.filter(data => data.store_id === +storeId);
+    console.log(loadedStore[0]);
     this.storeService.StoreInfo = loadedStore[0];
     this.router.navigate(['/', 'categories', this.categoryId, 'stores', storeId, 'storecategories']);
   }

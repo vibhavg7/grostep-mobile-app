@@ -6,7 +6,7 @@
     margin-bottom: 10px
 }
 
-ion-col.thumbWrap.col:after {
+.thumbWrap:after {
     content: "";
     position: absolute;
     height: 75px;
@@ -15,8 +15,8 @@ ion-col.thumbWrap.col:after {
     background: #eee;
 }
 
-ion-col.thumbWrap.col {
-    height: 125px;
+.thumbWrap {
+    // height: 125px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -30,7 +30,8 @@ ion-col.thumbWrap.col {
     padding: 5px 5px;background: #99c655;border: 2px solid;
     text-align: center;vertical-align: top;float:left;
     color:white;font: 10px Arial, sans-serif;position: absolute;
-    top: 6%;right: 6px;
+    top: -25%;
+    right: -1px;
 }
 
 .item ion-thumbnail {
@@ -57,6 +58,7 @@ ion-col.thumbWrap.col {
     background-color:#6fa833 !important;
     color:white
 }
+
 
 .segmentButton {
     margin: 5px 0px 0px 5px;

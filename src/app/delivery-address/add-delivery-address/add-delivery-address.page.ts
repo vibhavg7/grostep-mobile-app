@@ -44,8 +44,9 @@ export class AddDeliveryAddressPage implements OnInit {
     this.addressId = this.activatedRoute.snapshot.paramMap.get('addressId');
     this.prevPage = this.activatedRoute.snapshot.paramMap.get('prevPage');
     this.storeId = this.activatedRoute.snapshot.paramMap.get('storeId');
-    console.log(this.prevPage);
-    console.log(this.addressId);
+    // console.log(this.prevPage);
+    // console.log(this.addressId);
+    console.log(this.storeId);
     if (this.addressId !== '') {
       this.authService.getDelievryAddressById(this.addressId).subscribe(addressinfo => {
         this.registerCredentials.customer_name = addressinfo.customer_name;
@@ -68,7 +69,6 @@ export class AddDeliveryAddressPage implements OnInit {
   }
 
   addDelievryAddress() {
-    // console.log(this.addAddressForm.valid);
     if (!this.addAddressForm.valid) {
       return;
     }
@@ -78,14 +78,12 @@ export class AddDeliveryAddressPage implements OnInit {
         if (data.status === 200) {
           if (this.prevPage === 'cartpage') {
             this.navCtrl.navigateBack(`/cart/${this.storeId}`);
-          //   // this.navCtrl.navigateBack('/cart');
           } else {
             this.navCtrl.navigateRoot('/home/tabs/profile');
           }
         } else {
           if (this.prevPage === 'cartpage') {
             this.navCtrl.navigateBack(`/cart/${this.storeId}`);
-            //   this.navCtrl.navigateBack('/cart');
           } else {
             this.navCtrl.navigateRoot('/home/tabs/profile');
           }
@@ -96,8 +94,7 @@ export class AddDeliveryAddressPage implements OnInit {
       this.authService.addDelievryAddress(this.registerCredentials).subscribe(data => {
         if (data.status === 200) {
           if (this.prevPage === 'cartpage') {
-            console.log('dssdssd');
-            // this.navCtrl.navigateBack('/cart');
+            this.navCtrl.navigateBack(`/cart/${this.storeId}`);
           } else {
             this.navCtrl.navigateRoot('/home/tabs/profile');
           }

@@ -14,9 +14,10 @@ export class AuthService {
   customerInfo: any;
   private TOKEN_KEY = 'token';
   private CUSTOMER_ID = 'customerid';
+  private CUSTOMER_PHONE = 'customerphone';
   private customerdeliveryInfo: any = [];
   customerProfile: any;
-  private customerServiceUrl = 'http://ec2-18-224-29-78.us-east-2.compute.amazonaws.com:3000/customerapi/';
+  private customerServiceUrl = 'http://ec2-13-58-49-153.us-east-2.compute.amazonaws.com:3000/customerapi/';
   constructor(private httpClient: HttpClient, private cartService: CartService) { }
 
   get isLoggedIn() {
@@ -179,6 +180,7 @@ export class AuthService {
     this.cartService.removeAllCartItems();
     localStorage.removeItem(this.CUSTOMER_ID);
     localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.CUSTOMER_PHONE);
   }
 
   createAuthorizationHeader(headers: Headers) {
@@ -190,9 +192,11 @@ export class AuthService {
     if (response.status) {
       const token = response.token;
       const customer_id = response.customerData.customer_id;
+      const phone = response.customerData.phone;
       if (token) {
         localStorage.setItem(this.TOKEN_KEY, token);
         localStorage.setItem(this.CUSTOMER_ID, customer_id);
+        localStorage.setItem(this.CUSTOMER_PHONE, phone);
         return response;
       } else {
         return response;

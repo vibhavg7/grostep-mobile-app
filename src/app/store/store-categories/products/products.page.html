@@ -34,15 +34,22 @@
           <div *ngIf="storeProducts1?.length > 0">
             <ion-list>
               <ion-item *ngFor="let product of storeProducts1">
-                <ion-thumbnail slot="start">
+                <ion-thumbnail class="thumbWrap" slot="start">
+                  <span *ngIf="product?.store_discount > 0" class="discount_logo">
+                    {{ product?.store_discount | number : '1.0-0' }}%
+                    <br>OFF
+                  </span>
                   <ion-img *ngIf="product?.image_url" [src]="product?.image_url"></ion-img>
                   <ion-img *ngIf="!product?.image_url" src="assets/images/default_image.jpg"></ion-img>
                 </ion-thumbnail>
                 <ion-label>
                   <h2>{{product?.product_name}}</h2>
-                  <p>{{product?.weight + ' ' + product?.weight_text }}</p>
+                  <p style="font-weight:bold;">{{product?.weight + ' ' + product?.weight_text }}</p>
+                  <p>MRP:
+                    <del> &#8377; {{product?.product_marked_price }} </del>
+                  </p>
                   <p>
-                    <span> &#8377; {{product?.store_selling_price }}</span>
+                    <span style="font-weight:bold;"> &#8377; {{product?.store_selling_price }} </span>
                     <button *ngIf="!product?.added" class="addButton" (click)="addProduct(product)">
                       <span style="color: #fff;"> ADD</span>
                     </button>

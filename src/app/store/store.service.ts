@@ -13,7 +13,7 @@ export class StoreService {
   selectedDeliverySlotId: any;
   delivernow = true;
   constructor(private httpClient: HttpClient) { }
-  private storeServiceUrl = 'http://ec2-18-224-29-78.us-east-2.compute.amazonaws.com:3000/storesapi/';
+  private storeServiceUrl = 'http://ec2-13-58-49-153.us-east-2.compute.amazonaws.com:3000/storesapi/';
   private storeInfo: any;
   private storeCategories: any = [];
   private storeCategory: any;
@@ -36,6 +36,7 @@ export class StoreService {
     const obj: any = {};
     obj.zipcode = zipcode;
     obj.filterBy = filterBy;
+    console.log(obj);
     return this.httpClient.post<any[]>(`${this.storeServiceUrl}storeinfo/zipCode`, obj)
       .pipe(
         tap(data => {
