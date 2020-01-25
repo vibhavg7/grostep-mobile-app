@@ -34,6 +34,7 @@ export class CategoriesPage implements OnInit, OnEnter, OnDestroy {
     this.isLoading = true;
     this.categoryService.storeDataCatData('')
     .subscribe((data) => {
+      console.log(data);
       this.isLoading = false;
       this.categoryImages = data[0].store_categories;
       this.bannerImages = data[1].banner;

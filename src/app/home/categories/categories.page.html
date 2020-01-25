@@ -17,7 +17,7 @@
         <ion-col *ngIf="!isLoading" size="12" size-xl="8" offset-xl="2">
           <ion-slides *ngIf="bannerImages.length > 0" #mySlider (ionSlidesDidLoad)="slidesDidLoad(mySlider)" pager>
             <ion-slide size="12" *ngFor="let item of bannerImages" (click)="selectItem(item)">
-              <img *ngIf="item?.image_url" [src]="item.image_url" />
+              <img *ngIf="item?.image_url" [src]="item.image_url" onError="this.src='assets/images/default_image.jpg';"/>
               <ion-img *ngIf="!item?.image_url" src="assets/images/default_image.jpg"></ion-img>
             </ion-slide>
           </ion-slides>

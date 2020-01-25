@@ -8,13 +8,11 @@
 </ion-header>
 <ion-content style="font-weight:bold;background-color:#f5f5f5 !important;height:100%">
     <ion-grid>
-        <ion-row *ngIf="!prevPage">
-            <ion-col size="12">
-                <ion-col size="12">
+        <ion-row *ngIf="prevPage == 'profilepage'">
+            <ion-col padding="2" size="12" size-md="8" offset-md="2">
                     <ion-button (click)="addNewAddress()" color="primary" expand="block" fill="outline">
                         Add New Address
                     </ion-button>
-                </ion-col>
             </ion-col>
         </ion-row>
         <ion-row>

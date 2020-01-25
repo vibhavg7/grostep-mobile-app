@@ -35,6 +35,7 @@ export class DeliveryAddressPage implements OnInit {
       this.errorMessage = error;
     });
     this.prevPage = this.activatedRoute.snapshot.paramMap.get('prevPage');
+    console.log(this.prevPage);
     this.storeId = this.activatedRoute.snapshot.paramMap.get('storeId');
   }
 
@@ -87,7 +88,7 @@ export class DeliveryAddressPage implements OnInit {
   }
 
   addNewAddress() {
-    this.router.navigate(['/delivery-address/add-delivery-address', { addressId: '', prevPage: 'cartpage', storeId: this.storeId }]);
+    this.router.navigate(['/delivery-address/add-delivery-address', { addressId: '', prevPage: this.prevPage, storeId: this.storeId }]);
   }
 
   editDeliveryAddress(address) {

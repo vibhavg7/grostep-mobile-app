@@ -9,7 +9,7 @@ import { throwError } from 'rxjs';
 export class OfferService {
 
   constructor(private httpClient: HttpClient) { }
-  private storeServiceUrl = 'http://ec2-13-58-49-153.us-east-2.compute.amazonaws.com:3000/vouchersapi/';
+  private storeServiceUrl = 'http://ec2-13-233-10-240.ap-south-1.compute.amazonaws.com:3000/vouchersapi/';
 
   fetchAllOffers() {
     return this.httpClient.get<any[]>(`${this.storeServiceUrl}customeroffers`)

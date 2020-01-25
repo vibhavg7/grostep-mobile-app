@@ -15,7 +15,7 @@
       </ion-col>
       <ion-col size="12" size-sm="8" offset-sm="2">
         <form [formGroup]="searchCriteriaForm">
-            <!-- style="border:1px solid black" -->
+          <!-- style="border:1px solid black" -->
           <ion-item>
             <ion-label position="floating">Search in {{categoryName}}</ion-label>
             <ion-input type="text" (keyup)="onChanges()" autocomplete="off" formControlName="searchCriteria"></ion-input>
@@ -35,14 +35,13 @@
         <ion-list>
           <ion-item *ngFor="let store of loadedStores">
             <ion-thumbnail slot="start" (click)="clickStore(store?.store_id)">
-              <ion-img *ngIf="store?.image_url" [src]="store.image_url"></ion-img>
+              <img *ngIf="store?.image_url" [src]="store.image_url" onError="this.src='assets/images/default_image.jpg';" />
               <ion-img *ngIf="!store?.image_url" src="../../../../assets/images/default_image.jpg"></ion-img>
             </ion-thumbnail>
             <ion-label>
               <h2>
                 <span (click)="clickStore(store?.store_id)">{{store.store_name}}</span>
-                <ion-icon (click)="favouriteStore(store?.store_id)" style="float:right" 
-                  [color]="store?.likedBy ? 'danger' : 'dark'" name="heart"></ion-icon>
+                <ion-icon (click)="favouriteStore(store?.store_id)" style="float:right" [color]="store?.likedBy ? 'danger' : 'dark'" name="heart"></ion-icon>
               </h2>
               <p (click)="clickStore(store?.store_id)">{{store.address}}</p>
             </ion-label>

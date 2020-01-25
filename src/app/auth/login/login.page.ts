@@ -2,6 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { Validators, FormGroup, FormControl } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import {
+  Plugins,
+  PushNotification,
+  PushNotificationToken,
+  PushNotificationActionPerformed } from '@capacitor/core';
+
+const { PushNotifications } = Plugins;
+
 
 @Component({
   selector: 'app-login',
@@ -11,6 +19,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 export class LoginPage implements OnInit {
 
   storeId: number;
+  token: any;
   public loginForm: FormGroup;
   constructor(
     private authService: AuthService,
@@ -18,6 +27,15 @@ export class LoginPage implements OnInit {
     private router: Router) { }
 
   ngOnInit() {
+    PushNotifications.register();
+
+    // On success, we should be able to receive notifications
+    PushNotifications.addListener('registration',
+      (token: PushNotificationToken) => {
+        // alert('Push11111111 registration success, token: ' + token.value);
+        this.token = token.value;
+      }
+    );
   }
 
   ionViewWillEnter() {
@@ -25,7 +43,7 @@ export class LoginPage implements OnInit {
   }
 
   login(phoneNumber: any) {
-    this.authService.registerCustomer(phoneNumber)
+    this.authService.registerCustomer(phoneNumber, this.token)
       .subscribe((data: any) => {
         console.log(data);
         if (data.customer_id !== 0) {

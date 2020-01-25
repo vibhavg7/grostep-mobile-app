@@ -44,7 +44,7 @@ export class AddDeliveryAddressPage implements OnInit {
     this.addressId = this.activatedRoute.snapshot.paramMap.get('addressId');
     this.prevPage = this.activatedRoute.snapshot.paramMap.get('prevPage');
     this.storeId = this.activatedRoute.snapshot.paramMap.get('storeId');
-    // console.log(this.prevPage);
+    console.log(this.prevPage);
     // console.log(this.addressId);
     console.log(this.storeId);
     if (this.addressId !== '') {

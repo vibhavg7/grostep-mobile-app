@@ -13,7 +13,7 @@ export class StoreService {
   selectedDeliverySlotId: any;
   delivernow = true;
   constructor(private httpClient: HttpClient) { }
-  private storeServiceUrl = 'http://ec2-13-58-49-153.us-east-2.compute.amazonaws.com:3000/storesapi/';
+  private storeServiceUrl = 'http://ec2-13-233-10-240.ap-south-1.compute.amazonaws.com:3000/storesapi/';
   private storeInfo: any;
   private storeCategories: any = [];
   private storeCategory: any;

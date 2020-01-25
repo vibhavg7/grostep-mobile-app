@@ -17,7 +17,7 @@ export class AuthService {
   private CUSTOMER_PHONE = 'customerphone';
   private customerdeliveryInfo: any = [];
   customerProfile: any;
-  private customerServiceUrl = 'http://ec2-13-58-49-153.us-east-2.compute.amazonaws.com:3000/customerapi/';
+  private customerServiceUrl = 'http://ec2-13-233-10-240.ap-south-1.compute.amazonaws.com:3000/customerapi/';
   constructor(private httpClient: HttpClient, private cartService: CartService) { }
 
   get isLoggedIn() {
@@ -32,10 +32,10 @@ export class AuthService {
     return this.customerdeliveryInfo;
   }
 
-  registerCustomer(phone: any) {
+  registerCustomer(phone: any, token: any) {
     const obj: any = {};
     obj.phone = phone;
-    // console.log(obj);
+    obj.token = token;
     return this.httpClient.post<any[]>(`${this.customerServiceUrl}register`, obj)
       .pipe(
         tap(data => {
@@ -96,10 +96,11 @@ export class AuthService {
 
   getCustomerAddressesById() {
     const customerId = +localStorage.getItem(this.CUSTOMER_ID);
+    console.log(customerId);
     return this.httpClient.get<any>(`${this.customerServiceUrl}customeraddressoncart/${customerId}`)
       .pipe(
         tap(data => {
-          // console.log(data);
+          console.log(data);
         })
         , map((data) => {
           return data.addressInfo;
