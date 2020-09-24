@@ -8,10 +8,12 @@ import { throwError } from 'rxjs';
 })
 export class OfferService {
 
+  private CUSTOMER_ID = 'customerid';
   constructor(private httpClient: HttpClient) { }
   private offerServiceUrl = 'https://api.grostep.com/vouchersapi/';
   fetchAllOffers() {
-    return this.httpClient.get<any[]>(`${this.offerServiceUrl}customeroffers`)
+    const customerId = +localStorage.getItem(this.CUSTOMER_ID);
+    return this.httpClient.get<any[]>(`${this.offerServiceUrl}customeroffers/${customerId}`)
     .pipe(
       tap((data: any) => {
         // this.offers = data.store_categories;
