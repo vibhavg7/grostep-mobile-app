@@ -1,8 +1,25 @@
 .footer_color {
-    background-color:#6fa833 !important;
-    color:white
+    // background-color:#6fa833 !important;
+    // color:white
 }
 
-// ion-content{
-//     --ion-background-color: #F8F8F8;
-// }
+.pay-button-enabled {
+    background-color:#6fa833 !important;
+    color:#fff !important;
+    --color-activated: #fff;
+  }
+  
+  .pay-button-disabled {
+    background-color: #e5e5e5;
+    color: #191919; 
+    --color-activated: #191919;
+  }
+
+  ion-content{
+    --ion-background-color: #FFF;
+}
+
+#skeleton {
+  display: block;
+}
+  

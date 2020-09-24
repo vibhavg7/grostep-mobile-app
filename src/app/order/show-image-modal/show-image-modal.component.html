@@ -1,0 +1,39 @@
+<!-- <ion-header>
+  <ion-toolbar>
+    <ion-title>Bill Image</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click)="onCancel()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header> -->
+<ion-content fullscreen>
+    <!-- class="ion-text-center" -->
+  <ion-item class="close-fake" lines="none">      
+    <ion-button (click)="onCancel()" fill="clear" color="light">
+      <ion-icon name="arrow-back" slot="start"></ion-icon> Back
+    </ion-button>
+    <!-- <ion-button (click)="zoom(true)" fill="clear" color="light">
+      <ion-icon name="add" slot="start"></ion-icon>
+    </ion-button>
+    <ion-button (click)="zoom(false)" fill="clear" color="light">
+      <ion-icon name="remove" slot="start"></ion-icon>
+    </ion-button> -->
+  </ion-item>
+
+  <ion-slides [options]="sliderOpts" #slider>
+    <ion-slide>
+      <div class="swiper-zoom-container">
+          <img [src]="billimage">
+      </div>      
+    </ion-slide>
+  </ion-slides>
+
+</ion-content>
+<ion-footer *ngIf="orderStatus == 6" class="footer_color" (click)="acceptorderImage()">
+  <ion-button expand="block" fill="clear" style="color:#fff !important">
+    ACCEPT IMAGE
+    <ion-icon name="arrow-forward"></ion-icon>
+  </ion-button>
+</ion-footer>

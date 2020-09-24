@@ -1,0 +1,129 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button (click)="backToHome()" defaultHref="/home/tabs/categories"></ion-back-button>
+        </ion-buttons>
+        <ion-title>Live Orders</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div *ngIf="!customerliveorderscount && !isLoading" class="outer_empty_cart_wrap">
+        <div class="innerCartWrap">
+            <ion-icon class="noliveordericon" name="clock"></ion-icon>
+            <span style="color:#b61671;display:block;text-align: center;">No live orders to display.</span>
+            <span style="color:#b61671;display:block;">Please check past orders for order details.</span>
+        </div>
+    </div>
+
+    <ion-grid>
+        <ion-row>
+            <ion-col size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
+                <ion-list id="skeleton" *ngIf="isLoading">
+                    <!-- <ion-list-header>
+                                          <ion-skeleton-text animated style="width: 80px"></ion-skeleton-text>
+                                        </ion-list-header> -->
+                    <ion-item style="padding-bottom:6px;" lines="none" class="ion-no-padding" *ngFor="let number of skeletonStoreCount">
+                        <ion-thumbnail slot="start">
+                            <ion-skeleton-text></ion-skeleton-text>
+                        </ion-thumbnail>
+                        <ion-label>
+                            <h3>
+                                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                            </h3>
+                            <p>
+                                <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                            </p>
+                            <p>
+                                <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                            </p>
+                        </ion-label>
+                    </ion-item>
+                </ion-list>
+                <!-- <ion-spinner color="primary"></ion-spinner> -->
+            </ion-col>
+        </ion-row>
+        <ion-row style="padding: 5px 0px;" *ngIf="customerliveorderscount >0 && !isLoading">
+            <ion-col size="12">
+                <ion-text>
+                    Total live orders : {{customerliveorderscount}}
+                </ion-text>
+            </ion-col>
+        </ion-row>
+
+        <!-- height: 200px;
+        margin-bottom: 10px;
+        padding: 5px 5px;
+        margin: 0px 5px;
+        border-radius: 10px 10px;
+        background: #f4f4f4; -->
+        <div *ngIf="!isLoading && customerliveorderscount > 0">
+            <div (click)="liveorderdetails(item.order_id)" *ngFor="let item of liveordersList" style="
+            margin-bottom :10px;background:white;
+            height: 200px;padding-left: 5px;border-radius: 10px 10px;background: #f4f4f4;">
+                <ion-row style="padding-top: 5px;">
+                    <ion-col size="4" class="item-text-wrap">
+                        <strong>
+                            {{item?.store_name}}
+                        </strong>
+                    </ion-col>
+                    <ion-col size="4">
+                        <span style="font-weight:600">
+                            GRO#{{item?.order_id}}
+                            <!-- &#8377; {{item?.payable_amount}} -->
+                        </span>
+                    </ion-col>
+                    <ion-col size="4">
+                        <span style="font-weight:600">
+                            &#8377; {{item?.payable_amount}}
+                        </span>
+                        <!-- <span style="color:#8fc951;border:1px solid #8fc951 !important;padding: 4px 8px 4px 8px;">Live Track</span> -->
+                    </ion-col>
+                </ion-row>
+                <ion-row>
+                    <ion-col size="4">
+                        <span style="color:#28667C">
+                            {{item?.delivery_date| date : "EEE, dd-MM-y"}}
+                            <!-- {{item?.delivery_date| date : "EEE, dd-MM-y, h:mm a"}} -->
+                        </span>
+                    </ion-col>
+                    <ion-col size="4">
+                        <span>{{item?.payment_method_name}}</span>
+                    </ion-col>
+                    <ion-col size="4">
+                        <span *ngIf="item?.order_current_status_type">{{item?.delivery_slot}}</span>
+                    </ion-col>
+                </ion-row>
+                <ion-row style="font-size: 14px;color:#606060">
+                    <ion-col size="4">
+                        Expected Delivery Date
+                    </ion-col>
+                    <ion-col size="4">
+                        Payment Method
+                    </ion-col>
+                    <ion-col size="4">
+                        Delivery slot
+                    </ion-col>
+                </ion-row>
+                <!-- color:#8fc951; -->
+                <ion-row style="font-size:17px;text-align: center;display: flex;font-weight:bold;
+                          justify-content: center;">
+                    <span>
+                        Order status - {{item?.order_current_status_type}}
+                    </span>
+                </ion-row>
+                <!-- background-color: #d9d9d9; -->
+                <ion-row style="text-align: center;height: 44px;padding-top: 10px;
+                padding-left: 30px;padding-right: 30px;">
+                    <ion-col style="color:#fff;border-radius: 5px 5px;background-color:#8fc951" (click)="liveorderdetails(item.order_id)" size="12">
+                        <span>Live Track</span>
+                    </ion-col>
+                </ion-row>
+            </div>
+        </div>
+    </ion-grid>
+    <ion-infinite-scroll threshold="15%" (ionInfinite)="loadMore($event)">
+        <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more orders...">
+        </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+</ion-content>

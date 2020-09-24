@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Add Personal Information</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref=""></ion-back-button>
+      <ion-back-button (click)="onBack()" defaultHref=""></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -11,12 +11,27 @@
 <ion-content>
   <form (ngSubmit)="addUserInformation()" [formGroup]="addUserInfoForm">
     <ion-grid>
+      <ion-row style="background-color: #fff;" *ngIf="isLoading">
+        <ion-col size="12" size-md="8" offset-md="2" class="ion-text-center">
+          <ion-spinner color="primary"></ion-spinner>
+        </ion-col>
+      </ion-row>
       <ion-row>
         <ion-col size="12">
           <ion-item>
             <ion-label position="floating">Name</ion-label>
             <ion-input #myinput type="text" name="customer_name" [formControl]="addUserInfoForm.controls['customer_name']" [(ngModel)]="registerCredentials.customer_name"></ion-input>
           </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-text *ngIf="submitted && f.customer_name.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.customer_name.errors.required">Name is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.customer_name.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.customer_name.errors.pattern">Please enter valid name</span>
+          </ion-text>
         </ion-col>
       </ion-row>
       <ion-row>
@@ -29,16 +44,29 @@
       </ion-row>
       <ion-row>
         <ion-col size="12">
+          <ion-text *ngIf="submitted && f.email.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.email.errors.required">Email is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.email.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.email.errors.email">Please enter valid email address</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
           <ion-item>
             <ion-label position="floating">Date of birth</ion-label>
-            <ion-input type="text" name="customer_dob" [(ngModel)]="registerCredentials.customer_dob" [formControl]="addUserInfoForm.controls['customer_dob']"></ion-input>
+            <ion-datetime displayFormat="MM/DD/YYYY" name="customer_dob" [(ngModel)]="registerCredentials.customer_dob" [formControl]="addUserInfoForm.controls['customer_dob']"
+              placeholder="Select DOB"></ion-datetime>
+            <!-- <ion-input type="text" name="customer_dob" [(ngModel)]="registerCredentials.customer_dob" [formControl]="addUserInfoForm.controls['customer_dob']"></ion-input> -->
           </ion-item>
         </ion-col>
       </ion-row>
       <ion-row>
         <ion-col size="12">
-          <ion-button type="submit" color="primary" expand="block">
-            ADD Information
+          <ion-button type="submit" expand="block" [disabled]="buttonSubmitted && submitted" 
+            [ngClass]="{'user-info-button-enabled': !!addUserInfoForm.valid, 'user-info-button-disabled': !addUserInfoForm.valid }">
+            {{buttonText}}
           </ion-button>
         </ion-col>
       </ion-row>

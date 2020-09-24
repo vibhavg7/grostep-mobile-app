@@ -11,7 +11,18 @@ const routes: Routes = [
   {
     path: 'order-detail/:orderId',
     loadChildren: () => import('./order-detail/order-detail.module').then( m => m.OrderDetailPageModule)
+  },
+  {
+    path: 'liveorders',
+    loadChildren: () => import('./live-orders/live-orders.module').then( m => m.LiveOrdersPageModule)
+  },
+  {
+    path: 'liveordertrackingdetail/:orderId',
+    loadChildren: () => import('./live-order-tracking-detail/live-order-tracking-detail.module').
+                        then( m => m.LiveOrderTrackingDetailPageModule)
   }
+
+
 ];
 
 @NgModule({

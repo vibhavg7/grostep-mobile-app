@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Product } from '../store/store-categories/products/product.model';
 import { HttpClient } from '@angular/common/http';
+import { Subject, Observable, from, of } from 'rxjs';
+import { Plugins } from '@capacitor/core';
+
+const { Storage } = Plugins;
 
 export class CartItem {
   id: string;
@@ -15,6 +19,8 @@ export class CartItem {
   product_img: string;
   // tslint:disable-next-line:variable-name
   store_name: string;
+  // tslint:disable-next-line:variable-name
+  store_city: string;
   quantity: number;
   constructor(item: Product, quantity: number) {
       this.id = item.store_product_mapping_id;
@@ -26,6 +32,7 @@ export class CartItem {
       this.weight_text = item.weight_text;
       this.quantity = quantity;
       this.store_id = item.store_id;
+      this.store_city = item.store_city;
   }
 }
 
@@ -49,41 +56,56 @@ export interface Voucher {
 export class CartService {
   list: Array<CartItem>;
   private deliveryCharge = 0;
+  private subject = new Subject<any>();
   private voucher: Voucher = {} as Voucher;
   private voucherAmount = 0;
-  constructor(private httpClient: HttpClient) {
+  constructor(
+    private httpClient: HttpClient) {
     this.list = [];
   }
 
-  getAllCartItems() {
-    return this.list;
+  sendMessage(cartList) {
+    this.subject.next({ text: cartList.length });
+  }
+
+  getMessage(): Observable<any> {
+    return this.subject.asObservable();
+  }
+
+  getAllCartItems(): Observable<any> {
+    return from(Storage.get({ key: 'cartList' }));
   }
 
   getCartCount() {
     return this.list.length;
   }
 
-  checkEmptyCart() {
-    return this.list.length === 0 ? true : false;
-  }
+  // getStorageCartCount() {
+  //   return this.storage.get('cartstoragedata');
+  // }
+
+  // checkEmptyCart() {
+  //   return this.list.length === 0 ? true : false;
+  // }
 
   removeVoucher() {
+    this.removeVoucherItem();
     this.voucher = {} as Voucher;
-  }
-
-  getcartproductQuantity(product: Product): number {
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < this.list.length; i++) {
-      if (this.list[i].id === product.store_product_mapping_id) {
-        return this.list[i].quantity;
-      }
-    }
-    return 0;
+    return this.voucher;
   }
 
   removeAllCartItems() {
+    this.removeCartItem();
     this.list = [];
+    this.sendMessage(this.list);
     return this.list;
+  }
+
+  async removeCartItem() {
+    await Storage.remove({ key: 'cartList' });
+  }
+  async removeVoucherItem() {
+    await Storage.remove({ key: 'voucherCode' });
   }
 
   getItemById(id: any) {
@@ -96,48 +118,95 @@ export class CartService {
   }
 
   addItem(item: Product, quantity: number) {
-    console.log(item);
-    let isExists = false;
     const id = item.store_product_mapping_id;
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < this.list.length; i++) {
-      if (this.list[i].id === id) {
-        this.list[i].quantity += quantity;
-        this.list[i].price = this.list[i].price;
-        isExists = true;
-        break;
+    let isExists = false;
+    from(Storage.get({ key: 'cartList' })).subscribe((data) => {
+      const parsedData = JSON.parse(data.value);
+      if (parsedData !== null) {
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < parsedData.length; i++) {
+          if (parsedData[i].id === id) {
+            parsedData[i].quantity += quantity;
+            isExists = true;
+            this.setCartObject(parsedData);
+          } else {
+            isExists = false;
+          }
+        }
+        if (!isExists) {
+          parsedData.push(new CartItem(item, quantity));
+          this.setCartObject(parsedData);
+        }
+      } else {
+        this.list.push(new CartItem(item, quantity));
+        this.setCartObject(parsedData);
       }
-    }
-    if (!isExists) {
-      this.list.push(new CartItem(item, quantity));
-    }
-    console.log(this.list);
+    });
+  }
+
+  async getCartObject() {
+    const ret = await Storage.get({ key: 'cartList' });
+    const cart = JSON.parse(ret.value);
+    return cart;
+  }
+
+  async setCartObject(cartList) {
+    await Storage.set({
+      key: 'cartList',
+      value: JSON.stringify(cartList)
+    });
+  }
+
+  async setVoucherObject(voucher) {
+    await Storage.set({
+      key: 'voucherCode',
+      value: JSON.stringify(voucher)
+    });
   }
 
   removeItem(item: Product, quantity: number) {
-    let isExists = false;
     const id = item.store_product_mapping_id;
-    for (let i = 0; i < this.list.length; i++) {
-      if (this.list[i].id === id) {
-        if (this.list[i].quantity === 1) {
-          this.list.splice(i, 1);
-        } else {
-          this.list[i].quantity -= quantity;
+    from(Storage.get({ key: 'cartList' })).subscribe((data) => {
+      const parsedData = JSON.parse(data.value);
+      // tslint:disable-next-line:prefer-for-of
+      for (let i = 0; i < parsedData.length; i++) {
+        if (parsedData[i].id === id) {
+          if (parsedData[i].quantity === 1) {
+            parsedData.splice(i, 1);
+          } else {
+            parsedData[i].quantity -= quantity;
+          }
+          break;
         }
-        isExists = true;
-        break;
       }
-    }
+      this.setCartObject(parsedData);
+    });
   }
 
 
   removeItemById(id) {
-    for (let i = 0; i < this.list.length; i++) {
-      if (this.list[i].id === id) {
-        this.list.splice(i, 1);
-        break;
+    from(Storage.get({ key: 'cartList' })).subscribe((data) => {
+      const parsedData = JSON.parse(data.value);
+      // tslint:disable-next-line:prefer-for-of
+      for (let i = 0; i < parsedData.length; i++) {
+        if (parsedData[i].id === id) {
+          if (parsedData[i].quantity === 1) {
+            parsedData.splice(i, 1);
+          }
+          break;
+        }
       }
-    }
+      this.sendMessage(parsedData);
+      this.setCartObject(parsedData);
+    });
+    // for (let i = 0; i < this.list.length; i++) {
+    //   if (this.list[i].id === id) {
+    //     this.list.splice(i, 1);
+    //     // console.log('Hey');
+    //     this.sendMessage(this.list);
+    //     break;
+    //   }
+    // }
   }
 
   quantityPlus(item) {
@@ -153,19 +222,22 @@ export class CartService {
   }
 
   setDeliveryCharge(value) {
+    console.log(value);
     this.deliveryCharge = value;
   }
 
   setVoucher(voucher) {
     this.voucher = voucher;
+    this.setVoucherObject(voucher);
   }
 
   getvoucherAmount() {
     return this.voucher.voucher_amount ? this.voucher.voucher_amount : 0;
   }
 
-  getAppliedVoucher() {
-    return this.voucher;
+  getAppliedVoucher(): Observable<any> {
+    // return this.voucher;
+    return from(Storage.get({ key: 'voucherCode' }));
   }
 
   getGrandTotal(): number {

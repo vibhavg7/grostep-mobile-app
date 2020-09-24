@@ -7,9 +7,11 @@ import { IonicModule } from '@ionic/angular';
 import { PaymentStatusPageRoutingModule } from './payment-status-routing.module';
 
 import { PaymentStatusPage } from './payment-status.page';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   imports: [
+    SharedModule,
     CommonModule,
     FormsModule,
     IonicModule,

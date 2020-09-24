@@ -16,5 +16,31 @@
 }
 
 ion-content{
-    --ion-background-color: #F8F8F8;
+    --ion-background-color: #Fff;
+}
+
+ion-card {
+    // background-color: #f5f5f5;
+}
+
+.line{
+    width: 95%;
+    /* height: 47px; */
+    border-bottom: 1px solid #d8d8d8;
+    position: absolute;
+    }
+
+#skeleton {
+    display: block;
+  }
+
+
+
+.noliveordericon {
+    color: #b61671;
+    display: block;
+    /* text-align: center; */
+    /* align-items: center; */
+    margin: auto;
+    font-size: 60px;
 }

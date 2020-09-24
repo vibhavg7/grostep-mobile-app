@@ -1,0 +1,109 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Detect Delivery Location</ion-title>
+        <ion-buttons *ngIf="page != 'mainpage'" slot="start">
+            <ion-back-button defaultHref=""></ion-back-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content>
+    <ion-grid>
+        <ion-row>
+            <ion-col size="12" size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading1">
+                <ion-spinner color="primary"></ion-spinner>
+            </ion-col>
+            <ion-col size="12" size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
+                <!-- <ion-spinner color="primary"></ion-spinner> -->
+                <ion-list id="skeleton" *ngIf="isLoading">
+                    <!-- <ion-list-header>
+                                      <ion-skeleton-text animated style="width: 80px"></ion-skeleton-text>
+                                    </ion-list-header> -->
+                    <ion-item style="padding-bottom:6px;" lines="none" class="ion-no-padding" *ngFor="let number of skeletonStoreCount">
+                        <ion-thumbnail slot="start">
+                            <ion-skeleton-text></ion-skeleton-text>
+                        </ion-thumbnail>
+                        <ion-label>
+                            <h3>
+                                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                            </h3>
+                            <p>
+                                <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                            </p>
+                            <p>
+                                <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                            </p>
+                        </ion-label>
+                    </ion-item>
+                </ion-list>
+            </ion-col>
+
+        </ion-row>
+        <ion-row>
+            <ion-col size-md="8" offset-md="2">
+                <ion-list>
+                    <ion-item lines="none">
+                        <input class="input" type="text" [(ngModel)]="autocompleteInput" #addresstext style="padding: 12px 20px; border: 1px solid #ccc;outline:none;
+                               width: 400px;border-radius: 5px 5px;">
+                    </ion-item>
+                </ion-list>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col>
+                <ion-card style="background-color:#f5f5f5;font-weight: bold;border-radius: 5px 5px;" (click)="checkGPSPermission()">
+                    <ion-card-content>
+                        <ion-icon name="locate" slot="start"></ion-icon>
+                        <ion-text style="padding: 0px 0px 0px 11px;font-size: 16px;">Current Location</ion-text>
+                    </ion-card-content>
+
+                </ion-card>
+                <!-- <ion-list>
+                    <ion-item (click)="checkGPSPermission()">
+                            <ion-icon name="locate" slot="start"></ion-icon>
+                            <ion-text>Current Location</ion-text>
+                    </ion-item>
+                </ion-list> -->
+            </ion-col>
+        </ion-row>
+        <ion-row *ngIf="addressList?.length > 0 && !isLoading">
+            <ion-col style="padding-left: 14px;">
+                <ion-label style="margin-left: 5px;">SAVED ADDRESSES</ion-label>
+            </ion-col>
+            <ion-col size="12">
+                <div *ngFor="let item of addressList">
+                    <!-- style="background-color:#f5f5f5;border-radius: 5px 5px;" -->
+                    <ion-card (click)="addressSelected(item)" [ngClass]="{'selectedlocation-enabled': item?.status == 1, 'selectedlocation-disabled':item?.status == 0 }">
+                        <!-- <ion-card-header>
+                            <span style="color:black">
+                                <input style=" width: 1.1em; height: 1.1em;" type="radio" name="status" [checked]="item.status == 1" (click)="addressSelected(item)">
+                                <span>
+                                    {{item.customer_name}}
+                                </span>
+
+                            </span>
+                        </ion-card-header> -->
+                        <ion-card-content>
+                            <h5>Address:
+                                <b>{{item?.address}}</b>
+                            </h5>
+                            <h5 style="padding-top:2px">
+                                Pincode:
+                                <b>{{item?.pincode}}</b>
+                                <span *ngIf="item?.address_type_id" style="float:right;font-weight: 600;">
+                                    <ion-icon *ngIf="item?.address_type_id == 1" name="home"></ion-icon>
+                                    <ion-icon *ngIf="item?.address_type_id == 2" name="business"></ion-icon>
+                                    {{item?.type}}
+                                </span>
+                            </h5>
+                        </ion-card-content>
+
+                    </ion-card>
+                </div>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+    <ion-infinite-scroll threshold="15%" (ionInfinite)="loadMore($event)">
+        <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more addresses...">
+        </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+</ion-content>

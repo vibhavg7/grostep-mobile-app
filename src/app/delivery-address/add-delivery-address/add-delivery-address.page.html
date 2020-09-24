@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Add Delivery Address</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref=""></ion-back-button>
+      <ion-back-button (click)="backToHome()" defaultHref=""></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -11,21 +11,34 @@
   <form (ngSubmit)="addDelievryAddress()" [formGroup]="addAddressForm">
     <ion-grid>
       <ion-row>
+        <ion-col size="12" size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
+          <ion-spinner color="primary"></ion-spinner>
+        </ion-col>
+      </ion-row>
+      <ion-row style="margin-bottom: -20px;">
         <ion-col size-sm="6" offset-sm="3">
-          <ion-item>
+          <ion-item lines="none">
             <input style=" width: 1.1em; height: 1.1em;" type="radio" value="1" [formControl]="addAddressForm.controls['address_type']"
               id="home" name="address_type" checked [(ngModel)]="registerCredentials.address_type">
-            <label for="home">
-              <ion-icon name="home"></ion-icon>Home</label>
+            <label style="margin-left:4px" for="home">
+              <ion-icon style="margin-bottom: -2px;" name="home"></ion-icon>Home
+            </label>
           </ion-item>
         </ion-col>
         <ion-col size-sm="6" offset-sm="3">
-          <ion-item>
+          <ion-item lines="none">
             <input style=" width: 1.1em; height: 1.1em;" type="radio" value="2" [formControl]="addAddressForm.controls['address_type']"
               name="address_type" id="work" [(ngModel)]="registerCredentials.address_type">
-            <label for="work">
-              <ion-icon name="business"></ion-icon>Work</label>
+            <label style="margin-left:4px" for="work">
+              <ion-icon style="margin-bottom: -2px;" name="business"></ion-icon>Work</label>
           </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-text *ngIf="submitted && f.address_type.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.address_type.errors.required">Address type is required</span>
+          </ion-text>
         </ion-col>
       </ion-row>
       <ion-row>
@@ -38,10 +51,31 @@
       </ion-row>
       <ion-row>
         <ion-col size="12">
+          <ion-text *ngIf="submitted && f.customer_name.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.customer_name.errors.required">Name is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.customer_name.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.customer_name.errors.pattern">Please enter valid name</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
           <ion-item>
             <ion-label position="floating">Pincode</ion-label>
-            <ion-input type="number" name="pincode" [(ngModel)]="registerCredentials.pincode" [formControl]="addAddressForm.controls['pincode']"></ion-input>
+            <ion-input maxlength="6" (keypress)="numberOnly($event)" type="text" name="pincode" [(ngModel)]="registerCredentials.pincode"
+              [formControl]="addAddressForm.controls['pincode']"></ion-input>
           </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-text *ngIf="submitted && f.pincode.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.pincode.errors.required">Pincode is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.pincode.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.pincode.errors.pattern">Please enter valid pincode</span>
+          </ion-text>
         </ion-col>
       </ion-row>
       <ion-row>
@@ -54,10 +88,24 @@
       </ion-row>
       <ion-row>
         <ion-col size="12">
+          <ion-text *ngIf="submitted && f.flatNumber.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.flatNumber.errors.required">House No./Building/Apartment is required</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
           <ion-item>
             <ion-label position="floating">Area/Locality/Sector</ion-label>
             <ion-input type="text" name="address2" [(ngModel)]="registerCredentials.address2" [formControl]="addAddressForm.controls['address2']"></ion-input>
           </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-text *ngIf="submitted && f.address2.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.address2.errors.required">Area/Locality/Sector is required</span>
+          </ion-text>
         </ion-col>
       </ion-row>
       <ion-row>
@@ -70,30 +118,71 @@
       </ion-row>
       <ion-row>
         <ion-col size="12">
+          <ion-text *ngIf="submitted && f.landmark.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.landmark.errors.required">Landmark is required</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+            <!-- (click)="changeAddress()" -->
           <ion-item>
             <ion-label position="floating">Address</ion-label>
-            <ion-textarea type="text" name="address" [(ngModel)]="registerCredentials.address" autocomplete="on" autocorrect="on" [formControl]="addAddressForm.controls['address']"></ion-textarea>
+            <ion-textarea type="text" name="address" [(ngModel)]="registerCredentials.address" autocomplete="on" 
+              autocorrect="on" [formControl]="addAddressForm.controls['address']"></ion-textarea>
           </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-text *ngIf="submitted && f.address.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.address.errors.required">Address is required</span>
+          </ion-text>
         </ion-col>
       </ion-row>
       <ion-row>
         <ion-col size="12">
           <ion-item>
             <ion-label position="floating">Phone Number</ion-label>
-            <ion-input type="number" name="phone" [(ngModel)]="registerCredentials.phone" [formControl]="addAddressForm.controls['phone']"></ion-input>
+            <ion-input maxlength="10" (keypress)="numberOnly($event)" type="tel" name="phone" [(ngModel)]="registerCredentials.phone"
+              [formControl]="addAddressForm.controls['phone']"></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
       <ion-row>
         <ion-col size="12">
-          <ion-button type="submit" color="primary" expand="block">
+          <ion-text *ngIf="submitted && f.phone.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.phone.errors.required">Phone Number is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.phone.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.phone.errors.pattern">Please enter valid phone number</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+            <!-- !addAddressForm.valid || submitted -->
+          <ion-button type="submit" expand="block" [disabled]="submitted && buttonSubmitted"
+          [ngClass]="{'address-button-enabled': !!addAddressForm.valid, 'address-button-disabled': !addAddressForm.valid }"
+            >
             <span *ngIf="addressId == ''">
               ADD ADDRESS
             </span>
             <span *ngIf="addressId != ''">
               EDIT ADDRESS
             </span>
+            <ion-icon name="arrow-forward"></ion-icon>
           </ion-button>
+          <!-- <ion-button
+          [ngClass]="{'address-button-enabled': !!addAddressForm.valid, 'address-button-disabled':!addAddressForm.valid }"
+            expand="block">
+            <span *ngIf="addressId == ''">
+              ADD ADDRESS
+            </span>
+            <span *ngIf="addressId != ''">
+              EDIT ADDRESS
+            </span>
+          </ion-button> -->
         </ion-col>
       </ion-row>
     </ion-grid>

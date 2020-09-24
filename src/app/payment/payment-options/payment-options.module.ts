@@ -7,14 +7,17 @@ import { IonicModule } from '@ionic/angular';
 import { PaymentOptionsPageRoutingModule } from './payment-options-routing.module';
 
 import { PaymentOptionsPage } from './payment-options.page';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   imports: [
+    SharedModule,
     CommonModule,
     FormsModule,
     IonicModule,
     PaymentOptionsPageRoutingModule
   ],
-  declarations: [PaymentOptionsPage]
+  declarations: [PaymentOptionsPage],
+  entryComponents: []
 })
 export class PaymentOptionsPageModule {}

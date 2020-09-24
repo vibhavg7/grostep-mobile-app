@@ -11,10 +11,39 @@ page-delivery-address {
     }
 }
 
-ion-content{
-    --ion-background-color: #F8F8F8;
+.innerCartWrap {
+    width: 200px;
+    padding-top:200px;
+    text-align: center;
 }
 
+.iconcss {
+    display: block;
+    /* text-align: center; */
+    margin: auto;
+    font-size: 3em;
+}
+
+.outer_empty_cart_wrap
+{
+    display: flex;
+    justify-content: center;
+    /* align horizontal */
+    align-items: center;
+    flex-wrap:wrap;
+    /* align vertical */        
+    width: 100%;
+    height: 80%
+}
+
+ion-content{
+    --ion-background-color: #FFF;
+}
+
+
+#skeleton {
+    display: block;
+  }
 
 .deliveryaddressbutton
 {

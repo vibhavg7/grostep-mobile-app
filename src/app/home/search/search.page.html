@@ -1,8 +1,8 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
+    <!-- <ion-buttons slot="start">
       <ion-menu-button menu="m1"></ion-menu-button>
-    </ion-buttons>
+    </ion-buttons> -->
     <ion-title>Discover</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -12,9 +12,9 @@
     <ion-row>
       <ion-col>
         <form [formGroup]="searchCriteriaForm">
-          <ion-item style="background-color:#fff">
-            <ion-label position="floating">Search in stores</ion-label>
-            <ion-input type="text" (keyup)="onChanges()" autocomplete="off" formControlName="searchCriteria"></ion-input>
+          <ion-item lines="none">
+            <ion-label position="floating">Search in store or products</ion-label>
+            <ion-input type="text" (click)="onSearch()" autocomplete="off" formControlName="searchCriteria"></ion-input>
             <ion-icon name="search" slot="end" style="padding-top: 8px;"></ion-icon>
           </ion-item>
         </form>

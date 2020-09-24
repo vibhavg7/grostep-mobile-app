@@ -1,12 +1,80 @@
-<ion-header>
+<!-- <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button menu="m1"></ion-menu-button>
     </ion-buttons>
     <ion-title>Contact Grostep</ion-title>
   </ion-toolbar>
+</ion-header> -->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Contact Grostep</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="backToHome()" defaultHref="/home/tabs/profile"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <ion-grid>
+    <ion-row style="margin-bottom: 20px;">
+      <ion-col size="12">
+        <!-- #282c3f -->
+        <span style="color:#282c3f;font-weight:600;font-size:18px">
+          {{contactdetails?.message}}
+        </span>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <span style="font-weight: 600;">Online Customer Support</span>
+      </ion-col>
+    </ion-row>
+    <ion-row style="margin-top: -10px;">
+      <ion-col size="12">
+        <p>Email us at : {{contactdetails?.email}}</p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <span style="font-weight: 600;">Phone Customer Support</span>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <span style="display: block;padding-bottom: 10px;text-decoration:underline" *ngFor="let phonenumber of contactdetails?.phone">
+          {{phonenumber}}
+          <!-- <span (click)="callNumber(phonenumber)">Click to dial</span> -->
+        </span>
+      </ion-col>
+    </ion-row>
+    <ion-row style="margin-top: 5px;">
+      <ion-col size="6">
+        <span style="font-weight: 600;">
+          Office Timing
+        </span>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        {{contactdetails?.timing}}
+      </ion-col>
+    </ion-row>
+    <ion-row style="margin-top: 10px;">
+      <ion-col size="12">
+        <span style="font-weight: 600;">
+          Head Office Address
+        </span>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        {{contactdetails?.address}}
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div *ngIf="prevPage != 'liverordertracking'" class="outer_continue_shopping_button">
+      <ion-button fill="clear" (click)="sendFeedback()" class="inner_continue_shopping_button">SUBMIT FEEDBACK</ion-button>
+  </div>
 </ion-content>

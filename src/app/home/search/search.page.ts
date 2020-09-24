@@ -5,6 +5,7 @@ import { StoreService } from '../../store/store.service';
 import { of, Subscription } from 'rxjs';
 import { filter } from 'minimatch';
 import { Router } from '@angular/router';
+import { NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-search',
@@ -19,8 +20,11 @@ export class SearchPage implements OnInit, OnDestroy {
   filterBy: any;
   isLoading: boolean;
   searchCriteriaForm: FormGroup;
+  currentPage = 1;
+  pageSize = 1000;
   constructor(
       private formBuilder: FormBuilder,
+      private navCtrl: NavController,
       private router: Router,
       private storeService: StoreService) {
     this.searchCriteriaForm = this.formBuilder.group({
@@ -41,7 +45,8 @@ export class SearchPage implements OnInit, OnDestroy {
       distinctUntilChanged(),
       debounceTime(800),
       switchMap(query => (this.filterBy = query, console.log(this.filterBy),
-                 (this.filterBy !== '' ? this.storeService.fetchAllStoresBasedOnZipCode('', this.filterBy) : of([]))))
+                 (this.filterBy !== '' ? this.storeService.fetchAllStoresBasedOnCity('',
+                 this.filterBy, 0, this.currentPage, this.pageSize) : of([]))))
     )
       .subscribe((data: any) => {
               this.isLoading = false;
@@ -57,7 +62,14 @@ export class SearchPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    console.log(this.subscription);
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  onSearch() {
+    this.navCtrl.navigateForward([`/stores/storesearch/0`]);
   }
 
 }

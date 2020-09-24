@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Order Detail</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref=""></ion-back-button>
+      <ion-back-button (click)="backToHome()" defaultHref=""></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -10,20 +10,46 @@
 <ion-content>
 
   <div>
-    <ion-grid style="padding-left:5px;padding-top:5px">
-      <ion-row *ngIf="orderInfo?.order_id" style="background-color:#f5f5f5">
-        <ion-col class="orderrowstyles">
-          Order Id : {{orderInfo?.order_id}}
+    <ion-grid style="padding-left:5px;padding-top:5px;margin-top: 8px;background-color: #fff;">
+      <ion-row>
+        <ion-col size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
+          <ion-spinner color="primary"></ion-spinner>
         </ion-col>
       </ion-row>
-      <hr/>
-      <div style="background-color:#f5f5f5">
+      <!-- style="background-color:#f5f5f5" -->
+      <!-- <ion-row *ngIf="orderInfo?.order_id && !isLoading">
+        <ion-col size="6" class="orderrowstyles">
+          Order Id 
+        </ion-col>
+        <ion-col size="6">
+            {{orderInfo?.order_id}}
+          </ion-col>
+      </ion-row> -->
+      <!-- <hr/> -->
+      <!-- style="background-color:#f5f5f5" -->
+      <div *ngIf="!isLoading">
+        <ion-row *ngIf="orderInfo?.order_id">
+          <ion-col size="6" class="orderrowstyles">
+            Order Id
+          </ion-col>
+          <ion-col size="6">
+            {{orderInfo?.order_id}}
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="orderInfo?.store_name">
+          <ion-col size="6" class="orderrowstyles">
+            Store Name
+          </ion-col>
+          <ion-col size="6">
+            {{orderInfo?.store_name}}
+          </ion-col>
+        </ion-row>
         <ion-row *ngIf="orderInfo?.order_status">
           <ion-col size="6" class="orderrowstyles">
             Order Status
           </ion-col>
           <ion-col size="6">
-            <span>{{orderInfo?.order_status}}</span>
+            <span>{{orderInfo?.order_status_type}}</span>
           </ion-col>
         </ion-row>
         <ion-row *ngIf="orderInfo?.payment_mode_type">
@@ -34,12 +60,20 @@
             <span>{{orderInfo?.payment_mode_type}}</span>
           </ion-col>
         </ion-row>
+        <ion-row *ngIf="orderInfo?.payment_status">
+          <ion-col size="6" class="orderrowstyles">
+            Payment Status
+          </ion-col>
+          <ion-col size="6">
+            <span style="font-weight:600">{{orderInfo?.payment_status}}</span>
+          </ion-col>
+        </ion-row>
         <ion-row *ngIf="orderInfo?.order_placing_date">
           <ion-col size="6" class="orderrowstyles">
             Order Date
           </ion-col>
           <ion-col size="6">
-            {{orderInfo?.order_placing_date| date: "yyyy/MM/dd"}}
+            {{orderInfo?.order_placing_date| date: "dd/MM/yyyy"}}
           </ion-col>
         </ion-row>
         <ion-row *ngIf="orderInfo?.order_amount">
@@ -66,22 +100,22 @@
             &#8377; {{orderInfo?.delivery_amount}}
           </ion-col>
         </ion-row>
-        <ion-row *ngIf="orderInfo?.order_amount">
+        <ion-row *ngIf="orderInfo?.final_amount">
           <ion-col size="6" class="orderrowstyles">
             Total Payable Amount
           </ion-col>
           <ion-col size="6" style="font-weight:bold;">
-            &#8377; {{orderInfo?.order_amount}}
+            &#8377; {{orderInfo?.final_amount}}
           </ion-col>
         </ion-row>
-        <ion-row *ngIf="orderInfo?.order_amount">
-            <ion-col size="6" class="orderrowstyles">
-                Delivery Address
-            </ion-col>
-            <ion-col size="6">
-                {{orderInfo?.cust_delivery_address}}
-            </ion-col>
-          </ion-row>
+        <ion-row *ngIf="orderInfo?.cust_delivery_address">
+          <ion-col size="6" class="orderrowstyles">
+            Delivery Address
+          </ion-col>
+          <ion-col size="6">
+            {{orderInfo?.cust_delivery_address}}
+          </ion-col>
+        </ion-row>
         <!-- <ion-row *ngIf="orderInfo?.cust_delivery_address">
           <ion-col size="6" class="cust_delivery_address">
             Delivery Address
@@ -108,11 +142,15 @@
         </ion-row> -->
       </div>
       <hr/>
-      <ion-item-divider *ngIf="orderInfo?.products" style="font-weight:bold;background-color:#f5f5f5 !important">
+      <ion-item-divider *ngIf="orderInfo?.products && !isLoading" style="font-weight:bold;
+            color: black;">
         <span>Items of your order</span>
+        <span *ngIf="orderInfo?.bill_image_url" (click)="viewBill(orderInfo?.bill_image_url)" 
+        style="margin-left: 60px;text-decoration: underline;color:green">View Bill</span>
       </ion-item-divider>
-      <div *ngIf="orderInfo?.products">
-        <ion-list>
+      <div *ngIf="orderInfo?.products && !isLoading">
+        <ion-list style="
+        background-color: #fff;">
           <ion-item *ngFor="let item of orderInfo?.products">
             <ion-thumbnail slot="start">
               <ion-img *ngIf="item?.product_image_url" [src]="item.product_image_url"></ion-img>
@@ -126,18 +164,18 @@
               <p>
                 Quantity : {{item?.quantity_buyed}}
               </p>
-              <p style="font-weight:bold" text-wrap>Price : &#8377; {{item?.store_selling_price}} x {{item?.quantity_buyed}} = &#8377; {{item?.store_selling_price
+              <p style="font-weight:bold" class="ion-text-wrap">Price : &#8377; {{item?.store_selling_price}} x {{item?.quantity_buyed}} = &#8377; {{item?.store_selling_price
                 * item?.quantity_buyed| number : '1.2-2'}}</p>
               <p>
             </ion-label>
           </ion-item>
           <hr/>
-          <ion-item lines="none">
-            <span>Your Order has been {{orderInfo?.order_status}}</span>
+          <!-- <ion-item lines="none" *ngIf="orderInfo?.order_status == 11">
+            <span>Your {{orderInfo?.order_status}} on </span>
             <span style="display:block">
               {{orderInfo?.order_placing_date| date: "yyyy/MM/dd"}} {{orderInfo?.order_placing_date| date:'shortTime'}}
             </span>
-          </ion-item>
+          </ion-item> -->
           <!-- <ion-item no-lines *ngIf="orderStatus == 0">
                   <span>Your Order has been cancelled</span>
                   <span style="display:block">
@@ -146,7 +184,7 @@
                   </span>
           </ion-item> -->
           <hr/>
-          <ion-item lines="none">
+          <!-- <ion-item lines="none">
             <div class="outer_empty_cart_wrap">
               <div class="innerCartWrap">
                 <span>Changed your mind?</span>
@@ -155,7 +193,7 @@
                 </div>
               </div>
             </div>
-          </ion-item>
+          </ion-item> -->
 
           <!-- <ion-item no-lines *ngIf="orderStatus != 0 && orderStatus =='2' ">
                         <div *ngIf="orderStatus" class="outer_empty_cart_wrap">        

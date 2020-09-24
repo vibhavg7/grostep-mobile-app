@@ -10,27 +10,73 @@
 <ion-content>
     <div *ngIf="!offers?.length && !isLoading" class="outer_empty_cart_wrap">
         <div class="innerCartWrap">
+            <ion-icon class="noliveordericon" name="medical"></ion-icon>
             <span style="color:#b61671">No Available Vouchers!</span>
         </div>
     </div>
     <ion-grid>
         <ion-row>
-            <ion-col size-md="8" offset-md="2" text-center *ngIf="isLoading">
-                <ion-spinner color="primary"></ion-spinner>
+            <ion-col size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
+                <!-- <ion-spinner color="primary"></ion-spinner> -->
+                <ion-list id="skeleton" *ngIf="isLoading">
+                    <!-- <ion-list-header>
+                                      <ion-skeleton-text animated style="width: 80px"></ion-skeleton-text>
+                                    </ion-list-header> -->
+                    <ion-item style="padding-bottom:6px;" lines="none" class="ion-no-padding" *ngFor="let number of skeletonStoreCount">
+                        <ion-thumbnail slot="start">
+                            <ion-skeleton-text></ion-skeleton-text>
+                        </ion-thumbnail>
+                        <ion-label>
+                            <h3>
+                                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                            </h3>
+                            <p>
+                                <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                            </p>
+                            <p>
+                                <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                            </p>
+                        </ion-label>
+                    </ion-item>
+                </ion-list>
             </ion-col>
             <ion-col size="12" size-sm="8" offset-sm="2">
                 <div *ngIf="offers?.length > 0">
                     <ion-card *ngFor="let offer of offers">
-                        <img *ngIf="offer?.image_url" [src]="offer?.image_url" />
-                        <img *ngIf="!offer?.image_url" src="assets/images/default_image.jpg" />
+                        <!-- <img *ngIf="offer?.image_url" [src]="offer?.image_url" /> -->
+                        <!-- <img *ngIf="!offer?.image_url" src="assets/images/default_image.jpg" /> -->
                         <ion-card-header>
-                            <ion-card-subtitle>Voucher Code: {{ offer?.voucher_code }}</ion-card-subtitle>
-                            <ion-card-title>Offer Amount: &#8377; {{ offer?.voucher_amount }}</ion-card-title>
+                            <ion-card-subtitle style="padding:5px 0px 10px 0px">
+                            <span style="
+                            color: black;
+                            /* font-weight: bold; */
+                            /* margin-left: 51px; */
+                            font-size: 14px;
+                            width: 180px;
+                            border: 1px solid#edf7e3;
+                            padding: 10px;
+                            margin-left:-4px;
+                            outline: none;
+                            background: #edf7e3;
+                            border-radius: 5px 5px;">
+                            <!-- <img src="../../assets/images/offers_icon.png" style="height:40px;width:40px"/> -->
+                                Voucher Code: {{ offer?.voucher_code }}
+                            </span>
+                            <span *ngIf="offer?.applyButton" style="float: right; 
+                            font-weight: 600;
+                            color: #6fa833;
+                            font-size: 16px;">
+                                APPLY
+                            </span>
+                        </ion-card-subtitle>
+                            <ion-card-title style="font-size:16px">Offer Amount: &#8377; {{ offer?.voucher_amount }}</ion-card-title>
                         </ion-card-header>
+                        <div class="line"></div>
                         <ion-card-content>
-                            <p>Min Cart Amount: &#8377; {{ offer?.voucher_amount }}</p>
-                            {{offer?.description}} {{offer?.applyButton}}
-                            <ion-button (click)="applyVoucher(offer)" [disabled]="!offer?.applyButton" expand="block" fill="clear" color="primary"> APPLY </ion-button>
+                            <p style="color: black;font-size:16px">Min Cart Amount: &#8377; {{ offer?.voucher_cart_amount }}</p>
+                            {{offer?.description}}
+                            <!-- [disabled]="!offer?.applyButton" -->
+                            <!-- <ion-button (click)="applyVoucher(offer)" *ngIf="offer?.applyButton" expand="block" color="primary"> APPLY </ion-button> -->
                         </ion-card-content>
                     </ion-card>
                 </div>

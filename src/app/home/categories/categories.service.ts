@@ -2,33 +2,39 @@ import { Injectable } from '@angular/core';
 import { Observable, throwError, forkJoin } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { tap, catchError, map } from 'rxjs/operators';
+import { OrderService } from '../../order/order.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoriesService {
 
-  private categoryServiceUrl = 'http://ec2-13-233-10-240.ap-south-1.compute.amazonaws.com:3000/categoryapi';
-  private bannerServiceUrl = 'http://ec2-13-233-10-240.ap-south-1.compute.amazonaws.com:3000/bannerapi';
+  private categoryServiceUrl = 'https://api.grostep.com/categoryapi';
+  private bannerServiceUrl = 'https://api.grostep.com/bannerapi';
   private storecategories: any = [];
-  constructor(private httpClient: HttpClient) { }
+  constructor(
+    private httpClient: HttpClient,
+    private authService: AuthService,
+    private orderService: OrderService) { }
 
 
   get StoreCategories(): any {
     return this.storecategories;
   }
 
-  public storeDataCatData(zipCode): Observable<any[]> {
+  public storeDataCatData(city): Observable<any[]> {
     const obj: any = {};
-    obj.page_number = 1; obj.page_size = 20; obj.filterBy = '';
+    obj.filterBy = city;
     const obj1: any = {};
-    obj1.filterBy = zipCode;
-    const response1 = this.httpClient.post(`${this.categoryServiceUrl}/storecategories/zipcode`, obj1);
-    const response2 = this.httpClient.post(`${this.bannerServiceUrl}/bannerinfo`, obj);
-    return forkJoin([response1, response2])
+    obj1.filterBy = city;
+    const response1 = this.httpClient.post(`${this.categoryServiceUrl}/storecategories/citywise`, obj1);
+    const response2 = this.httpClient.post(`${this.bannerServiceUrl}/bannerinfo/citywise`, obj);
+    const response3 = this.orderService.fetchCustomerLiveOrderCount();
+    const response4 = this.authService.getUserProfile();
+    return forkJoin([response1, response2, response3, response4])
     .pipe(tap((d) => {
       this.storecategories = d[0].store_categories;
-      // console.log(d[1]);
     }));
   }
   private handleError(err: HttpErrorResponse) {

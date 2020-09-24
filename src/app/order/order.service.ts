@@ -1,63 +1,148 @@
 import { Injectable } from '@angular/core';
+import { Observable, throwError, of } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { tap, map, catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/internal/operators/catchError';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class OrderService {
+    private orderServiceUrl = 'https://api.grostep.com/ordersapi/';
+    private customerServiceUrl = 'https://api.grostep.com/customerapi/';
+    private CUSTOMER_ID = 'customerid';
+    constructor(private httpClient: HttpClient) { }
 
-  constructor(private httpClient: HttpClient) { }
-  private orderServiceUrl = 'http://ec2-13-233-10-240.ap-south-1.compute.amazonaws.com:3000/ordersapi/';
-  private CUSTOMER_ID = 'customerid';
-  public ordersInfo: any = [];
-
-  placeOrder(obj) {
-    console.log(obj);
-    return this.httpClient.post<any[]>(`${this.orderServiceUrl}placeorder`, obj)
-      .pipe(
-        tap((data: any) => {
-        })
-        , map((data) => {
-          console.log(data);
-          return data;
-        })
-        , catchError(this.handleError)
-      );
-  }
-
-  fetchAllCustomerOrders() {
-    const obj: any = {};
-    obj.customerId = localStorage.getItem(this.CUSTOMER_ID);
-    obj.page_number = 1;
-    obj.page_size = 1000;
-    obj.filterBy = '';
-    return this.httpClient.post<any[]>(`${this.orderServiceUrl}customerorders`, obj)
-    .pipe(
-      tap((data: any) => {
-        this.ordersInfo = data.customer_orders_info;
-      })
-      , map((data) => {
-        return data;
-      })
-      , catchError(this.handleError)
-    );
-  }
-
-  private handleError(err: HttpErrorResponse) {
-    // in a real world app, we may send the server to some remote logging infrastructure
-    // instead of just logging it to the console
-    let errorMessage = '';
-    if (err.error instanceof ErrorEvent) {
-      // A client-side or network error occurred. Handle it accordingly.
-      errorMessage = `An error occurred: ${err.error.message}`;
-    } else {
-      // The backend returned an unsuccessful response code.
-      // The response body may contain clues as to what went wrong,
-      errorMessage = `Server returned code: ${err.status}, error message is: ${err.message}`;
+    fetchAllCustomerLiveOrders(pagenumber: number, pagesize: number) {
+        const obj: any = {};
+        obj.customerId = localStorage.getItem(this.CUSTOMER_ID);
+        obj.page_number = pagenumber;
+        obj.page_size = pagesize;
+        console.log(obj);
+        return this.httpClient.post(`${this.orderServiceUrl}customerliveorders`, obj)
+            .pipe(
+                tap(data => {
+                })
+                , map((data) => {
+                    console.log(data);
+                    return data;
+                })
+                , catchError(this.handleError)
+            );
     }
-    // console.error(errorMessage);
-    return throwError(errorMessage);
-  }
+
+    fetchCustomerLiveOrderCount() {
+        const customerId = localStorage.getItem(this.CUSTOMER_ID);
+        return this.httpClient.get(`${this.orderServiceUrl}customerliveordercount/${customerId}`)
+            .pipe(
+                tap(data => {
+                })
+                , map((data) => {
+                    return data;
+                })
+                , catchError(this.handleError)
+            );
+    }
+    fetchAllCustomerLiveOrderDetail(orderId: any) {
+        return this.httpClient.get<any>(`${this.orderServiceUrl}customerliveorders/${orderId}`)
+            .pipe(
+                tap(data => {
+                    // console.log(data);
+                })
+                , map((data) => {
+                    // console.log(data);
+                    return data;
+                    // return data.addressInfo[0];
+                })
+                , catchError(this.handleError)
+            );
+    }
+    fetchOrderInformationById(orderId: any) {
+        return this.httpClient.get<any>(`${this.orderServiceUrl}customerorderInfoById/${orderId}`)
+            .pipe(
+                tap(data => {
+                    // console.log(data);
+                })
+                , map((data) => {
+                    // console.log(data);
+                    return data;
+                    // return data.addressInfo[0];
+                })
+                , catchError(this.handleError)
+            );
+    }
+    fetchAllCustomerOrders(pagenumber: number, pagesize: number) {
+        const obj: any = {};
+        obj.customerId = localStorage.getItem(this.CUSTOMER_ID);
+        obj.page_number = pagenumber;
+        obj.page_size = pagesize;
+        obj.filterBy = '';
+        return this.httpClient.post(`${this.orderServiceUrl}customerorders`, obj)
+            .pipe(
+                tap(data => {
+                })
+                , map((data) => {
+                    console.log(data);
+                    return data;
+                })
+                , catchError(this.handleError)
+            );
+    }
+    updateOrderStatus(orderId: any, orderStatus: any) {
+        const obj: any = {};
+        obj.status = orderStatus;
+        return this.httpClient.put<any>(`${this.customerServiceUrl}updateOrder/${orderId}`, obj)
+        .pipe(
+          tap(data => {
+            // console.log(data);
+          })
+          , map((data) => {
+            return data;
+          })
+          , catchError(this.handleError)
+        );
+    }
+    placeOrder(orderObj: any) {
+        return this.httpClient.post(`${this.orderServiceUrl}placeorder`, orderObj)
+            .pipe(
+                tap(data => {
+                })
+                , map((data) => {
+                    console.log(data);
+                    return data;
+                })
+                , catchError(this.handleError)
+            );
+    }
+
+    cancelOrder(orderId, orderStatus) {
+        const obj: any = {};
+        obj.status = orderStatus;
+        return this.httpClient.put<any>(`${this.orderServiceUrl}cancelOrderByCustomer/${orderId}`, obj)
+        .pipe(
+          tap(data => {
+            // console.log(data);
+          })
+          , map((data) => {
+            return data;
+          })
+          , catchError(this.handleError)
+        );
+    }
+
+    private handleError(err: HttpErrorResponse) {
+        // in a real world app, we may send the server to some remote logging infrastructure
+        // instead of just logging it to the console
+        let errorMessage = '';
+        if (err.error instanceof ErrorEvent) {
+            // A client-side or network error occurred. Handle it accordingly.
+            errorMessage = `An error occurred: ${err.error.message}`;
+        } else {
+            // The backend returned an unsuccessful response code.
+            // The response body may contain clues as to what went wrong,
+            errorMessage = `Server returned code: ${err.status}, error message is: ${err.message}`;
+        }
+        // console.error(errorMessage);
+        return throwError(errorMessage);
+    }
 }

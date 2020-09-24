@@ -1,39 +1,53 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home/tabs/categories"></ion-back-button>
+      <ion-back-button (click)="backToHome()" defaultHref="/home/tabs/categories"></ion-back-button>
     </ion-buttons>
     <ion-title>Login</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div style="height:90%;">
-    <table id="wrapper">
-      <tr>
-        <td>
-          <img style="width:50%;height:38%" src="assets/images/applogo.png" alt="" />
-          <h3 style="text-align:center;color:#000;font-weight:540;font-family: Georgia;">Deliver grocery at your doorstep </h3>
-        </td>
-      </tr>
-    </table>
-  </div>
+  <ion-grid class="my-grid">
+    <ion-row>
+      <ion-col size="12" size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
+        <ion-spinner color="primary"></ion-spinner>
+      </ion-col>
+    </ion-row>
+    <ion-row class="parent-row">
+      <ion-col style="border-radius: 10px 10px;background-color: #fff;" size="12">
+        <ion-item style="--background: #fff;padding-top: 15px;" lines="none">
+          <img style="width:50%;margin:0 auto" src="assets/images/applogo.png" alt="" />
+        </ion-item>
+        <ion-item style="--padding-top:15px;--background: #fff;" lines="none">
+          <h3 style="text-align:center;color:#191919;margin:auto">
+            Grocery at your doorstep
+          </h3>
+        </ion-item>
+        <ion-item style="--background: #f2f2f2;padding: 0px 20px 0px 20px;" lines="none">
+          <ion-input #input type="tel" appBlockCopyPaste placeholder="Enter your phone number" 
+          [(ngModel)]="phoneNumber" maxlength="10" (keypress)="numberOnly($event)">
+          </ion-input>
+        </ion-item>
+        <ion-item lines="none" style="--padding-top:15px;--background: #fff;--padding-bottom: 20px;">
+          <button type="submit" [ngClass]="{'login-button-enabled': phoneNumber?.length == 10, 'login-button-disabled':phoneNumber?.length != 10 }"
+            (click)="login(phoneNumber)">
+            Login</button>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
-<ion-footer class="footer_color">
+<!-- <ion-footer class="footer_color">
   <ion-row>
     <ion-col size="8">
-      <input type="number" placeholder="Enter your phone number" #phoneNumber style="height: 42px;width: 230px;font-size: 17px;padding-left:11px">
+      <input type="tel" appBlockCopyPaste placeholder="Enter your phone number" [(ngModel)]="phoneNumber"
+        maxlength="10" (keypress)="numberOnly($event)" style="height: 42px;width: 230px;font-size: 16px;padding-left:11px">
     </ion-col>
     <ion-col size="4">
-      <button type="submit" style="height: 42px;width: 78px;margin-left: 18px;background-color: #6fa833;color: #fff;font-size: 17px;" (click)="login(phoneNumber.value)">
+      <button type="submit" [ngClass]="{'login-button-enabled': phoneNumber?.length == 10, 'login-button-disabled':phoneNumber?.length != 10 }"
+        (click)="login(phoneNumber)">
         Login</button>
     </ion-col>
   </ion-row>
-  <!-- <div style="height:10%;width:100%;background-color:whitesmoke">
-    <div style="position: relative;top: 50%;transform: translateY(-50%);">
-      <input type="number" placeholder="Enter your phone number" #phoneNumber style="height: 42px;margin-left: 22px;width: 220px;font-size: 20px;border-radius: 8px;">
-      <button type="submit" style="height: 42px;width: 78px;margin-left: 27px;border-radius: 12px;" (click)="login(phoneNumber.value)">
-        Login</button>
-    </div>
-  </div> -->
-</ion-footer>
+</ion-footer> -->

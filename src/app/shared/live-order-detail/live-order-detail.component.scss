@@ -1,0 +1,30 @@
+ion-content{
+    --ion-background-color: #F8F8F8;
+}
+input[type="radio"]{
+    vertical-align:baseline;
+    width: 1.2em; height: 2em;
+    // height: 2em;
+    // width: 6%;
+     margin-left: -10px
+    }
+
+    label {
+        display: block;
+    margin: -26px 0px 0px 20px;
+    font-weight: bold;
+    color: #8fc951;
+    }
+    
+    .verticalLine {
+      border-left: thick solid #8fc951;
+    //   height:120px;
+    }
+
+    
+.footer_color{
+    background-color:#6fa833 !important;
+    color:white
+  }
+
+    agm-map { height: 220px; /* height is required */ }

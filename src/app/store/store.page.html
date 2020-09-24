@@ -8,46 +8,110 @@
 </ion-header>
 
 <ion-content>
+  <div *ngIf="!loadedStoresCount && !isLoading" class="outer_empty_cart_wrap">
+    <div class="innerCartWrap">
+      <ion-icon class="noliveordericon" name="folder"></ion-icon>
+      <span style="color:#b61671;display:block;text-align: center;font-size:16px;">No stores to display!</span>
+    </div>
+  </div>
   <ion-grid>
     <ion-row>
-      <ion-col size-md="8" offset-md="2" text-center *ngIf="isLoading">
+      <!-- <ion-col size-md="8" offset-md="2" text-center *ngIf="isLoading">
         <ion-spinner color="primary"></ion-spinner>
-      </ion-col>
-      <ion-col size="12" size-sm="8" offset-sm="2">
+      </ion-col> -->
+      <ion-col size="12" size-sm="8" offset-sm="2" *ngIf="!isLoading && loadedStoresCount > 0">
         <form [formGroup]="searchCriteriaForm">
-          <!-- style="border:1px solid black" -->
-          <ion-item>
+          <ion-item lines="none" (click)="onSearch()">
             <ion-label position="floating">Search in {{categoryName}}</ion-label>
-            <ion-input type="text" (keyup)="onChanges()" autocomplete="off" formControlName="searchCriteria"></ion-input>
+            <ion-input type="text" autocomplete="off" formControlName="searchCriteria"></ion-input>
             <ion-icon style="padding-top: 8px;" name="search" slot="end"></ion-icon>
           </ion-item>
         </form>
-
       </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col size="12" size-sm="8" offset-sm="2" style="font-weight:550">
-        <ion-text>{{loadedStoresCount}} Stores Nearby</ion-text>
+      <ion-col *ngIf="!isLoading && loadedStoresCount > 0" size="12" size-sm="8" offset-sm="2" style="font-weight:500;margin-top:5px">
+        <ion-text style="font-weight:550;color:#282c3f">
+          {{loadedStoresCount}} Stores Nearby</ion-text>
       </ion-col>
-    </ion-row>
-    <ion-row>
       <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center">
-        <ion-list>
-          <ion-item *ngFor="let store of loadedStores">
-            <ion-thumbnail slot="start" (click)="clickStore(store?.store_id)">
-              <img *ngIf="store?.image_url" [src]="store.image_url" onError="this.src='assets/images/default_image.jpg';" />
-              <ion-img *ngIf="!store?.image_url" src="../../../../assets/images/default_image.jpg"></ion-img>
-            </ion-thumbnail>
-            <ion-label>
-              <h2>
-                <span (click)="clickStore(store?.store_id)">{{store.store_name}}</span>
-                <ion-icon (click)="favouriteStore(store?.store_id)" style="float:right" [color]="store?.likedBy ? 'danger' : 'dark'" name="heart"></ion-icon>
-              </h2>
-              <p (click)="clickStore(store?.store_id)">{{store.address}}</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
+        <div>
+          <ion-list *ngIf="!isLoading && loadedStoresCount > 0">
+            <ng-container *ngFor="let store of loadedStores">
+                <ion-item  lines="none" class="ion-no-padding" 
+                [ngClass]="{'open-storeclass': store?.closed == 0, 'close-storeclass':store?.closed == 1 }"
+                (click)="clickStore(store?.store_id,store?.closed)">
+                <ion-thumbnail *ngIf="store?.image_url" slot="start" (click)="clickStore(store?.store_id,store?.closed)">
+                  <img *ngIf="store?.image_url" [src]="store.image_url" onError="this.src='assets/images/default_image.jpg';" />
+                </ion-thumbnail>
+                <div *ngIf="!store?.image_url" class="storeimagecss" (click)="clickStore(store?.store_id,store?.closed)">
+                  {{store.store_name}}
+                </div>
+                <ion-label style="padding-left: 5px;">
+                  <h2>
+                    <span style="font-size:14px" *ngIf="store?.store_name">{{store.store_name}}</span>
+                  </h2>
+                  <p>
+                    <span style="font-size:13px" *ngIf="store?.address">{{store.address}}</span>
+                  </p>
+                  <p  style="font-weight:bold;font-size:13px">
+                    <span *ngIf="store?.distanceFromCustomer && store?.timeFromCustomer">
+                        {{store?.distanceFromCustomer }} | {{store?.timeFromCustomer}}
+                    </span>
+                    <span *ngIf="!store?.distanceFromCustomer && !store?.timeFromCustomer">
+                      0 Km | 0 min
+                    </span>
+                  </p>
+                  <p style="font-weight:bold;font-size:13px" *ngIf="store?.closed == 1">
+                    CLOSED - Will Open Tomorrow at {{store?.store_opening_time}}{{store?.store_opening_time_clock}}
+                  </p>
+                </ion-label>
+              </ion-item>
+            </ng-container>
+          </ion-list>
+          <ion-list id="skeleton" *ngIf="isLoading">
+              <ion-item style ="padding-bottom:6px;" 
+              lines="none" class="ion-no-padding" *ngFor="let number of skeletonStoreCount">
+                <ion-thumbnail slot="start" class="skeletonthumbnail">
+                  <ion-skeleton-text animated></ion-skeleton-text>
+                </ion-thumbnail>
+                <ion-label>
+                  <h3>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                  </h3>
+                  <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                  </p>
+                  <p>
+                    <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                  </p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+  
+        </div>
       </ion-col>
     </ion-row>
+
+
   </ion-grid>
+  <ion-infinite-scroll threshold="15%" (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more stores...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>
+
+<!-- <ion-footer *ngIf="cartList?.length" class="footer_color">
+    <ion-row>
+      <ion-col size="6">
+        <ion-button style="--color-activated: #fff;" expand="full" (click)="viewCart()" fill="clear" >
+          {{cartList?.length}} Items
+        </ion-button>
+      </ion-col>
+  
+      <ion-col size="6">
+        <ion-button style="--color-activated: #fff;" expand="full" (click)="viewCart()" fill="clear">
+          View Basket
+          <ion-icon name="cart"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-footer> -->

@@ -1,0 +1,95 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Feedback Form</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click)="onCancel()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <form (ngSubmit)="addCustomerFeedback()" [formGroup]="customerFeedbackForm">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Name</ion-label>
+            <ion-input type="text" name="name" [formControl]="customerFeedbackForm.controls['name']" [(ngModel)]="registerCredentials.name"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" style="color:red;margin-left:10px">
+          <ion-text *ngIf="submitted && f.name.errors">
+            <span *ngIf="f.name.errors.required">Name is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.name.errors">
+            <span *ngIf="f.name.errors.pattern">Please enter valid name</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input type="email" name="email" [(ngModel)]="registerCredentials.email" [formControl]="customerFeedbackForm.controls['email']"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" style="color:red;margin-left:10px">
+          <ion-text *ngIf="submitted && f.email.errors">
+            <span *ngIf="f.email.errors.required">Email is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.email.errors">
+            <span *ngIf="f.email.errors.email">Please enter valid email address</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Phone</ion-label>
+            <ion-input maxlength="10" (keypress)="numberOnly($event)" type="tel" name="phone" [(ngModel)]="registerCredentials.phone" [formControl]="customerFeedbackForm.controls['phone']"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" style="color:red;margin-left:10px">
+          <ion-text *ngIf="submitted && f.phone.errors">
+            <span *ngIf="f.phone.errors.required">Phone Number is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.phone.errors">
+            <span *ngIf="f.phone.errors.pattern">Please enter valid phone number</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Message</ion-label>
+            <ion-textarea maxlength="250" type="text" name="message" [(ngModel)]="registerCredentials.message" autocomplete="on" autocorrect="on" [formControl]="customerFeedbackForm.controls['message']"></ion-textarea>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+          <ion-col size="12" style="color:red;margin-left:10px">
+            <ion-text *ngIf="submitted && f.message.errors">
+              <span *ngIf="f.message.errors.required">Message is required</span>
+            </ion-text>
+            <ion-text *ngIf="submitted && f.message.errors">
+              <span *ngIf="f.message.errors.maxlength">Must be at below 250 characters.</span>
+            </ion-text>
+          </ion-col>
+        </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-button type="submit" expand="block" [ngClass]="{'user-info-button-enabled': !!customerFeedbackForm.valid, 'user-info-button-disabled': !customerFeedbackForm.valid }">
+            SUBMIT FEEDBACK
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
+</ion-content>

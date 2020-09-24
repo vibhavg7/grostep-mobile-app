@@ -18,22 +18,41 @@
       </ion-segment-button>
     </ion-segment>
   </div>
+  <ion-row *ngIf="storeProductsCount > 0 && !isLoading">
+    <ion-col size="12" size-sm="8" offset-sm="2">
+        <!-- <form [formGroup]="searchCriteriaForm">
+            <ion-item lines="none" (click)="onSearch()">
+              <ion-label position="floating">Search in {{categoryName}}</ion-label>
+              <ion-input type="text" autocomplete="off" formControlName="searchCriteria"></ion-input>
+              <ion-icon style="padding-top: 8px;" name="search" slot="end"></ion-icon>
+            </ion-item>
+          </form> -->
+      <ion-item lines="none" style="padding-top:6px">
+        <ion-label position="floating">Search in {{pageTitle}}</ion-label>
+        <ion-input #myInput type="text" (input)="filterItem(myInput.value)" autocomplete="off"></ion-input>
+        <ion-icon style="padding-top: 8px;" (click)="seachBoxActive()" name="search" slot="end"></ion-icon>
+      </ion-item>
+    </ion-col>
+  </ion-row>
   <div style="height:78% !important">
-    <div *ngIf="!storeProducts1?.length && !isLoading" class="outer_empty_cart_wrap">
+    <div *ngIf="storeProducts1?.length <=0 && !isLoading" class="outer_empty_cart_wrap">
       <div class="innerCartWrap">
-        <!-- <ion-icon name="albums"></ion-icon> -->
+        <ion-icon class="noliveordericon" name="folder"></ion-icon>
         <span style="color:#b61671">No Products Found!</span>
       </div>
     </div>
     <ion-grid>
       <ion-row>
-        <ion-col size-md="8" offset-md="2" text-center *ngIf="isLoading">
+          <!-- <ion-col style="padding-left: 14px;font-weight:600;" *ngIf="storeProductsCount >0 " >
+              <ion-label>{{storeProductsCount}} Items</ion-label>
+          </ion-col> -->
+        <!-- <ion-col size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
           <ion-spinner color="primary"></ion-spinner>
-        </ion-col>
-        <ion-col size="12" size-sm="8" offset-sm="2" text-center>
+        </ion-col> -->
+        <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center">
           <div *ngIf="storeProducts1?.length > 0">
-            <ion-list>
-              <ion-item *ngFor="let product of storeProducts1">
+            <ion-list style="padding-top: 0px;">
+              <ion-item lines="none" style="padding-bottom:10px;" *ngFor="let product of storeProducts1">
                 <ion-thumbnail class="thumbWrap" slot="start">
                   <span *ngIf="product?.store_discount > 0" class="discount_logo">
                     {{ product?.store_discount | number : '1.0-0' }}%
@@ -43,19 +62,34 @@
                   <ion-img *ngIf="!product?.image_url" src="assets/images/default_image.jpg"></ion-img>
                 </ion-thumbnail>
                 <ion-label>
-                  <h2>{{product?.product_name}}</h2>
-                  <p style="font-weight:bold;">{{product?.weight + ' ' + product?.weight_text }}</p>
-                  <p>MRP:
+                  <h2 style="padding-top:0;white-space: pre-line">{{product?.product_name}}</h2>
+                  <p *ngIf="product?.weight && product?.weight_text" style="font-weight:bold;">
+                    {{product?.weight + ' ' + product?.weight_text }}
+                  </p>
+                  <p *ngIf="product?.store_discount > 0">
                     <del> &#8377; {{product?.product_marked_price }} </del>
                   </p>
                   <p>
                     <span style="font-weight:bold;"> &#8377; {{product?.store_selling_price }} </span>
-                    <button *ngIf="!product?.added" class="addButton" (click)="addProduct(product)">
-                      <span style="color: #fff;"> ADD</span>
+                    <button *ngIf="!product?.added && product?.stock && loadedStore?.closed === 0" class="addButton" 
+                      (click)="addProduct(product)">
+                      <span style="color: #fff;font-size:16px;outline:none"> ADD</span>
+                      <!-- <ion-icon name="add"></ion-icon> -->
                     </button>
 
-                    <span *ngIf="product?.added" style="width: 120px;height: 35px;float:right;color:white">
+                    <!-- <ion-button *ngIf="!product?.stock" expand="block" fill="clear"> -->
+                    <span expand="block" fill="clear" *ngIf="!product?.stock && loadedStore?.closed === 0" 
+                      class="outofstockButton">OUT OF STOCK</span>
+                    <!-- </ion-button> -->
+
+                    <!-- <button *ngIf="!product?.stock" class="addButton">
+                        <span style="color: #fff;">OUT OF STOCK</span>
+                      </button> -->
+
+                    <span *ngIf="product?.added && product?.stock && loadedStore?.closed === 0" 
+                    style="width: 120px;height: 35px;float:right;color:white">
                       <span *ngIf="product?.added" (click)="removeItemfromCart(product)" style="width:45px;background-color:#8fc951;
+                                        border-radius: 5px 0px 0px 5px;
                                         line-height: 35px;text-align:center;display: inline-block;height: 35px;font-size:1.2em;">
                         -
                       </span>
@@ -66,7 +100,8 @@
                       </span>
                       <span *ngIf="product?.added" style="width:45px;background-color:#8fc951;
                                       line-height: 35px;text-align:center;display: inline-block;
-                                             height: 35px;font-size:1.2em;" (click)="addtocart(product);">
+                                      border-radius: 0px 5px 5px 0px;
+                                             height: 35px;font-size:16px;" (click)="addtocart(product);">
                         +
                       </span>
                     </span>
@@ -76,23 +111,51 @@
 
             </ion-list>
           </div>
+          <ion-list id="skeleton" *ngIf="isLoading">
+              <!-- <ion-list-header>
+                <ion-skeleton-text animated style="width: 80px"></ion-skeleton-text>
+              </ion-list-header> -->
+              <ion-item style ="padding-bottom:6px;" 
+              lines="none" class="ion-no-padding" *ngFor="let number of skeletonStoreCount">
+                <ion-thumbnail slot="start" class="skeletonthumbnail">
+                  <ion-skeleton-text></ion-skeleton-text>
+                </ion-thumbnail>
+                <ion-label>
+                  <h3>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                  </h3>
+                  <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                  </p>
+                  <p>
+                    <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                  </p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+  
         </ion-col>
       </ion-row>
 
     </ion-grid>
+    <ion-infinite-scroll threshold="15%" (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more products...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
   </div>
 </ion-content>
 
 <ion-footer *ngIf="cartList?.length" class="footer_color">
   <ion-row>
     <ion-col size="6">
-      <ion-button expand="full" (click)="viewCart()" fill="clear" style="color:#fff !important">
-        {{cartList[0]?.store_name}} - {{cartList?.length}} Items
+      <ion-button style="--color-activated: #fff;" expand="full" (click)="viewCart()" fill="clear">
+        <!-- {{cartList[0]?.store_name}} -  -->
+        {{cartList?.length}} Items
       </ion-button>
     </ion-col>
 
     <ion-col size="6">
-      <ion-button expand="full" (click)="viewCart()" fill="clear" style="color:#fff !important">
+      <ion-button style="--color-activated: #fff;" expand="full" (click)="viewCart()" fill="clear">
         View Basket
         <ion-icon name="cart"></ion-icon>
       </ion-button>

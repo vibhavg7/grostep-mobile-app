@@ -19,7 +19,17 @@ const routes: Routes = [
   {
     path: 'favourite-store',
     loadChildren: () => import('./favourite-store/favourite-store.module').then( m => m.FavouriteStorePageModule)
+  },
+  {
+    path: 'storesearch/:categoryId',
+    loadChildren: () => import('./store-search/store-search.module').then( m => m.StoreSearchPageModule)
+  },
+  {
+    path: 'grostepstore',
+    loadChildren: () => import('./grostep-store/grostep-store.module').then( m => m.GrostepStorePageModule)
   }
+
+
 ];
 
 @NgModule({

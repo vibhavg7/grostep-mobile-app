@@ -2,54 +2,65 @@
   <ion-toolbar>
     <ion-title>Review Cart</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref=""></ion-back-button>
+      <ion-back-button (click)="backToHome()" defaultHref=""></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div *ngIf="!cartList?.length" class="outer_empty_cart_wrap">
+  <ion-col size="12" size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
+    <ion-spinner color="primary"></ion-spinner>
+  </ion-col>
+  <div *ngIf="!cartList?.length && !isLoading" class="outer_empty_cart_wrap">
     <div class="innerCartWrap">
-      <ion-icon name="cart"></ion-icon>
-      <span style="color:#b61671">Your bag is empty!</span>
+      <ion-icon class="noliveordericon" name="cart"></ion-icon>
+      <span style="color:#b61671;font-size:18px">Your cart is empty!</span>
     </div>
   </div>
-  <div *ngIf="!cartList?.length" class="outer_continue_shopping_button">
+  <div *ngIf="!cartList?.length && !isLoading" class="outer_continue_shopping_button">
     <ion-button fill="clear" (click)="continueShopping()" class="inner_continue_shopping_button">CONTINUE SHOPPING</ion-button>
   </div>
-  <ion-grid no-padding style="background-color: lightgrey; display: flex; flex-flow: column;">
+  <ion-grid *ngIf="cartList?.length && !isLoading" class="ion-no-padding" style="display: flex; flex-flow: column;">
     <ion-row>
-      <ion-col size="12" size-sm="8" offset-sm="2" text-center style="background-color: #fff;margin:10px 0px">
-        <ion-list *ngIf="cartList?.length">
-          <ion-item *ngFor="let product of cartList">
+      <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center">
+        <ion-list *ngIf="cartList?.length" [ngClass]="{'open-storeclass': storeClosingStatus == 0, 'close-storeclass':storeClosingStatus == 1 }">
+          <ion-item-divider *ngIf="cartStoreName" style="font-weight: 400;
+            color: #191919;
+            font-size: 16px;
+            padding: 2px 0px 8px 14px;" [ngClass]="{'open-storeclass': storeClosingStatus == 0, 'close-storeclass':storeClosingStatus == 1 }">
+            <span>{{cartStoreName}}</span>
+            <div style="font-weight: bold;margin: 0 auto;">
+              {{ storeClosingStatus == 1 ? 'CLOSED' : 'OPEN' }}
+            </div>
+          </ion-item-divider>
+          <ion-item lines="none" [ngClass]="{'open-storeclass': storeClosingStatus == 0, 'close-storeclass':storeClosingStatus == 1 }"
+            *ngFor="let product of cartList">
             <ion-thumbnail slot="start">
               <ion-img *ngIf="product?.product_img" [src]="product.product_img"></ion-img>
               <ion-img *ngIf="!product?.product_img" src="../../../../assets/images/default_image.jpg"></ion-img>
             </ion-thumbnail>
             <ion-label>
-              <h2>
+              <h2 style="padding-top:0;display:inline">
                 {{product?.title}}
-                <div slot="end" style="float:right;width:20%;border-color:#8fc951 !important" (click)="removeItemFromCart(product)">
-                  <ion-icon style="border: 1px solid;color:#8fc951;
-                                    box-shadow: 0px 0px 2px #888;padding: 0.2em 0.2em;" name="close"></ion-icon>
-                </div>
               </h2>
               <p>Quantity : {{product?.weight + ' ' + product?.weight_text}}</p>
               <p style="font-weight:bold">Price : &#8377; {{product?.price}} x {{product?.quantity}} = &#8377; {{product?.price * product?.quantity|
                 number : '1.2-2'}}
-                <span style="width: 120px;height: 35px;float:right;color:white">
+                <span *ngIf="storeClosingStatus == 0" style="width: 120px;height: 35px;float:right;color:white">
                   <span (click)="quantityMinus(product)" style="width:45px;background-color:#8fc951;
-                                      line-height: 35px;text-align:center;display: inline-block;height: 35px;font-size:1.2em;">
+                                          border-radius: 5px 0px 0px 5px;
+                                          line-height: 35px;text-align:center;display: inline-block;height: 35px;font-size:1.2em;">
                     -
                   </span>
                   <span *ngIf="product?.quantity > 0" style="width:30px;background-color:#8fc951;
-                                    line-height: 35px;text-align:center;display: inline-block;
-                                           height: 35px;font-size:1.2em;">
+                                        line-height: 35px;text-align:center;display: inline-block;
+                                               height: 35px;font-size:1.2em;">
                     {{product?.quantity}}
                   </span>
                   <span style="width:45px;background-color:#8fc951;
-                                    line-height: 35px;text-align:center;display: inline-block;
-                                           height: 35px;font-size:1.2em;" (click)="quantityPlus(product);">
+                                        line-height: 35px;text-align:center;display: inline-block;
+                                        border-radius: 0px 5px 5px 0px;
+                                               height: 35px;font-size:16px;" (click)="quantityPlus(product);">
                     +
                   </span>
                 </span>
@@ -59,8 +70,8 @@
         </ion-list>
       </ion-col>
     </ion-row>
-    <ion-row>
-      <ion-col size-sm="8" offset-sm="2" text-center style="background-color: #fff;margin-bottom:10px">
+    <ion-row *ngIf="cartList?.length">
+      <ion-col size-sm="8" offset-sm="2" class="ion-text-center" [ngClass]="{'open-storeclass': storeClosingStatus == 0, 'close-storeclass':storeClosingStatus == 1 }">
         <ion-list>
           <ion-item *ngIf="(voucher | json) === '{}'" (click)="applyVoucher()" lines="none" style="background-color:whitesmoke">
             <ion-icon slot="start" name="paper"></ion-icon>
@@ -68,7 +79,6 @@
           </ion-item>
           <ion-item *ngIf="(voucher | json) != '{}'" lines="none" style="background-color:whitesmoke">
             <ion-label>{{voucher?.voucher_code}} - Applied</ion-label>
-            <!-- fill="clear" -->
             <ion-button (click)="removeVoucher(voucher?.voucher_id)">
               Remove
               <ion-icon name="close"></ion-icon>
@@ -79,7 +89,7 @@
     </ion-row>
 
     <ion-row style="flex-grow: 1;">
-      <ion-col size="12" size-sm="8" offset-sm="2" text-center style="background-color: #fff;">
+      <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center" [ngClass]="{'open-storeclass': storeClosingStatus == 0, 'close-storeclass':storeClosingStatus == 1 }">
         <ion-list *ngIf="cartList?.length">
           <ion-item lines="none">
             <label>Amount To Pay</label>
@@ -102,34 +112,45 @@
   </ion-grid>
 </ion-content>
 
-<ion-footer *ngIf="cartList?.length">
+<ion-footer *ngIf="!storeClosingStatus && cartList?.length && !isLoading">
   <ion-grid>
     <ion-row *ngIf="addressCount > 0">
       <ion-col size="7">
         <p>
-          <ion-icon name="home"></ion-icon>
-          {{selectedAddress.flatNumber}}, {{selectedAddress.address}} {{selectedAddress.address2}}
+          <span style="display: block;font-weight: bold;">
+            <ion-icon name="home"></ion-icon>
+            Deliver to {{selectedAddress?.type}}
+          </span>
+          {{selectedAddress.flatNumber}}, {{selectedAddress.address2}}
         </p>
         <p *ngIf="addressCount > 1">
-          <ion-button style="float: left;margin: -5px;" (click)="changeAddress()" expand="block" fill="clear" color="primary"> Change Address </ion-button>
+          <ion-button style="float: left;margin: -5px;" [disabled]="storeClosingStatus" (click)="changeAddress()" expand="block" fill="clear"
+            color="primary"> Change Address </ion-button>
         </p>
       </ion-col>
       <ion-col size="5">
-        <ion-button (click)="addAddress()" expand="block" fill="clear" color="primary"> Add Address </ion-button>
+        <ion-button [disabled]="storeClosingStatus" (click)="addAddress()" expand="block" fill="clear" color="primary"> Add Address </ion-button>
       </ion-col>
     </ion-row>
-    <ion-row class="footer_color">
+    <!-- [disabled]="storeClosingStatus" -->
+    <ion-row class="footer_color" *ngIf="!!currentuser">
       <ion-col size="12">
-        <ion-button *ngIf="currentuser && addressCount > 0 && cartList?.length > 0" expand="full" (click)="addDeliveryOptions()" fill="clear" style="color:#fff !important">
+        <!-- {{!!currentuser && addressCount > 0 && cartList?.length > 0}} -->
+        <ion-button *ngIf="!!currentuser && addressCount > 0 && cartList?.length > 0" expand="full" (click)="addDeliveryOptions()"
+          fill="clear" class="cart-button-class">
           Add Delivery Options
           <ion-icon name="arrow-forward"></ion-icon>
         </ion-button>
-        <ion-button *ngIf="!currentuser" expand="block" (click)="login()" fill="clear" style="color:#fff !important">
-          Login
+        <ion-button *ngIf="!!currentuser && addressCount == 0" expand="full" (click)="addAddress()" fill="clear" class="cart-button-class">
+          Add Delivery Address
           <ion-icon name="arrow-forward"></ion-icon>
         </ion-button>
-        <ion-button *ngIf="currentuser && addressCount == 0" expand="full" (click)="addAddress()" fill="clear" style="color:#fff !important">
-          Add Delivery Address
+      </ion-col>
+    </ion-row>
+    <ion-row class="footer_color" *ngIf="!currentuser">
+      <ion-col size="12">
+        <ion-button *ngIf="!currentuser" expand="block" (click)="login()" fill="clear" class="cart-button-class">
+          Login
           <ion-icon name="arrow-forward"></ion-icon>
         </ion-button>
       </ion-col>

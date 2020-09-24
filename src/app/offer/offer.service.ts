@@ -9,16 +9,32 @@ import { throwError } from 'rxjs';
 export class OfferService {
 
   constructor(private httpClient: HttpClient) { }
-  private storeServiceUrl = 'http://ec2-13-233-10-240.ap-south-1.compute.amazonaws.com:3000/vouchersapi/';
-
+  private offerServiceUrl = 'https://api.grostep.com/vouchersapi/';
   fetchAllOffers() {
-    return this.httpClient.get<any[]>(`${this.storeServiceUrl}customeroffers`)
+    return this.httpClient.get<any[]>(`${this.offerServiceUrl}customeroffers`)
     .pipe(
       tap((data: any) => {
         // this.offers = data.store_categories;
         // console.log(this.storeCategories);
       })
       , map((data) => {
+        return data;
+      })
+      , catchError(this.handleError)
+    );
+  }
+
+  searchVoucherByName(voucherCode, cartAmount) {
+    const obj: any = {};
+    obj.voucherCode = voucherCode;
+    obj.cartAmount = cartAmount;
+    console.log(obj);
+    return this.httpClient.post<any[]>(`${this.offerServiceUrl}searchVoucherByName`, obj)
+    .pipe(
+      tap((data: any) => {
+      })
+      , map((data) => {
+        console.log(data);
         return data;
       })
       , catchError(this.handleError)

@@ -1,13 +1,18 @@
 .otp {
-    color: darkgray;
-    border-style: none;
-    width: 50px;
-    height: 60px;
-    font-size: 50px;
+  color: #191919;
+  border-style: none;
+  width: 130px;
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
   }
   
+  ion-content {
+    --padding-top: 12px;
+  }
+
   td {
-    border: 2px solid darkgray
+    border: 2px solid #191919;
   }
   
   table {
@@ -18,7 +23,28 @@
     text-align: center;
   }
 
-.footer_color{
-  background-color:#6fa833 !important;
-  color:white
+.validate-button-enabled {
+  --background:#6fa833 !important;
+  --color:white;
+  width: 80%;
+  margin: auto;
+}
+
+.validate-button-disabled {
+  --background: #e5e5e5;
+  --color: #191919; 
+  width: 80%;
+  margin: auto;
+}
+
+ion-content{ 
+  --ion-background-color: #F8F8F8;
+}
+
+.resend-button-enabled {
+  font-weight:550;font-size:18px;color:#8fc951;
+}
+
+.resend-button-disabled {
+  font-weight:500;font-size:18px;color:#797979;
 }

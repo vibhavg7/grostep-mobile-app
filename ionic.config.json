@@ -1,5 +1,8 @@
 {
-  "name": "demo-app",
-  "integrations": {},
+  "name": "Grostep",
+  "integrations": {
+    "capacitor": {},
+    "cordova": {}
+  },
   "type": "angular"
 }

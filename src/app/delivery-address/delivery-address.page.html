@@ -2,38 +2,71 @@
     <ion-toolbar>
         <ion-title>Choose Address</ion-title>
         <ion-buttons slot="start">
-            <ion-back-button defaultHref=""></ion-back-button>
+            <ion-back-button (click)="backToHome()" defaultHref=""></ion-back-button>
         </ion-buttons>
     </ion-toolbar>
 </ion-header>
-<ion-content style="font-weight:bold;background-color:#f5f5f5 !important;height:100%">
+<ion-content style="font-weight:bold;height:100%">
     <ion-grid>
-        <ion-row *ngIf="prevPage == 'profilepage'">
-            <ion-col padding="2" size="12" size-md="8" offset-md="2">
-                    <ion-button (click)="addNewAddress()" color="primary" expand="block" fill="outline">
-                        Add New Address
-                    </ion-button>
+        <ion-row *ngIf="isLoading">
+            <ion-col size="12" size-md="8" offset-md="2" class="ion-text-center">
+                <ion-list id="skeleton" *ngIf="isLoading">
+                    <!-- <ion-list-header>
+                              <ion-skeleton-text animated style="width: 80px"></ion-skeleton-text>
+                            </ion-list-header> -->
+                    <ion-item style="padding-bottom:6px;" lines="none" class="ion-no-padding" *ngFor="let number of skeletonStoreCount">
+                        <ion-thumbnail slot="start">
+                            <ion-skeleton-text></ion-skeleton-text>
+                        </ion-thumbnail>
+                        <ion-label>
+                            <h3>
+                                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                            </h3>
+                            <p>
+                                <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                            </p>
+                            <p>
+                                <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                            </p>
+                        </ion-label>
+                    </ion-item>
+                </ion-list>
+                <!-- <ion-spinner color="primary"></ion-spinner> -->
             </ion-col>
         </ion-row>
-        <ion-row>
-            <ion-col size="12" size-md="8" offset-md="2" text-center *ngIf="isLoading">
-                <ion-spinner color="primary"></ion-spinner>
+        <ion-row *ngIf="prevPage == 'profilepage' && !isLoading">
+            <ion-col padding="2" size="12" size-md="8" offset-md="2">
+                <ion-button (click)="addNewAddress()" color="primary" expand="block" fill="solid">
+                    Add New Address
+                </ion-button>
             </ion-col>
-            <ion-col size="12" *ngIf="!isLoading">
+        </ion-row>
+        <div *ngIf="!addressList?.length && !isLoading" class="outer_empty_cart_wrap">
+            <div class="innerCartWrap">
+                <ion-icon class="iconcss" name="business"></ion-icon>
+                <span style="color:#b61671">No delivery address found!</span>
+            </div>
+        </div>
+        <ion-row *ngIf="addressList?.length > 0 && !isLoading">
+            <ion-col style="padding-left: 14px;font-weight:600;" *ngIf="addressListCount >0 ">
+                <ion-label style="margin-left: 5px;">{{addressListCount}} Addresses</ion-label>
+            </ion-col>
+            <ion-col size="12">
                 <div *ngFor="let item of addressList">
-                    <ion-card style="background-color:#fff">
+                    <ion-card style="background-color:#f8f8f8;color:#303030;font-size:16px">
                         <ion-card-header>
                             <span style="color:black">
-                                <input style=" width: 1.1em; height: 1.1em;" type="radio" name="status" [checked]="item.status == 1" (click)="addressSelected(item)">
+                                <input *ngIf="prevPage =='cartpage'" style=" width: 1.1em; height: 1.1em;" type="radio" name="status" [checked]="item.status == 1"
+                                    (click)="addressSelected(item)">
                                 <span (click)="addressSelected(item)">
                                     {{item.customer_name}}
                                 </span>
 
-                                <ion-icon style="border-left: 1px solid black;float: right;
+                                <ion-icon *ngIf="prevPage != 'cartpage'" style="border-left: 1px solid black;float: right;
                                              padding-left: 10px;color:black !important" name="trash" (click)="deleteDeliveryAddress(item)">
                                 </ion-icon>
 
-                                <ion-icon style="padding-right:9px;float: right;color:black !important" name="create" (click)="editDeliveryAddress(item)">
+                                <ion-icon *ngIf="prevPage != 'cartpage'" style="padding-right:9px;float: right;color:black !important" name="create" (click)="editDeliveryAddress(item)">
                                 </ion-icon>
 
                             </span>
@@ -42,10 +75,7 @@
                             <h5>Address:
                                 <b>{{item?.address}}</b>
                             </h5>
-                            <h5 style="padding-top:2px">Name:
-                                <b>{{item?.customer_name}}</b>
-                            </h5>
-                            <h5 style="padding-top:2px">
+                            <h5 style="padding-top:2px;">
                                 Pincode:
                                 <b>{{item?.pincode}}</b>
                                 <span *ngIf="item?.address_type_id" style="float:right">
@@ -61,5 +91,8 @@
             </ion-col>
         </ion-row>
     </ion-grid>
-
+    <ion-infinite-scroll threshold="15%" (ionInfinite)="loadMore($event)">
+        <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more addresses...">
+        </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
 </ion-content>

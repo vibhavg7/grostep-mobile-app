@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { tap, map } from 'rxjs/operators';
 import { catchError } from 'rxjs/internal/operators/catchError';
@@ -13,7 +13,7 @@ export class StoreService {
   selectedDeliverySlotId: any;
   delivernow = true;
   constructor(private httpClient: HttpClient) { }
-  private storeServiceUrl = 'http://ec2-13-233-10-240.ap-south-1.compute.amazonaws.com:3000/storesapi/';
+  private storeServiceUrl = 'https://api.grostep.com/storesapi/';
   private storeInfo: any;
   private storeCategories: any = [];
   private storeCategory: any;
@@ -32,15 +32,52 @@ export class StoreService {
   set StoreCategory(storeCategoryData) {
     this.storeCategory = storeCategoryData;
   }
-  fetchAllStoresBasedOnZipCode(zipcode: any, filterBy: any): Observable<any> {
+
+  searchStoreAndProductsBasedOnName(zipcode: any, filterBy: any, categoryId: any, storeId: any, storedCity: any) {
     const obj: any = {};
     obj.zipcode = zipcode;
     obj.filterBy = filterBy;
+    obj.categoryId = categoryId;
+    obj.storeId = storeId;
+    obj.storedCity = storedCity.toLowerCase();
+    if (filterBy.length < 3) {
+      const obj1: any = {status: 500, message: 'no information', store: [], products: [] };
+      return of(obj1);
+    }
     console.log(obj);
+    return this.httpClient.post<any[]>(`${this.storeServiceUrl}storeinfo/searchStoreAndProductsBasedOnName`, obj)
+      .pipe(
+        tap(data => {
+        })
+        , map((data) => {
+          return data;
+        })
+        , catchError(this.handleError)
+      );
+  }
+
+  storeClosingStatus(storeId) {
+    return this.httpClient.get<any[]>(`${this.storeServiceUrl}storestatus/${storeId}`)
+    .pipe(
+      tap((data: any) => {
+      })
+      , map((data) => {
+        return data;
+      })
+      , catchError(this.handleError)
+    );
+  }
+
+  fetchAllStoresBasedOnCity(city: any, filterBy: any, categoryId: any, pagenumber: number, pagesize: number): Observable<any> {
+    const obj: any = {};
+    obj.zipcode = city;
+    obj.filterBy = filterBy;
+    obj.page_number = pagenumber;
+    obj.page_size = pagesize;
+    obj.categoryId = categoryId;
     return this.httpClient.post<any[]>(`${this.storeServiceUrl}storeinfo/zipCode`, obj)
       .pipe(
         tap(data => {
-          // console.log(JSON.stringify(data));
         })
         , map((data) => {
           return data;
@@ -54,7 +91,6 @@ export class StoreService {
       .pipe(
         tap((data: any) => {
           this.storeCategories = data.store_categories;
-          // console.log(this.storeCategories);
         })
         , map((data) => {
           return data;
@@ -63,14 +99,30 @@ export class StoreService {
       );
   }
 
-  fetchStoreProducts(categoryid, storeid) {
+  fetchStoreInfoById(storeId: any): Observable<any> {
+    return this.httpClient.get<any[]>(`${this.storeServiceUrl}storeinfo/${storeId}`)
+      .pipe(
+        tap((data: any) => {
+        })
+        , map((data) => {
+          return data;
+        })
+        , catchError(this.handleError)
+      );
+  }
+
+  fetchStoreProducts(categoryid, storeid, pagenumber: number, pagesize: number, subCategoryId: number) {
     const obj: any = {};
     obj.category_mapping_id = categoryid;
     obj.store_id = storeid;
+    obj.page_number = pagenumber;
+    obj.page_size = pagesize;
+    obj.sub_category_id = subCategoryId;
+    console.log(obj);
     return this.httpClient.post<any[]>(`${this.storeServiceUrl}storeinfo/storeproductscategorywise`, obj)
       .pipe(
         tap((data: any) => {
-          this.storeProducts = data.store_products_info;
+          // this.storeProducts = data.store_products_info;
         })
         , map((data) => {
           return data;
@@ -89,7 +141,6 @@ export class StoreService {
           this.storeDeliveryslots = data.slots;
         })
         , map((data) => {
-          // console.log(data);
           return data;
         })
         , catchError(this.handleError)

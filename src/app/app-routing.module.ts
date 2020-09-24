@@ -55,6 +55,21 @@ const routes: Routes = [
     path: 'payment-options',
     loadChildren: () => import('./payment/payment-options/payment-options.module').then( m => m.PaymentOptionsPageModule)
   },
+  {
+    path: 'blank',
+    loadChildren: () => import('./shared/blank/blank.module').then( m => m.BlankPageModule)
+  },
+  {
+    path: 'notservicablepage',
+    loadChildren: () => import('./shared/not-servicable-page/not-servicable-page.module').then( m => m.NotServicablePagePageModule)
+  },
+  {
+    path: 'changedeliverylocation',
+    loadChildren: () => import('./shared/change-delivery-location/change-delivery-location.module')
+    .then( m => m.ChangeDeliveryLocationPageModule)
+  },
+
+
 ];
 
 @NgModule({

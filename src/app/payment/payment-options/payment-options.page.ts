@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService, CartItem, Voucher } from '../../cart/cart.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { StoreService } from '../../store/store.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController, ModalController, NavController } from '@ionic/angular';
 import { OrderService } from '../../order/order.service';
 import { DeliveryAddressService } from '../../delivery-address/delivery-address.service';
-
+import { OfferService } from '../../offer/offer.service';
+import { OfferListComponent } from '../../shared/offer-list/offer-list.component';
+import { Plugins } from '@capacitor/core';
+const { Storage } = Plugins;
+import * as moment from 'moment';
 @Component({
   selector: 'app-payment-options',
   templateUrl: './payment-options.page.html',
@@ -14,9 +18,16 @@ import { DeliveryAddressService } from '../../delivery-address/delivery-address.
 })
 export class PaymentOptionsPage implements OnInit {
 
+  totalAmount: number;
+  utcselectedeliverydate: any;
+  confirmedOrder = false;
+  isLoading = false;
+  storeId: number;
+  categoryId: number;
+  deliveryInstructions: string;
   delivernow: boolean;
   addressinfo: any;
-  voucher: Voucher;
+  voucher: any;
   showDeliveryAddress: boolean;
   selectedeliverydate: any;
   selectedeliverytime: any;
@@ -24,59 +35,109 @@ export class PaymentOptionsPage implements OnInit {
   showPaymentDetails: boolean;
   showDetails: any;
   cartList: CartItem[];
-  checkedIdx = 0;
+  checkedIdx = 1;
   private CUSTOMER_ID = 'customerid';
   private CUSTOMER_PHONE = 'customerphone';
-  options = [
-    'Cash On Delivery',
-    'Card On Delivery',
-    'Paytm on Delivery',
-    'Sodexo',
-    'Online Payment'
-    // 'PayuMoney Wallet',confirmOrder
-    // 'Pay with Paytm Wallet',
-    // 'Credit/ Debit Card',
-    // 'Net Banking',
-    // 'PayZapp',
-    // 'Pay using MobiKwiK Wallet'
-  ];
+  options: any;
+  // [
+  //   'Cash On Delivery',
+  //   'Card On Delivery',
+  //   'Paytm on Delivery',
+  //   'Sodexo',
+  //   'Online Payment'
+  //   // 'PayuMoney Wallet',confirmOrder
+  //   // 'Pay with Paytm Wallet',
+  //   // 'Credit/ Debit Card',
+  //   // 'Net Banking',
+  //   // 'PayZapp',
+  //   // 'Pay using MobiKwiK Wallet'
+  // ];
   couponCode: any;
   constructor(
     private cartService: CartService,
+    public toastCtrl: ToastController,
+    private modalCtrl: ModalController,
     private deliveryService: DeliveryAddressService,
     private alertCtrl: AlertController,
     private orderService: OrderService,
+    private offerService: OfferService,
     private storeService: StoreService,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private navCtrl: NavController
   ) { }
 
   ngOnInit() {
     this.showPaymentDetails = true;
+    this.activatedRoute.paramMap.subscribe((data: any) => {
+      if (!data.has('storeId')) {
+        this.navCtrl.navigateBack('/home/tabs/categories');
+        return;
+      }
+      // this.storeId = +data.get('storeId');
+      this.storeId = +this.activatedRoute.snapshot.paramMap.get('storeId');
+      this.categoryId = +this.activatedRoute.snapshot.paramMap.get('categoryId');
+    });
   }
 
   ionViewWillEnter() {
-    this.cartList = this.cartService.getAllCartItems();
-    console.log(this.cartList);
-    this.voucher = this.cartService.getAppliedVoucher();
-    this.auth.getUserProfile().subscribe((data: any) => {
-      this.addressinfo = data.customer_delivery_addresses.filter((address: any) => {
+    // this.confirmedOrder = true;
+    // this.cartList = this.cartService.getAllCartItems();
+    this.cartService.getAllCartItems().subscribe((data) => {
+      this.cartList = JSON.parse(data.value);
+      this.calculateTotalAmount(this.cartList);
+    });
+    this.deliveryService.getDeliveryInstructions().subscribe((data) => {
+      this.deliveryInstructions = data.value;
+    });
+    this.cartService.getAppliedVoucher().subscribe((voucherData) => {
+      const voucher = JSON.parse(voucherData.value);
+      if (voucher != null) {
+        this.voucher = voucher;
+      } else {
+        this.voucher = {};
+      }
+    });
+    this.getObject();
+  }
+
+  calculateTotalAmount(cartList) {
+    let amount = 0;
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0; i < cartList.length; i++) {
+      const productPrice: any = cartList[i].price;
+      amount += (productPrice * cartList[i].quantity);
+    }
+    this.totalAmount = amount;
+  }
+
+
+  async getObject() {
+    const localMoment = moment();
+    const utcMoment = moment.utc();
+    const ret = await Storage.get({ key: 'usertempaddress1' });
+    // const city = JSON.parse(ret.value).city;
+    this.auth.getProfileAndPaymentMethodInfo(JSON.parse(ret.value).city).subscribe((data: any) => {
+      this.addressinfo = data[0].customer_delivery_addresses.filter((address: any) => {
         return address.status === 1;
       })[0];
-      console.log(this.addressinfo);
+      this.options = data[1].paymentMethods;
+      if (this.storeService.delivernow) {
+        this.delivernow = true;
+        this.selectedeliverydate = utcMoment.format('DD/MM/YYYY');
+        this.utcselectedeliverydate = utcMoment.format();
+        this.selectedeliverytime = '60 - 90 mins';
+      } else {
+        this.delivernow = false;
+        const slotInfo = this.storeService.storeDeliveryslots
+          .filter(slot => slot.slot_id === +this.storeService.selectedDeliverySlotId)[0];
+        this.selectedeliverydate = slotInfo.delivery_date;
+        this.utcselectedeliverydate = slotInfo.utc_delivery_date;
+        this.selectedeliverytime = slotInfo.start_time % 12 + '' +
+          slotInfo.openingTimeClock + ' - ' + slotInfo.end_time % 12 + '' + slotInfo.closingTimeClock;
+      }
     });
-    if (this.storeService.delivernow) {
-      this.delivernow = true;
-      this.selectedeliverydate = new Date();
-      this.selectedeliverytime = '45 - 60 mins';
-    } else {
-      this.delivernow = false;
-      const slotInfo = this.storeService.storeDeliveryslots
-                                  .filter(slot => slot.slot_id === +this.storeService.selectedDeliverySlotId)[0];
-      this.selectedeliverydate = slotInfo.delivery_date;
-      this.selectedeliverytime = slotInfo.start_time % 12 + '' +
-                            slotInfo.openingTimeClock + ' - ' + slotInfo.end_time % 12 + '' + slotInfo.closingTimeClock;
-    }
   }
 
   togglecartlist() {
@@ -103,57 +164,89 @@ export class PaymentOptionsPage implements OnInit {
   }
 
   changePaymentOption(e, index) {
+    // console.log(this.checkedIdx);
+    // console.log(e);
+    // console.log(index);
     if (e) {
       this.checkedIdx = index;
-      if (this.checkedIdx === 4) {
+      if (this.checkedIdx === 5) {
         this.presentOnlinePaymentAlert();
       }
     } else {
       this.checkedIdx = -1;
     }
+    // console.log(this.checkedIdx);
   }
 
   confirmOrder() {
-    // console.log(this.storeService.StoreInfo.token)
-    const obj: any = {};
-    obj.customerid = +localStorage.getItem(this.CUSTOMER_ID);
-    obj.storeid = this.cartList[0].store_id;
-    obj.deliverypersonid = '';
-    obj.voucherid = this.voucher.voucher_id ? this.voucher.voucher_id : 0;
-    obj.totalamount = this.cartService.getGrandTotal();
-    obj.discountamount = this.cartService.getvoucherAmount();
-    obj.deliveryfee = this.cartService.getDeliveryCharge();
-    obj.payableamount = this.cartService.getGrandTotal() + this.getDeliveryCharge() - this.getVoucherAmount();
-    obj.paymentmode = this.checkedIdx + 1;
-    obj.delivernow = this.storeService.delivernow;
-    obj.storeToken = this.storeService.StoreInfo.token;
-    obj.deliverydate = this.selectedeliverydate;
-    obj.phone = +localStorage.getItem(this.CUSTOMER_PHONE);
-    obj.deliveryslot = this.selectedeliverytime;
-    obj.deliveryaddressid = this.addressinfo.delivery_address_id;
-    obj.totalitemcount = this.cartList.length;
-    obj.instructions = this.deliveryService.getDeliveryInstructions();
-    obj.products = this.cartList;
-    this.orderService.placeOrder(obj).subscribe((data: any) => {
-      if (data.status === 200) {
-        this.cartService.removeAllCartItems();
-        this.cartService.removeVoucher();
-        this.router.navigate(['/payment/payment-status',
-          { order_id: data.order_id, status: data.status }]);
+    this.storeService.storeClosingStatus(this.storeId).subscribe((data1) => {
+      this.confirmedOrder = true;
+      if (data1.storeInfo[0].closed === 1) {
+        this.alertCtrl
+          .create({
+            header: 'Store Information',
+            message: 'Store is closed. Please try from another store',
+            buttons: [
+              {
+                text: 'Okay',
+                handler: () => {
+                  this.confirmedOrder = false;
+                  this.router.navigate(['/', 'categories', this.categoryId, 'stores']);
+                  // this.router.navigate(['']);
+                }
+              }
+            ]
+          })
+          .then(alertEl => alertEl.present());
+      } else {
+        // console.log(this.storeService.StoreInfo.token)
+        this.confirmedOrder = true;
+        this.isLoading = true;
+        const obj: any = {};
+        obj.customerid = +localStorage.getItem(this.CUSTOMER_ID);
+        obj.storeid = this.cartList[0].store_id;
+        obj.deliverypersonid = '';
+        obj.voucherid = this.voucher.voucher_id ? this.voucher.voucher_id : 0;
+        obj.totalamount = this.totalAmount;
+        obj.discountamount = this.cartService.getvoucherAmount();
+        obj.deliveryfee = this.cartService.getDeliveryCharge();
+        obj.payableamount = this.totalAmount + this.getDeliveryCharge() - this.getVoucherAmount();
+        obj.paymentmode = this.checkedIdx;
+        obj.delivernow = this.storeService.delivernow;
+        obj.storeToken = this.storeService.StoreInfo.token;
+        obj.deliverydate = this.utcselectedeliverydate;
+        obj.deliveryslot = this.selectedeliverytime;
+        obj.phone = +localStorage.getItem(this.CUSTOMER_PHONE);
+        obj.deliveryaddressid = this.addressinfo.delivery_address_id;
+        obj.totalitemcount = this.cartList.length;
+        obj.instructions = this.deliveryInstructions;
+        obj.products = this.cartList;
+        obj.payment_status = 1;
+        console.log(obj);
+        this.orderService.placeOrder(obj).subscribe((data: any) => {
+          if (data.status === 200) {
+            this.cartService.removeAllCartItems();
+            this.cartService.removeVoucher();
+            this.deliveryService.removeInstructions();
+            this.router.navigate(['/payment/payment-status',
+              { order_id: data.order_id, status: data.status }]);
+            this.isLoading = false;
+            this.confirmedOrder = false;
+          }
+        });
       }
     });
   }
 
   presentOnlinePaymentAlert() {
-
     this.alertCtrl
-        .create({
-          header: 'Payment',
-          // tslint:disable-next-line:max-line-length
-          message: 'Note : When you click on Place Order - Your order will be placed first and then you will be redirected to payment page.',
-          buttons: ['Okay']
-        })
-        .then(alertEl => alertEl.present());
+      .create({
+        header: 'Payment',
+        // tslint:disable-next-line:max-line-length
+        message: 'Note : When you click on Place Order - Your order will be placed first and then you will be redirected to payment page.',
+        buttons: ['Okay']
+      })
+      .then(alertEl => alertEl.present());
   }
 
   togglevoucher() {
@@ -181,7 +274,7 @@ export class PaymentOptionsPage implements OnInit {
   }
 
   getTotal(): number {
-    return this.cartService.getGrandTotal();
+    return this.totalAmount;
   }
 
   getDeliveryCharge(): number {
@@ -189,7 +282,7 @@ export class PaymentOptionsPage implements OnInit {
   }
 
   getPayableAmount() {
-    return this.cartService.getGrandTotal() + this.getDeliveryCharge() - this.getVoucherAmount();
+    return this.totalAmount + this.getDeliveryCharge() - this.getVoucherAmount();
   }
 
   getVoucherAmount() {
@@ -197,15 +290,54 @@ export class PaymentOptionsPage implements OnInit {
   }
 
   availableCouponCode() {
-    this.router.navigate(['/offer', { prevPage: 'paymentoptionspage' }]);
+    this.modalCtrl.create({ component: OfferListComponent, componentProps: { storeId: this.storeId, prevPage: 'cartpage' } })
+      .then((modalEl) => {
+        modalEl.present();
+        return modalEl.onDidDismiss();
+      }).then((resultData: any) => {
+        if (resultData.role === 'voucherapplied') {
+          this.voucher = resultData.data.voucherDetail;
+          console.log(this.voucher);
+        }
+      });
+    // this.router.navigate(['/offer', { prevPage: 'paymentoptionspage' }]);
   }
 
   applyCouponCode() {
+    if (this.couponCode === undefined) {
+      this.presentToast('Please enter valid coupon code');
+    } else {
+      this.offerService.searchVoucherByName(this.couponCode, this.totalAmount).subscribe((data: any) => {
+        console.log(data);
+        if (data.status === 200 && data.coupon.length <= 0) {
+          this.presentToast('This coupon code is not applicable for this order.');
+        } else {
+          this.presentToast(`${data.coupon[0].voucher_code} code applied sucessfully.`);
+          this.cartService.setVoucher(data.coupon[0]);
+          this.cartService.getAppliedVoucher().subscribe((voucherData) => {
+            const voucher = JSON.parse(voucherData.value);
+            console.log(voucher);
+            if (voucher != null) {
+              this.voucher = voucher;
+            } else {
+              this.voucher = {};
+            }
+          });
+        }
+      });
+    }
   }
 
   removeVoucher(voucherid) {
     this.voucher = {} as Voucher;
     this.cartService.removeVoucher();
   }
+
+  async presentToast(msg) {
+    const toast = await this.toastCtrl.create({ message: msg, duration: 1000, position: 'bottom' });
+
+    toast.present();
+  }
+
 
 }

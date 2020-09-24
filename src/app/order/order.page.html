@@ -2,7 +2,7 @@
     <ion-toolbar>
         <ion-title>My Orders</ion-title>
         <ion-buttons slot="start">
-            <ion-back-button defaultHref=""></ion-back-button>
+            <ion-back-button (click)="backToHome()" defaultHref=""></ion-back-button>
         </ion-buttons>
     </ion-toolbar>
 </ion-header>
@@ -10,8 +10,8 @@
 <ion-content>
     <div *ngIf="!customerordercount && !isLoading" class="outer_empty_cart_wrap">
         <div class="innerCartWrap">
-            <ion-icon name="ios-clock-outline" style="zoom:3.0;"></ion-icon>
-            <span style="color:#b61671;display:block;">You haven't placed any orders yet.</span>
+            <ion-icon class="noliveordericon" name="clock"></ion-icon>
+            <span style="color:#b61671;display:block;text-align: center;">You haven't placed any orders yet.</span>
         </div>
     </div>
     <div *ngIf="!customerordercount && !isLoading" class="outer_continue_shopping_button">
@@ -20,21 +20,43 @@
 
     <ion-grid>
         <ion-row>
-            <ion-col size-md="8" offset-md="2" text-center *ngIf="isLoading">
-                <ion-spinner color="primary"></ion-spinner>
+            <ion-col size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
+                <!-- <ion-spinner color="primary"></ion-spinner> -->
+                <ion-list id="skeleton" *ngIf="isLoading">
+                    <!-- <ion-list-header>
+                                  <ion-skeleton-text animated style="width: 80px"></ion-skeleton-text>
+                                </ion-list-header> -->
+                    <ion-item style="padding-bottom:6px;" lines="none" class="ion-no-padding" *ngFor="let number of skeletonStoreCount">
+                        <ion-thumbnail slot="start">
+                            <ion-skeleton-text></ion-skeleton-text>
+                        </ion-thumbnail>
+                        <ion-label>
+                            <h3>
+                                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                            </h3>
+                            <p>
+                                <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                            </p>
+                            <p>
+                                <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                            </p>
+                        </ion-label>
+                    </ion-item>
+                </ion-list>
             </ion-col>
         </ion-row>
-        <ion-row>
-            <ion-col size="12" *ngIf="!isLoading">
+        <ion-row *ngIf="!isLoading && customerordercount > 0">
+            <ion-col size="12">
                 <ion-text>
-                        Total order count : {{ordersList?.length}}
+                    Total order count : {{customerordercount}}
                 </ion-text>
             </ion-col>
         </ion-row>
-        <div *ngIf="ordersList?.length > 0">
-            <div *ngFor="let item of ordersList" (click)="orderdetails(item.order_id)" style="border:1px solid grey;margin-bottom :10px; background:white">
+        <div *ngIf="!isLoading && customerordercount > 0">
+            <div *ngFor="let item of ordersList" (click)="orderdetails(item.order_id)" style="background-color: #f4f4f4;
+                height: 175px;border-radius: 10px 10px;padding: 5px;margin-bottom: 10px;">
                 <ion-row>
-                    <ion-col size="4" class="item-text-wrap" text-wrap>
+                    <ion-col size="4" class="item-text-wrap">
                         <strong>
                             {{item?.store_name}}
                         </strong>
@@ -45,24 +67,24 @@
                         </span>
                     </ion-col>
                     <ion-col size="4">
-                        <span style="color:#b61671">View Details</span>
+                        <span style="color:#28667C">View Details</span>
                     </ion-col>
                 </ion-row>
                 <ion-row>
                     <ion-col size="4">
-                        <span style="color:#b61671">
+                        <span style="color:#28667C">
                             {{item?.order_placing_date| date : "EEE, dd-MM-y"}}
                         </span>
                     </ion-col>
                     <ion-col size="4">
                         <!-- this needs to be worked later -->
-                        <span>Paid</span>
+                        <span>{{item?.payment_status}}</span>
                     </ion-col>
                     <ion-col size="4">
-                        <span style="color:#99c655" *ngIf="item?.payment_mode">{{item?.payment_mode_type}}</span>
+                        <span style="color:#99c655" *ngIf="item?.payment_method_name">{{item?.payment_method_name}}</span>
                     </ion-col>
                 </ion-row>
-                <ion-row style="font-size:0.7em;color:#606060">
+                <ion-row style="font-size:14px;color:#606060">
                     <ion-col size="4">
                         Delivery Date
                     </ion-col>
@@ -73,14 +95,18 @@
                         Payment Mode
                     </ion-col>
                 </ion-row>
-                <ion-row style="font-size:0.8em;text-align: center;display: flex;
+                <ion-row style="font-size:16px;text-align: center;display: flex;padding-bottom:5px;
                               justify-content: center;">
                     <span>
-                        Order has been {{item?.order_status}} by Grostep
+                        Order #{{item?.order_id}} has been {{item?.type}}
+                        <!-- by Grostep -->
                     </span>
                 </ion-row>
             </div>
         </div>
     </ion-grid>
-
+    <ion-infinite-scroll threshold="15%" (ionInfinite)="loadMore($event)">
+        <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more orders...">
+        </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
 </ion-content>

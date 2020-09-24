@@ -1,63 +1,60 @@
 <ion-header>
   <ion-toolbar>
-      <ion-buttons slot="start">
-          <ion-back-button defaultHref="/auth/login"></ion-back-button>
-        </ion-buttons>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/auth/login"></ion-back-button>
+    </ion-buttons>
     <ion-title>Validate OTP</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-grid>
-    <ion-row>
-      <ion-col size="12">
-        <span style="font-weight:bold;">Verify Mobile Number</span>
+  <ion-grid style="--background: #fff;padding: 0px 15px;border-radius: 10px 10px;">
+    <ion-row style="background-color: #fff;" *ngIf="isLoading">
+      <ion-col size="12" size-md="8" offset-md="2" class="ion-text-center">
+        <ion-spinner color="primary"></ion-spinner>
       </ion-col>
     </ion-row>
-    <ion-row>
-      <ion-col>
-        <span>
-          Enter the six digit OTP sent to your number
+    <ion-row style="background-color: #fff;">
+      <ion-col style="text-align:center;color: #191919;margin-top: 20px;background-color: #ffff;">
+        <span style="display:block;font-size:18px">
+          Enter four digit OTP sent to your number.
         </span>
+        <span style="text-align:center;font-weight:600;font-size:18px">{{phonenumber}}</span>
       </ion-col>
     </ion-row>
-    <ion-row>
-      <ion-col>
-        <table style="margin-left:auto;margin-right:auto;">
-          <tr>
-            <td>
-              <ion-input type="text" #otp1 name="otp1" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp1)">
-              </ion-input>
-            </td>
-            <td>
-              <ion-input type="text" #otp2 name="otp2" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp2)">
-              </ion-input>
-            </td>
-            <td>
-              <ion-input type="text" #otp3  name="otp3" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp3)">
-              </ion-input>
-            </td>
-            <td>
-              <ion-input type="text" #otp4 name="otp4" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp4)">
-              </ion-input>
-            </td>
-            <!-- <td>
-              <ion-input type="text" #otp5 name="otp5" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp5)">
-              </ion-input>
-            </td>
-            <td>
-              <ion-input type="text" #otp6 name="otp6" class="otp" pattern="[0-9]{6}" maxlength="1" size="1" (keyup)="next(otp6)">
-              </ion-input>
-            </td> -->
-          </tr>
-        </table>
+    <ion-row style="background-color: #fff;">
+      <ion-col style="background-color: #ffff;">
+        <ion-item lines="none" style="width: 150px;margin: auto;--background: #fff;">
+          <ion-input type="text" #input style="border-bottom: 1px solid;font-size: 18px;"
+           [(ngModel)]="phoneOTP" class="otp" pattern="[0-9]{4}" maxlength="4" size="4">
+          </ion-input>
+        </ion-item>
+        <ion-item lines="none" style="float:right;margin-right: 30px;--background: #fff;">
+          <span style="margin-right:15px;font-weight:500;font-size:18px;" *ngIf="!hidevalue">
+              00:{{maxTime}}
+          </span>
+          <span (click)="resendOTP()"
+          [ngClass]="{'resend-button-enabled': hidevalue, 'resend-button-disabled':!hidevalue }">
+              Resend OTP
+          </span>
+          <span></span>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row style="background-color: #fff;padding-bottom:10px">
+      <ion-col style="background-color: #ffff;">
+          <ion-button (click)="validateOTP(phoneOTP)" type="submit" expand="block" 
+            [ngClass]="{'validate-button-enabled': phoneOTP?.length == 4, 'validate-button-disabled':phoneOTP?.length != 4 }">
+              Verify and Continue
+            </ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
 </ion-content>
-<ion-footer class="footer_color" (click)="validateOTP()">
-    <ion-button expand="block" (click)="validateOTP()" fill="clear" style="color:#fff !important">
-        Verify and Continue
-        <ion-icon name="arrow-forward"></ion-icon>
-    </ion-button>
-  </ion-footer>
+<!-- <ion-footer (click)="validateOTP(phoneOTP)" [ngClass]="{'validate-button-enabled': phoneOTP?.length == 4, 'validate-button-disabled':phoneOTP?.length != 4 }">
+  <ion-button expand="block" [ngClass]="{'validate-button-enabled': phoneOTP?.length == 4, 'validate-button-disabled':phoneOTP?.length != 4 }"
+    (click)="validateOTP(phoneOTP)" fill="clear">
+    Verify and Continue
+    <ion-icon name="arrow-forward"></ion-icon>
+  </ion-button>
+</ion-footer> -->

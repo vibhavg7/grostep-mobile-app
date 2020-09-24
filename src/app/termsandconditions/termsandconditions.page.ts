@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NavController, Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-termsandconditions',
@@ -7,9 +8,23 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TermsandconditionsPage implements OnInit {
 
-  constructor() { }
+  constructor(
+    private navCtrl: NavController,
+    private platform: Platform
+) { }
 
   ngOnInit() {
   }
+
+  ionViewWillEnter() {
+    this.platform.backButton.subscribeWithPriority(0, () => {
+      this.navCtrl.navigateRoot(['/home/tabs/profile']);
+    });
+  }
+
+  backToHome() {
+    this.navCtrl.navigateRoot(['/home/tabs/profile']);
+  }
+
 
 }

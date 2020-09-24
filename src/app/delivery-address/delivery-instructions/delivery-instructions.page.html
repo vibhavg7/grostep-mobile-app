@@ -13,7 +13,7 @@
       <ion-col>
         <ion-item>
           <ion-label position="floating">Instructions</ion-label>
-          <ion-textarea #comment auto-grow=true autofocus=true rows="6" cols="30"></ion-textarea>
+          <ion-textarea maxlength="200" #comment auto-grow=true autofocus=true rows="6" cols="30"></ion-textarea>
         </ion-item>
       </ion-col>
     </ion-row>
@@ -21,8 +21,9 @@
 </ion-content>
 
 <ion-footer class="footer_color" (click)="addDeliveryInstructions(comment.value)">
-    <ion-button [disabled]="!comment.value" expand="block" fill="clear" style="color:#fff !important">
-        ADD Delivery Instructions
-        <ion-icon name="arrow-forward"></ion-icon>
-    </ion-button>
-  </ion-footer>
+  <ion-button [disabled]="!comment.value || submitted"
+    expand="block" fill="clear" style="color:#fff !important;">
+    ADD Delivery Instructions
+    <ion-icon name="arrow-forward"></ion-icon>
+  </ion-button>
+</ion-footer>

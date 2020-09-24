@@ -1,9 +1,12 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ApplicationRef } from '@angular/core';
 import { CategoriesService } from './categories.service';
 import { OnEnter } from '../on-enter';
 import { Subscription } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
+import { NavController, Platform } from '@ionic/angular';
+import { Plugins } from '@capacitor/core';
 
+const { Storage } = Plugins;
 @Component({
   selector: 'app-categories',
   templateUrl: './categories.page.html',
@@ -11,50 +14,133 @@ import { Router, NavigationEnd } from '@angular/router';
 })
 export class CategoriesPage implements OnInit, OnEnter, OnDestroy {
 
+  cityWisebannerImages: any;
+  skeletonStoreCount;
+  noContactbannerImages: any;
+  usertempaddress: any;
+  customerliveorderscount = 0;
   errorMessage: any = '';
   bannerImages: any = [];
   categoryImages: any = [];
+  sliderOptions = {
+    zoom: false,
+    slidesPerView: 1.4,
+    // slidesPerColumn: 1.5,
+    // slidesPerGroup: 1.5,
+    centeredSlides: false,
+    spaceBetween: 10,
+    watchSlidesProgress: false,
+    // resistanceRatio: 0,
+    // virtualTranslate: true,
+  };
+
+  sliderOptions1  = {
+    zoom: false,
+    slidesPerView: 1.4,
+    // slidesPerColumn: 1.5,
+    // slidesPerGroup: 1.5,
+    centeredSlides: false,
+    spaceBetween: 0,
+    watchSlidesProgress: true,
+    // resistanceRatio: 0,
+    // virtualTranslate: true,
+  };
+
   isLoading = false;
+  customerInfo: any;
   private subscription: Subscription;
   constructor(
     private router: Router,
+    private platform: Platform,
+    private navCtrl: NavController,
+    private ref: ApplicationRef,
     private categoryService: CategoriesService) { }
 
   public async ngOnInit(): Promise<void> {
+    this.isLoading = true;
+    this.skeletonStoreCount = new Array(1);
     await this.onEnter();
-
+    await this.getObject();
     this.subscription = this.router.events.subscribe((event: any) => {
       if (event instanceof NavigationEnd && event.url === '/home/tabs/categories') {
         this.onEnter();
+        this.getObject();
       }
     });
   }
 
+  async getObject() {
+    const ret = await Storage.get({ key: 'usertempaddress1' });
+    this.usertempaddress = JSON.parse(ret.value).locationaddress !== undefined ?
+                          JSON.parse(ret.value).locationaddress : JSON.parse(ret.value).locality;
+  }
+
   public async onEnter(): Promise<void> {
-    this.isLoading = true;
-    this.categoryService.storeDataCatData('')
-    .subscribe((data) => {
-      console.log(data);
-      this.isLoading = false;
-      this.categoryImages = data[0].store_categories;
-      this.bannerImages = data[1].banner;
-    }, (error) => {
-      this.errorMessage = error;
-    });
+    const ret = await Storage.get({ key: 'usertempaddress1' });
+    setTimeout(() => {
+      this.categoryService.storeDataCatData(JSON.parse(ret.value).city)
+      .subscribe((data) => {
+        this.isLoading = false;
+        this.categoryImages = data[0].store_categories;
+        this.bannerImages = data[1].banners.filter(b => {
+          return b.banner_type === 1;
+        });
+        this.noContactbannerImages = data[1].banners.filter(b => {
+          return b.banner_type === 2;
+        });
+        this.cityWisebannerImages = data[1].banners.filter(b => {
+          return b.banner_type === 3;
+        });
+        this.customerliveorderscount = data[2].customer_liveorders_count.customer_liveorders_count;
+        this.customerInfo = data[3].customer_info[0];
+        if (this.customerInfo !== undefined && this.customerInfo.customer_name !== undefined
+            && this.customerInfo.customer_name != null) {
+          this.customerInfo.customer_name = this.titleCase(this.customerInfo.customer_name);
+        } else {
+        }
+        this.ref.tick();
+      }, (error) => {
+        this.errorMessage = error;
+      });
+    }, 500);
+    this.ref.tick();
   }
 
   selectItem(item) {
+  }
+
+  titleCase(str) {
+    const splitStr = str.toLowerCase().split(' ');
+    for (let i = 0; i < splitStr.length; i++) {
+      // You do not need to check if i is larger than splitStr length, as your for does that for you
+      // Assign it back to the array
+      splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+    }
+    // Directly return the joined string
+    return splitStr.join(' ');
+  }
+
+  changedeliverylocation() {
+    this.navCtrl.navigateForward(['/changedeliverylocation']);
+  }
+
+  grostepStores() {
+    this.navCtrl.navigateForward(['/stores/grostepstore']);
   }
 
   public ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 
-  ionViewWillEnter() {
-  }
-
   slidesDidLoad(slides) {
     slides.startAutoplay();
+  }
+
+  ionViewWillEnter() {
+    this.platform.backButton.subscribeWithPriority(0, () => {
+      // tslint:disable-next-line:no-string-literal
+      navigator['app'].exitApp();
+    });
   }
 
 }

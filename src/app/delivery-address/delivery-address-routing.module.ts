@@ -13,7 +13,7 @@ const routes: Routes = [
     loadChildren: () => import('./add-delivery-address/add-delivery-address.module').then( m => m.AddDeliveryAddressPageModule)
   },
   {
-    path: 'delivery-options/:storeId',
+    path: 'delivery-options',
     loadChildren: () => import('./delivery-options/delivery-options.module').then( m => m.DeliveryOptionsPageModule)
   },
   {

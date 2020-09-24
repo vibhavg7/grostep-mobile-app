@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>My Offers</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click)="onCancel()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div *ngIf="!offers?.length && !isLoading" class="outer_empty_cart_wrap">
+    <div class="innerCartWrap">
+        <ion-icon class="noliveordericon" name="medical"></ion-icon>
+      <span style="color:#b61671">No Available Vouchers!</span>
+    </div>
+  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
+        <ion-spinner color="primary"></ion-spinner>
+      </ion-col>
+      <ion-col size="12" size-sm="8" offset-sm="2">
+        <div *ngIf="offers?.length > 0">
+            <ion-card *ngFor="let offer of offers">
+                <!-- <img *ngIf="offer?.image_url" [src]="offer?.image_url" /> -->
+                <!-- <img *ngIf="!offer?.image_url" src="assets/images/default_image.jpg" /> -->
+                <ion-card-header>
+                  <ion-card-subtitle style="padding:5px 0px 10px 0px">
+                    <span class="vouchercss">
+                    <!-- <img src="../../assets/images/offers_icon.png" style="height:40px;width:40px"/> -->
+                        Voucher Code: {{ offer?.voucher_code }}
+                    </span>
+                    <!-- [attr.disabled]="!offer?.applyButton ? true : null" -->
+                    <span (click)="applyVoucher(offer)"
+                    [ngClass]="{'applyenabledcss': !!offer?.applyButton, 'applydisabledcss': !offer?.applyButton }">
+                        APPLY
+                    </span>
+                </ion-card-subtitle>
+                </ion-card-header>
+                <div class="line"></div>
+                <ion-card-content>
+                    <p style="font-weight:bold;font-size:16px">Min Cart Amount: &#8377; {{ offer?.voucher_cart_amount }}</p>
+                    {{offer?.description}}
+                    <!-- <ion-button (click)="applyVoucher(offer)" [disabled]="!offer?.applyButton" expand="block" color="primary"> APPLY </ion-button> -->
+                </ion-card-content>
+            </ion-card>
+
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

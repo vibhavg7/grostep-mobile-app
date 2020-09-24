@@ -1,0 +1,25 @@
+ion-content{
+    --ion-background-color: #Ffff;
+}
+
+ion-item{
+    // -background:#f5f5f5;
+    // --padding-start: 2px;
+    // // padding-bottom:10px;
+ }
+
+ .selectedlocation-enabled {
+    background-color:#dcdcdc;
+    border-radius: 5px 5px;
+    color:#000 !important;
+ }
+
+ .selectedlocation-disabled {
+    background-color:#Ffff;
+    border-radius: 5px 5px;
+    color:#494949;
+ }
+
+ #skeleton {
+    display: block;
+}

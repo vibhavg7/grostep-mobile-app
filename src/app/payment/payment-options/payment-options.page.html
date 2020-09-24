@@ -23,10 +23,12 @@
               <ion-img *ngIf="!product?.product_img" src="assets/images/default_image.jpg"></ion-img>
             </ion-thumbnail>
             <ion-label>
-              <h2>{{product?.title}}</h2>
-              <p>{{product?.weight + ' ' + product?.weight_text }}</p>
+              <h2 style="padding-top:0;white-space: pre-line">{{product?.title}}</h2>
+              <p style="font-weight:bold;">{{product?.weight + ' ' + product?.weight_text }}</p>
               <p>
-                <span> &#8377; {{product?.price }}</span>
+                <span style="font-weight:bold;">
+                  &#8377; {{product?.price }} x {{product?.quantity}} = &#8377; {{product?.price * product?.quantity| number : '1.2-2'}}
+                </span>
               </p>
             </ion-label>
           </ion-item>
@@ -36,25 +38,25 @@
     <ion-row>
       <ion-col size="12">
         <ion-item (click)="togglevoucher()">
-          <ion-label>Have a Coupon Code
+          <ion-label>My Offers
             <ion-icon style="float:right;" color="success" [name]="showVoucher ? 'arrow-up' : 'arrow-down'"></ion-icon>
           </ion-label>
         </ion-item>
         <div *ngIf="showVoucher">
           <div *ngIf="(voucher | json) === '{}'">
-            <ion-item lines="none">
-              <ion-input style="border-radius: 2px !important;border: 1px solid green;" [(ngModel)]="couponCode" placeholder="Enter Coupon Code"
-                type="text"></ion-input>
+            <ion-item style="padding-top:10px" lines="none">
+              <ion-input style="border-radius: 5px !important;border: 1px solid green;--padding-start: 10px;max-width: 200px;" [(ngModel)]="couponCode"
+                placeholder="Enter Coupon Code" type="text"></ion-input>
+              <ion-button style="    height: 40px;width: 70px;float: right;margin-left: 25px;" (click)="applyCouponCode()">Apply</ion-button>
             </ion-item>
             <div style="display:block;padding-left:15px;padding-top:3px;">
-              <ion-button (click)="applyCouponCode()">Apply</ion-button>
-              <ion-button (click)="availableCouponCode()">Available</ion-button>
+              <ion-button style="height: 40px;" (click)="availableCouponCode()">Available OFFERS</ion-button>
             </div>
 
           </div>
           <div *ngIf="(voucher | json) != '{}'">
             <ion-item>
-              <ion-label>{{voucher?.voucher_code}} - Applied</ion-label>
+              <ion-label style="font-weight:bold">{{voucher?.voucher_code}} - Applied</ion-label>
               <ion-button (click)="removeVoucher(voucher?.voucher_id)">
                 Remove
                 <ion-icon name="close"></ion-icon>
@@ -65,90 +67,103 @@
       </ion-col>
     </ion-row>
     <ion-row>
-        <ion-col size="12">
-          <ion-item (click)="toggleDeliveryAddress()">
-            <ion-label>Delivery Address
-              <ion-icon style="float:right;" color="success" [name]="showDeliveryAddress ? 'arrow-up' : 'arrow-down'"></ion-icon>
-            </ion-label>
-          </ion-item>
-          <div *ngIf="showDeliveryAddress">
-              <ion-list style="padding:12px;" text-wrap>                            
-                  <span style="display: block;font-size:1.1em;padding:5px 0px;">
-                      <b>Name: </b>{{addressinfo?.customer_name}} </span>
-                  <span style="display: block;font-size:1.1em;padding:5px 0px;">
-                      <b>Address: </b>{{addressinfo.flatNumber}}, {{addressinfo.address}} {{addressinfo.address2}}</span>
-                  <span style="display: block;font-size:1.1em;padding:5px 0px;">
-                      <b>Pincode: </b>{{addressinfo?.pincode}}
-                  </span>   
-                  <span style="display: block;font-size:1.1em;padding:5px 0px;">
-                          <b>Phone Number: </b>{{addressinfo?.delivery_phone}}
-                  </span>    
-                  <span style="display: block;font-size:1.1em;padding:5px 0px;">
-                          <b>Delivery Date: </b>{{selectedeliverydate| date: 'dd/MM/yyyy'}}
-                  </span>
-                  <span *ngIf="!delivernow" style="display: block;font-size:1.1em;padding:5px 0px;">
-                          <b>Delivery Time: </b>{{selectedeliverytime}}
-                  </span>     
-                  <span *ngIf="delivernow" style="display: block;font-size:1.1em;padding:5px 0px;">
-                      <b>Estimated Delivery Time: </b>{{selectedeliverytime}}
-              </span>         
+      <ion-col size="12">
+        <ion-item (click)="toggleDeliveryAddress()">
+          <ion-label>Delivery Address
+            <ion-icon style="float:right;" color="success" [name]="showDeliveryAddress ? 'arrow-up' : 'arrow-down'"></ion-icon>
+          </ion-label>
+        </ion-item>
+        <div *ngIf="showDeliveryAddress">
+          <ion-list style="padding:12px;" text-wrap>
+            <span style="display: block;font-size:1.1em;padding:5px 0px;">
+              <b>Name: </b>{{addressinfo?.customer_name}} </span>
+            <span style="display: block;font-size:1.1em;padding:5px 0px;">
+              <b>Address: </b>{{addressinfo.flatNumber}}, {{addressinfo.address}} {{addressinfo.address2}}</span>
+            <span style="display: block;font-size:1.1em;padding:5px 0px;">
+              <b>Pincode: </b>{{addressinfo?.pincode}}
+            </span>
+            <span style="display: block;font-size:1.1em;padding:5px 0px;">
+              <b>Phone Number: </b>{{addressinfo?.delivery_phone}}
+            </span>
+            <span style="display: block;font-size:1.1em;padding:5px 0px;">
+                <!-- | date: 'dd/MM/yyyy' -->
+              <b>Delivery Date: </b>{{selectedeliverydate}}
+            </span>
+            <span *ngIf="!delivernow" style="display: block;font-size:1.1em;padding:5px 0px;">
+              <b>Delivery Time: </b>{{selectedeliverytime}}
+            </span>
+            <span *ngIf="delivernow" style="display: block;font-size:1.1em;padding:5px 0px;">
+              <b>Estimated Delivery Time: </b>{{selectedeliverytime}}
+            </span>
+            <span *ngIf="deliveryInstructions" style="display: block;padding:5px 0px;white-space: pre-line">
+              <b>Delivery Instructions: </b> {{deliveryInstructions}}
+            </span>
           </ion-list>
-          </div>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="12">
-            <ion-item (click)="togglepayment()">
-                <ion-label> <span>Total Payable Amount </span>
-                  <ion-icon style="float:right;" color="success" [name]="showPaymentDetails ? 'arrow-up' : 'arrow-down'"></ion-icon>
-                </ion-label>
-              </ion-item>
-              <div *ngIf="showPaymentDetails">
-                  <ion-list *ngIf="cartList?.length">
-                      <ion-item lines="none">
-                        <label>Amount To Pay</label>
-                        <span slot="end">&#8377; {{getTotal()| number : '1.2-2'}}
-                        </span>
-                      </ion-item>
-                      <ion-item lines="none">
-                        <label>Shipping Charge</label>
-                        <span slot="end">&#8377; {{getDeliveryCharge()| number : '1.2-2'}}
-                        </span>
-                      </ion-item>
-                      <ion-item lines="none">
-                        <label>Voucher Amount</label>
-                        <span slot="end">&#8377; {{getVoucherAmount()| number : '1.2-2'}}
-                        </span>
-                      </ion-item>
-                      <ion-item lines="none">
-                        <label>Grand Total</label>
-                        <span slot="end" style="font-weight:bold">&#8377; {{getPayableAmount()| number : '1.2-2'}}
-                        </span>
-                      </ion-item>
-                    </ion-list>
-                    <ion-list>
-                        <div style="font-weight:bold;padding-bottom:10px;margin-left:10px;">
-                            Payment Options
-                        </div>
-                        <ion-item *ngFor="let item of options; let i=index">
-                            <ion-label>{{item}}</ion-label>
-                            <ion-checkbox slot="end" [ngModel]="checkedIdx == i"
-                            (ngModelChange)="changePaymentOption($event,i)"></ion-checkbox>                                    
-                      </ion-item>
-                    </ion-list>
-              </div>
-        </ion-col>
-      </ion-row>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <ion-item (click)="togglepayment()">
+          <ion-label>
+            <span>Total Payable Amount </span>
+            <ion-icon style="float:right;" color="success" [name]="showPaymentDetails ? 'arrow-up' : 'arrow-down'"></ion-icon>
+          </ion-label>
+        </ion-item>
+        <div *ngIf="showPaymentDetails">
+          <ion-list *ngIf="cartList?.length">
+            <ion-item lines="none">
+              <label>Amount To Pay</label>
+              <span slot="end">&#8377; {{getTotal()| number : '1.2-2'}}
+              </span>
+            </ion-item>
+            <ion-item lines="none">
+              <label>Delivery Charge</label>
+              <span slot="end">&#8377; {{getDeliveryCharge()| number : '1.2-2'}}
+              </span>
+            </ion-item>
+            <ion-item lines="none">
+              <label>Voucher Amount</label>
+              <span slot="end">&#8377; {{getVoucherAmount()| number : '1.2-2'}}
+              </span>
+            </ion-item>
+            <ion-item lines="none">
+              <label>Grand Total</label>
+              <span slot="end" style="font-weight:bold">&#8377; {{getPayableAmount()| number : '1.2-2'}}
+              </span>
+            </ion-item>
+          </ion-list>
+          <ion-list>
+            <div style="font-weight:bold;padding-bottom:10px;margin-left:10px;">
+              Payment Options
+            </div>
+            <!-- let i=index -->
+            <ion-item *ngFor="let item of options;">
+              <ion-label>{{item?.payment_method_name}}</ion-label>
+              <ion-checkbox slot="end" [ngModel]="checkedIdx == item?.payment_method_id" (ngModelChange)="changePaymentOption($event,item?.payment_method_id)"></ion-checkbox>
+            </ion-item>
+          </ion-list>
+        </div>
+      </ion-col>
+      <ion-col style="background-color: #fff;" *ngIf="isLoading" size="12" size-md="8" offset-md="2" text-center>
+        <ion-spinner color="primary"></ion-spinner>
+      </ion-col>
+    </ion-row>
+    <!-- <ion-row style="background-color: #fff;" *ngIf="isLoading">
+      <ion-col size="12" size-md="8" offset-md="2" text-center>
+        <ion-spinner color="primary"></ion-spinner>
+      </ion-col>
+    </ion-row> -->
   </ion-grid>
 </ion-content>
 
-<ion-footer>
-    <ion-row class="footer_color">
-      <ion-col size="12">
-        <ion-button expand="block" (click)="confirmOrder()" fill="clear" style="color:#fff !important">
-            PLACE ORDER
-            <ion-icon name="arrow-forward"></ion-icon>
-        </ion-button>
-      </ion-col>
-    </ion-row>
-  </ion-footer>
+<ion-footer *ngIf="checkedIdx != -1">
+  <ion-row class="footer_color">
+    <ion-col size="12">
+      <ion-button expand="block" [disabled]="confirmedOrder" (click)="confirmOrder()" fill="clear" style="color:#fff !important;">
+        PLACE ORDER
+        <ion-icon name="arrow-forward"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</ion-footer>

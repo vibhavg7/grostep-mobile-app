@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Live Order Detail</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click)="viewDetail()">
+        <ion-label>View Detail</ion-label>
+      </ion-button>
+      <ion-button (click)="onCancel()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-grid style="width:100% !important;height:100% !important">
+    <ion-row style="width:100% !important;height:40% !important;">
+      <ion-col>
+        <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom" [scrollwheel]="false" [disableDefaultUI]="false" [zoomControl]="true">
+          <!-- <agm-marker [latitude]="lat" [longitude]="long"></agm-marker> -->
+          <agm-marker *ngFor="let data of markers; let i = index" [latitude]="data.lat" [longitude]="data.lng">
+          </agm-marker>
+
+          <agm-polyline>
+            <agm-polyline-point *ngFor="let data of markers" [latitude]="data.lat" [longitude]="data.lng">
+            </agm-polyline-point>
+          </agm-polyline>
+
+        </agm-map>
+      </ion-col>
+    </ion-row>
+    <ion-row style="width:100%;height:60%">
+      <ion-col>
+        <div class="verticalLine" [style.height.px]="height">
+          <p>
+            <input type="radio" id="orderPlaced" name="orderPlaced" [checked]="livestatus >= 1" />
+            <label>Order placed</label>
+          </p>
+          <p>
+            <input type="radio" id="acceptedByMerchant" [checked]="livestatus >= 2" name="acceptedByMerchant" />
+            <label *ngIf="livestatus >= 2">Order accepted by merchant</label>
+            <label *ngIf="livestatus < 2">Merchant acceptance pending</label>
+          </p>
+          <p>
+            <input type="radio" [checked]="livestatus >= 3" id="deliveryPersonAssigned" name="deliveryPersonAssigned" />
+            <label *ngIf="livestatus < 3">Delivery person assingment pending</label>
+            <label *ngIf="livestatus >= 3">
+              Delivery person assinged {{deliverypersonname}} PhoneNumber - {{deliverypersonphone}}
+            </label>
+          </p>
+          <p>
+            <input type="radio" [checked]="livestatus > 6" id="billConfirmationRequired" name="billConfirmationRequired" />
+            <label *ngIf="livestatus < 6">
+              Bill confirmation pending
+            </label>
+            <label *ngIf="livestatus >=6">
+              Bill Confirmation Required
+              <div (click)="showImageModal(billimage)">
+                <span style="text-decoration:underline">View Image</span>
+              </div>
+            </label>
+          </p>
+          <p>
+            <input type="radio" [checked]="livestatus >= 10" id="ontheway" name="ontheway" />
+            <label>Order on the way</label>
+          </p>
+          <p>
+            <input type="radio" [checked]="livestatus >= 11" id="delivered" name="delivered" />
+            <label>Delivered</label>
+          </p>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>
+<ion-footer>
+    <ion-row>
+      <ion-col *ngIf="prevPage == 'sucesspage'" (click)="continueShopping()" class="footer_color" size="12">
+        <ion-button expand="block" fill="clear" style="color:#fff !important">
+          CONTINUE SHOPPING
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-footer>

@@ -1,0 +1,8 @@
+{
+  "appId": "com.grostep.customersapp",
+  "appName": "Grostep",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "cordova": {}
+}

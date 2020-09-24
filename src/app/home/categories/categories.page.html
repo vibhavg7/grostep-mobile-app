@@ -1,9 +1,19 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
+    <!-- <ion-buttons slot="start">
       <ion-menu-button menu="m1"></ion-menu-button>
-    </ion-buttons>
-    <ion-title>Grostep</ion-title>
+    </ion-buttons> -->
+    <ion-title style="color: #535665;">
+      <span><ion-icon style="color:#6fa833;margin-bottom:-2px" name="pin"></ion-icon></span>
+      <div style="display:inline-block;margin-right: 4px;font-size: 16px;" (click)="changedeliverylocation()">
+        <!-- display:block; -->
+        <span style="font-size: 13px;">You are here</span>
+        <span style="font-weight: 600;display: block;font-size: 15px;">
+          {{usertempaddress}}
+          <i (click)="changedeliverylocation()" style="font-size:16px" class="fa">&#xf107;</i>
+        </span>
+      </div>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,34 +21,126 @@
   <div>
     <ion-grid>
       <ion-row>
-        <ion-col size-md="8" offset-md="2" text-center *ngIf="isLoading">
+        <ion-col size="12" size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
           <ion-spinner color="primary"></ion-spinner>
         </ion-col>
-        <ion-col *ngIf="!isLoading" size="12" size-xl="8" offset-xl="2">
-          <ion-slides *ngIf="bannerImages.length > 0" #mySlider (ionSlidesDidLoad)="slidesDidLoad(mySlider)" pager>
-            <ion-slide size="12" *ngFor="let item of bannerImages" (click)="selectItem(item)">
-              <img *ngIf="item?.image_url" [src]="item.image_url" onError="this.src='assets/images/default_image.jpg';"/>
-              <ion-img *ngIf="!item?.image_url" src="assets/images/default_image.jpg"></ion-img>
+      </ion-row>
+      <ion-row style="margin-top: 10px;height:150px;" *ngIf="!isLoading" class="ion-no-padding">
+        <ion-col size="12" size-xl="8" offset-xl="2">
+          <ion-slides [options]="sliderOptions" >
+            <ion-slide *ngFor="let item of bannerImages">
+              <div class="slide-content">
+                <div class="image-wrap">
+                  <img style="border-radius: 10px 10px;" 
+                  *ngIf="item?.image_url" [src]="item.image_url" onError="this.src='assets/images/default_image.jpg';"
+                  />
+                </div>
+              </div>
             </ion-slide>
           </ion-slides>
         </ion-col>
       </ion-row>
-      <hr *ngIf="!isLoading" style="border-width: 1px;">
-      <ion-row *ngIf="!isLoading" style="background-color:#e8fbe8;border:1px solid lightgrey;height:70px">
-        <ion-col no-padding size="12" size-xl="8" offset-xl="2">
-          <p style="font-weight: bold;font:19px Times, sans-serif;margin: 7px 6px;font-style: italic;line-height: 26px;">
-            Hey Folks! Feeling exited.. What would you like to order today?
+      <hr *ngIf="!isLoading">
+      <ion-row *ngIf="!isLoading" style="height:42px">
+        <ion-col class="ion-no-padding" size="12" size-xl="8" offset-xl="2">
+          <p style="font-weight: 500;font-size: 16px;margin: 8px 10px;color:#282c3f">
+            Hey {{customerInfo?.customer_name }}! What would you like to order today?
           </p>
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col class="ion-text-center" size="4" offset-xl="2" style="background-color: #fafafa;border:1px solid lightgrey" *ngFor="let item of categoryImages"
-          [routerLink]="['/','categories',item?.store_category_id,'stores']">
-          <ion-img style="height: 104px !important;" *ngIf="item?.image_url" [src]="item?.image_url"></ion-img>
-          <ion-img style="height: 104px !important;" *ngIf="!item?.image_url" src="assets/images/default_image.jpg"></ion-img>
-          <ion-text style="display: block;">{{item?.store_category_name}}</ion-text>
+        <ion-col class="ion-text-center" size="4" style="height: 160px !important;outline:none" *ngFor="let item of categoryImages" 
+        [routerLink]="['/','categories',item?.store_category_id,'stores']">
+          <ion-list style="background-color: #f5f5f5;height:140px;border-radius: 8px 8px;" lines="none">
+            <ion-item style="padding-top: 5px;">
+              <div style="height:70px;min-height:70px;margin:auto">
+                  <img style="height:70px;min-height:70px;" *ngIf="item?.image_url" [src]="item?.image_url">
+              </div>
+            </ion-item>
+            <ion-item style="padding-top: 5px;">
+              <div style="margin: 0 auto;display:block;height:70px;min-height:70px;">
+                <ion-text style="font-size:14px;display:inline-block;text-align:center;height:80px;min-height:80px;">
+                  {{item?.store_category_name}}
+                </ion-text>
+              </div>
+            </ion-item>
+          </ion-list>
         </ion-col>
       </ion-row>
+
+      <ion-row style="margin-top: 10px;background-color: #f5f5f5;padding: 10px 0px 0px 0px;" 
+        *ngIf="!isLoading" class="ion-no-padding">
+          <ion-col size="12" size-xl="8" offset-xl="2">
+            <ion-slides style="--bullet-background-active:#fff;height:140px;" [options]="sliderOptions1" pager>
+              <ion-slide *ngFor="let item of cityWisebannerImages">
+                <div class="slide-content">
+                  <div class="image-wrap">
+                    <img style="border-radius: 5px 5px;height:135px;min-height:135px" 
+                    *ngIf="item?.image_url" [src]="item.image_url" onError="this.src='assets/images/default_image.jpg';"
+                    />
+                  </div>
+                </div>
+              </ion-slide>
+            </ion-slides>
+          </ion-col>
+        </ion-row>
+
+      <ion-row style="margin-top: 10px;background-color: #f5f5f5;padding: 10px 0px 0px 0px;" *ngIf="!isLoading" class="ion-no-padding">
+          <ion-col size="12" size-xl="8" offset-xl="2">
+            <ion-slides [options]="sliderOptions" scrollbar>
+              <ion-slide *ngFor="let item of noContactbannerImages">
+                <div class="slide-content">
+                  <div class="image-wrap">
+                    <!-- border-radius: 20px 20px; -->
+                    <!-- style="height:200px;" -->
+                    <img style="border-radius: 10px 10px;height:85px;min-height:85px" 
+                    *ngIf="item?.image_url" [src]="item.image_url" onError="this.src='assets/images/default_image.jpg';"
+                    />
+                  </div>
+                </div>
+              </ion-slide>
+            </ion-slides>
+          </ion-col>
+        </ion-row>
+      <!-- <ion-row (click)="grostepStores()">
+        <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center">
+          <ion-list>
+            <ion-item no-padding>
+              <ion-thumbnail slot="start">
+                <img src="assets/images/default_image.jpg"/>
+              </ion-thumbnail>
+              <ion-label style="padding-left: 5px;">
+                <h2>
+                  <span>
+                    Looking for something else
+                    <ion-icon name="arrow-forward" style="float: right;"></ion-icon>
+                  </span>
+                </h2>
+                <p>
+                  List the items we will try to get for you!
+                </p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row> -->
     </ion-grid>
   </div>
 </ion-content>
+<ion-footer [routerLink]="['/','order','liveorders']" *ngIf="customerliveorderscount > 0" class="footer_color">
+  <ion-row>
+    <ion-col size="12">
+      <ion-text style="font-size: 16px;
+      margin: 1px 6px;line-height: 28px;font-weight: 500;outline:none">
+        <span style="margin-right:8px">
+          Track your live {{customerliveorderscount > 1 ? 'orders' : 'order'}}
+        <span style="height:20px;float:right" >
+            <img style="height:20px;height: 25px;margin-right: 18px;" src="../../../assets/images/7.png">
+        </span>
+        </span>
+
+        <!-- <span class="cartlengthlogo">{{customerliveorderscount}}</span> -->
+      </ion-text>
+    </ion-col>
+  </ion-row>
+</ion-footer>

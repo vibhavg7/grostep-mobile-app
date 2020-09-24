@@ -1,0 +1,127 @@
+{
+  "project_info": {
+    "project_number": "754158695953",
+    "firebase_url": "https://grostep-realtime-nodejs.firebaseio.com",
+    "project_id": "grostep-realtime-nodejs",
+    "storage_bucket": "grostep-realtime-nodejs.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:754158695953:android:a7ee4be3ff17936384e3b0",
+        "android_client_info": {
+          "package_name": "com.grostep.customerapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "754158695953-7j7tdhfcd0rolv4hhci68qrncrv5mbn0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDy5PAu2voOc10qrz7YUACmiQto7OJjVas"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "754158695953-7j7tdhfcd0rolv4hhci68qrncrv5mbn0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:754158695953:android:dc91f2ba78efba3084e3b0",
+        "android_client_info": {
+          "package_name": "com.grostep.customersapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "754158695953-7j7tdhfcd0rolv4hhci68qrncrv5mbn0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDy5PAu2voOc10qrz7YUACmiQto7OJjVas"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "754158695953-7j7tdhfcd0rolv4hhci68qrncrv5mbn0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:754158695953:android:dad034725b5fce7484e3b0",
+        "android_client_info": {
+          "package_name": "com.grostep.deliveryapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "754158695953-7j7tdhfcd0rolv4hhci68qrncrv5mbn0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDy5PAu2voOc10qrz7YUACmiQto7OJjVas"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "754158695953-7j7tdhfcd0rolv4hhci68qrncrv5mbn0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:754158695953:android:02a05e4237ace68884e3b0",
+        "android_client_info": {
+          "package_name": "com.grostep.merchantapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "754158695953-7j7tdhfcd0rolv4hhci68qrncrv5mbn0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDy5PAu2voOc10qrz7YUACmiQto7OJjVas"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "754158695953-7j7tdhfcd0rolv4hhci68qrncrv5mbn0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
