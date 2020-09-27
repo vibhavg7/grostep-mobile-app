@@ -222,7 +222,6 @@ export class CartService {
   }
 
   setDeliveryCharge(value) {
-    console.log(value);
     this.deliveryCharge = value;
   }
 
@@ -232,6 +231,9 @@ export class CartService {
   }
 
   getvoucherAmount() {
+    // from(Storage.get({ key: 'voucherCode' })).subscribe((data) => {
+    //   console.log(data);
+    // });
     return this.voucher.voucher_amount ? this.voucher.voucher_amount : 0;
   }
 

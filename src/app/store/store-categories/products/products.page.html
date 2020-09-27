@@ -53,13 +53,13 @@
           <div *ngIf="storeProducts1?.length > 0">
             <ion-list style="padding-top: 0px;">
               <ion-item lines="none" style="padding-bottom:10px;" *ngFor="let product of storeProducts1">
-                <ion-thumbnail class="thumbWrap" slot="start">
+                <ion-thumbnail class="thumbWrap" slot="start" *ngIf="product?.image_url">
                   <span *ngIf="product?.store_discount > 0" class="discount_logo">
                     {{ product?.store_discount | number : '1.0-0' }}%
                     <br>OFF
                   </span>
                   <ion-img *ngIf="product?.image_url" [src]="product?.image_url"></ion-img>
-                  <ion-img *ngIf="!product?.image_url" src="assets/images/default_image.jpg"></ion-img>
+                  <!-- <ion-img *ngIf="!product?.image_url" src="assets/images/default_image.jpg"></ion-img> -->
                 </ion-thumbnail>
                 <ion-label>
                   <h2 style="padding-top:0;white-space: pre-line">{{product?.product_name}}</h2>

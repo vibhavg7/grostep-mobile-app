@@ -93,17 +93,18 @@
         <ion-list *ngIf="cartList?.length">
           <ion-item lines="none">
             <label>Amount To Pay</label>
-            <span slot="end">&#8377; {{getTotal()| number : '1.2-2'}}
+            <span slot="end">&#8377; {{totalAmount| number : '1.2-2'}}
             </span>
           </ion-item>
           <ion-item lines="none">
             <label>Discount</label>
-            <span slot="end"> - &#8377; {{getVoucherAmount()| number : '1.2-2'}}
+            <!-- <span slot="end"> - &#8377; {{getVoucherAmount()| number : '1.2-2'}} -->
+            <span slot="end"> - &#8377; {{(voucher?.voucher_amount ? voucher?.voucher_amount : 0) | number : '1.2-2'}}
             </span>
           </ion-item>
           <ion-item lines="none">
             <label>Grand Total</label>
-            <span slot="end" style="font-weight:bold">&#8377; {{getPayableAmount()| number : '1.2-2'}}
+            <span slot="end" style="font-weight:bold">&#8377; {{totalAmount - (voucher?.voucher_amount ? voucher?.voucher_amount : 0) | number : '1.2-2'}}
             </span>
           </ion-item>
         </ion-list>

@@ -238,6 +238,7 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   getTotal(): number {
+    console.log(this.totalAmount);
     // this.cartService.getAllCartItems().subscribe((data) => {
     //   let amount = 0;
     //   const parsedData = JSON.parse(data.value);
@@ -257,6 +258,7 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   getVoucherAmount() {
+    console.log(this.voucher);
     return this.cartService.getvoucherAmount();
   }
 

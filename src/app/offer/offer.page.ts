@@ -44,11 +44,14 @@ export class OfferPage implements OnInit {
 
   fetchAllOffers() {
     this.offerService.fetchAllOffers().subscribe((data) => {
+      console.log(data);
       if (data.status === 200) {
         this.offers = data.vouchers;
         this.isLoading = false;
         this.offers.forEach((offerData: any) => {
-          if (this.cartAmount >= offerData.voucher_cart_amount &&
+          if (this.cartAmount >= offerData.voucher_cart_amount
+              && offerData.customer_daily_usage_count < offerData.voucher_max_usage_count
+              && offerData.customer_used_count < offerData.voucher_max_limit_user
               (this.prevPage === 'cartpage' || this.prevPage === 'paymentoptionspage') ) {
             offerData.applyButton = true;
           } else {
@@ -63,6 +66,22 @@ export class OfferPage implements OnInit {
   }
 
   applyVoucher(offer) {
+    if (+offer.calculation_type === 1) {
+      const offerValue = this.cartAmount * (offer.voucher_value / 100);
+      if (offerValue >= offer.voucher_max_value) {
+        offer.voucher_amount = offer.voucher_max_value;
+      } else  {
+        offer.voucher_amount = Math.ceil(offerValue);
+      }
+    }
+    if (+offer.calculation_type === 2) {
+      if (offer.voucher_amount >= offer.voucher_max_value) {
+        offer.voucher_amount = offer.voucher_max_value;
+      } else  {
+        offer.voucher_amount = offer.voucher_value;
+      }
+    }
+    console.log(offer);
     this.cartService.setVoucher(offer);
     if (this.prevPage === 'cartpage') {
       this.navCtrl.navigateBack(`/cart/${this.storeId}`);

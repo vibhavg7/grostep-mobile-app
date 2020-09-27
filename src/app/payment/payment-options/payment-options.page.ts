@@ -18,6 +18,9 @@ import * as moment from 'moment';
 })
 export class PaymentOptionsPage implements OnInit {
 
+  deliveryCharge: number;
+  storeClosingStatus: number;
+  currentuser: boolean;
   totalAmount: number;
   utcselectedeliverydate: any;
   confirmedOrder = false;
@@ -84,15 +87,18 @@ export class PaymentOptionsPage implements OnInit {
   ionViewWillEnter() {
     // this.confirmedOrder = true;
     // this.cartList = this.cartService.getAllCartItems();
+    this.isLoading = true;
     this.cartService.getAllCartItems().subscribe((data) => {
       this.cartList = JSON.parse(data.value);
       this.calculateTotalAmount(this.cartList);
     });
+    this.deliveryCharge = this.cartService.getDeliveryCharge();
     this.deliveryService.getDeliveryInstructions().subscribe((data) => {
       this.deliveryInstructions = data.value;
     });
     this.cartService.getAppliedVoucher().subscribe((voucherData) => {
       const voucher = JSON.parse(voucherData.value);
+      console.log(voucher);
       if (voucher != null) {
         this.voucher = voucher;
       } else {
@@ -117,7 +123,7 @@ export class PaymentOptionsPage implements OnInit {
     const localMoment = moment();
     const utcMoment = moment.utc();
     const ret = await Storage.get({ key: 'usertempaddress1' });
-    // const city = JSON.parse(ret.value).city;
+    this.currentuser = this.auth.isauthenticated;
     this.auth.getProfileAndPaymentMethodInfo(JSON.parse(ret.value).city).subscribe((data: any) => {
       this.addressinfo = data[0].customer_delivery_addresses.filter((address: any) => {
         return address.status === 1;
@@ -137,6 +143,13 @@ export class PaymentOptionsPage implements OnInit {
         this.selectedeliverytime = slotInfo.start_time % 12 + '' +
           slotInfo.openingTimeClock + ' - ' + slotInfo.end_time % 12 + '' + slotInfo.closingTimeClock;
       }
+      this.storeService.storeClosingStatus(this.storeId).subscribe((data1: any) => {
+        if (data1.status === 200) {
+          console.log(data1);
+          this.isLoading = false;
+          this.storeClosingStatus = +data1.storeInfo[0].closed;
+        }
+      });
     });
   }
 
@@ -286,45 +299,43 @@ export class PaymentOptionsPage implements OnInit {
   }
 
   getVoucherAmount() {
-    return this.cartService.getvoucherAmount();
+    // return this.cartService.getvoucherAmount();
+    return this.voucher.voucher_amount;
   }
 
-  availableCouponCode() {
-    this.modalCtrl.create({ component: OfferListComponent, componentProps: { storeId: this.storeId, prevPage: 'cartpage' } })
-      .then((modalEl) => {
-        modalEl.present();
-        return modalEl.onDidDismiss();
-      }).then((resultData: any) => {
-        if (resultData.role === 'voucherapplied') {
-          this.voucher = resultData.data.voucherDetail;
-          console.log(this.voucher);
-        }
-      });
-    // this.router.navigate(['/offer', { prevPage: 'paymentoptionspage' }]);
-  }
+  // availableCouponCode() {
+  //   this.modalCtrl.create({ component: OfferListComponent, componentProps: { storeId: this.storeId, prevPage: 'cartpage' } })
+  //     .then((modalEl) => {
+  //       modalEl.present();
+  //       return modalEl.onDidDismiss();
+  //     }).then((resultData: any) => {
+  //       if (resultData.role === 'voucherapplied') {
+  //         this.voucher = resultData.data.voucherDetail;
+  //         console.log(this.voucher);
+  //       }
+  //     });
+  //   // this.router.navigate(['/offer', { prevPage: 'paymentoptionspage' }]);
+  // }
 
-  applyCouponCode() {
-    if (this.couponCode === undefined) {
-      this.presentToast('Please enter valid coupon code');
-    } else {
-      this.offerService.searchVoucherByName(this.couponCode, this.totalAmount).subscribe((data: any) => {
-        console.log(data);
-        if (data.status === 200 && data.coupon.length <= 0) {
-          this.presentToast('This coupon code is not applicable for this order.');
-        } else {
-          this.presentToast(`${data.coupon[0].voucher_code} code applied sucessfully.`);
-          this.cartService.setVoucher(data.coupon[0]);
-          this.cartService.getAppliedVoucher().subscribe((voucherData) => {
-            const voucher = JSON.parse(voucherData.value);
-            console.log(voucher);
-            if (voucher != null) {
-              this.voucher = voucher;
-            } else {
-              this.voucher = {};
+
+  applyVoucher() {
+    if (this.currentuser) {
+      if (this.storeClosingStatus === 1) {
+        this.presentToast('Store is currently closed. Please apply coupon when store will open');
+      } else {
+        this.modalCtrl.create({ component: OfferListComponent, componentProps: { storeId: this.storeId, prevPage: 'paymentoptionspage' } })
+          .then((modalEl) => {
+            modalEl.present();
+            return modalEl.onDidDismiss();
+          }).then((resultData: any) => {
+            if (resultData.role === 'voucherapplied') {
+              this.voucher = resultData.data.voucherDetail;
+              console.log(this.voucher);
             }
           });
-        }
-      });
+      }
+    } else {
+      this.presentToast('You need to login in order to apply coupon code');
     }
   }
 
