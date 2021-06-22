@@ -20,6 +20,9 @@ const { Storage } = Plugins;
   styleUrls: ['./cart.page.scss'],
 })
 export class CartPage implements OnInit, OnDestroy {
+  chargeableDeliveryCost: any = 0;
+  deliveryInstructions: any;
+  slot: any;
   subscription: Subscription;
   city: any;
   currentuser: any;
@@ -36,6 +39,7 @@ export class CartPage implements OnInit, OnDestroy {
   cartCategories: Array<string> = [];
   isLoading = false;
   storeClosingStatus = 0;
+  outOfStockProductExist = false;
   constructor(
     private cartService: CartService,
     private modalCtrl: ModalController,
@@ -51,9 +55,8 @@ export class CartPage implements OnInit, OnDestroy {
     private alertCtrl: AlertController) { }
 
   ngOnInit() {
-    console.log('ngoninit');
-    // this.storeId = +this.activatedRoute.snapshot.paramMap.get('storeId');
-    // this.categoryId = this.activatedRoute.snapshot.paramMap.get('categoryId');
+    this.storeId = +this.activatedRoute.snapshot.paramMap.get('storeId');
+    this.categoryId = this.activatedRoute.snapshot.paramMap.get('categoryId');
     this.platform.backButton.subscribeWithPriority(0, () => {
       if (this.router.url.split(';')[0] === '/home/tabs/cart') {
         this.navCtrl.navigateRoot(['/home/tabs/categories']);
@@ -64,9 +67,6 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   async getObject() {
-    console.log('getObject');
-    this.storeId = +this.activatedRoute.snapshot.paramMap.get('storeId');
-    this.categoryId = this.activatedRoute.snapshot.paramMap.get('categoryId');
     this.platform.backButton.subscribeWithPriority(0, () => {
       if (this.router.url.split(';')[0] === '/home/tabs/cart') {
         this.navCtrl.navigateRoot(['/home/tabs/categories']);
@@ -75,54 +75,76 @@ export class CartPage implements OnInit, OnDestroy {
       }
     });
     const ret = await Storage.get({ key: 'usertempaddress1' });
-    this.city = JSON.parse(ret.value).city;
     this.currentuser = this.auth.isauthenticated;
     this.isLoading = true;
     this.cartService.getAllCartItems().subscribe((cartdata) => {
-      this.cartList = JSON.parse(cartdata.value);
-      if (this.cartList !== null && this.cartList.length > 0) {
-        this.calculateTotalAmount(this.cartList);
-        this.cartStoreName = this.cartList[0].store_name;
-        if (this.currentuser) {
-          this.auth.getSelectedCustomerAddressCityWiseAndVoucher(this.city).subscribe((data: any) => {
-            this.isLoading = false;
-            this.selectedAddress = data[0].addressInfo[0];
-            this.addressCount = data[0].customer_address_count[0].customer_address_count;
-            const voucher = JSON.parse(data[1].value);
-            console.log(voucher);
-            if (voucher != null) {
-              this.voucher = voucher;
-            } else {
-              this.voucher = {};
-            }
-            // this.storeId = +this.activatedRoute.snapshot.paramMap.get('storeId');
-            // this.categoryId = this.activatedRoute.snapshot.paramMap.get('categoryId');
-            // // this.voucher = this.cartService.getAppliedVoucher();
-            if (this.storeId === 0 && this.cartList.length > 0) {
-              this.storeId = this.cartList[0].store_id;
-              this.storeService.storeClosingStatus(this.storeId).subscribe((data1: any) => {
-                if (data1.status === 200) {
-                  console.log(data1);
-                  this.isLoading = false;
-                  this.storeClosingStatus = +data1.storeInfo[0].closed;
+      const parsedCartData = JSON.parse(cartdata.value);
+      if (parsedCartData && Object.keys(parsedCartData).length > 0 && parsedCartData.constructor === Object) {
+        this.cartList = parsedCartData.items;
+        this.deliveryInstructions = parsedCartData.deliveryInstructions;
+        this.slot = parsedCartData.slot;
+        this.chargeableDeliveryCost = parsedCartData.chargeableDeliveryCost;
+        if (this.cartList !== null && this.cartList.length > 0) {
+          const result = this.cartList.map(a => a.store_product_mapping_id);
+          this.storeId = this.cartList[0].store_id;
+          const cartId = JSON.parse(cartdata.value).cart_id;
+          this.cartStoreName = this.cartList[0].store_name.trim();
+          this.city = this.cartList[0].store_city.trim();
+          this.cartService.validateStoreCartProducts(result, this.storeId).subscribe(async (data: any) => {
+            if (+data.status === 200) {
+              this.cartList.map((data1: any) => {
+                const result1 = data.cartData.filter(a1 => a1.store_product_mapping_id === data1.store_product_mapping_id);
+                if (result1.length > 0) {
+                  data1.stock = result1[0].stock;
+                  data1.store_selling_price = result1[0].store_selling_price;
+                  data1.product_marked_price = result1[0].product_marked_price;
+                  data1.store_product_caping = result1[0].store_product_caping;
+                  data1.store_discount = result1[0].store_discount;
+                  data1.store_product_status = result1[0].store_product_status;
+                  data1.image_url = result1[0].image_url;
                 }
               });
+              const cartObj: any = {};
+              cartObj.chargeableDeliveryCost = this.chargeableDeliveryCost;
+              cartObj.count = this.cartList.length;
+              cartObj.items = this.cartList;
+              cartObj.paymentMode = null;
+              if (cartId) {
+                cartObj.cart_id = cartId;
+              }
+              if (this.deliveryInstructions) {
+                cartObj.deliveryInstructions = this.deliveryInstructions;
+              } else {
+                cartObj.deliveryInstructions = '';
+              }
+              if (this.slot && Object.keys(this.slot).length > 0 && this.slot.constructor === Object) {
+                cartObj.slot = this.slot;
+              } else {
+                cartObj.slot = {};
+              }
+              cartObj.total = this.cartList.reduce((sum, current) => {
+                return sum + (current.store_selling_price * current.quantity);
+              }, 0);
+              this.cartService.setCartObject(cartObj);
+              this.outOfStockProductExist = this.cartList.some((data12: any) => +data12.stock === 0);
+              this.calculateTotalAmount(this.cartList);
+              this.storeClosingStatus = +data.storeData[0].closed;
+              if (this.currentuser) {
+                this.auth.getSelectedCustomerAddressCityWiseAndVoucher(this.city).subscribe((data12: any) => {
+                  this.selectedAddress = data12[0].addressInfo[0];
+                  this.addressCount = data12[0].customer_address_count[0].customer_address_count;
+                  const voucher = JSON.parse(data12[1].value);
+                  if (voucher != null) {
+                    this.voucher = voucher;
+                  } else {
+                    this.voucher = {};
+                  }
+                });
+              }
             }
           });
-        } else {
-          this.isLoading = false;
-          if (this.storeId === 0 && this.cartList.length > 0) {
-            this.storeId = this.cartList[0].store_id;
-            console.log(this.storeId);
-            this.storeService.storeClosingStatus(this.storeId).subscribe((data1: any) => {
-              if (data1.status === 200) {
-                console.log(data1);
-                this.isLoading = false;
-                this.storeClosingStatus = +data1.storeInfo[0].closed;
-              }
-            });
-          }
         }
+        this.isLoading = false;
       } else {
         this.isLoading = false;
       }
@@ -130,21 +152,16 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   ionViewWillEnter() {
-    console.log('ionViewWillEnter');
     this.subscription = this.auth.getToken().subscribe((message: any) => {
-      console.log(message);
-      console.log('giii');
+      // console.log(message);
       if (message.text !== '') {
+        // console.log('inside' + message.text);
         this.currentuser = true;
         this.getObject();
-        console.log(this.currentuser);
       }
     });
+    // console.log('outside');
     this.getObject();
-  }
-
-  ionVieWDidEnter() {
-    console.log('ionVieWDidEnter');
   }
 
   backToHome() {
@@ -156,20 +173,120 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   quantityMinus(item) {
-    if (item.quantity > 1) {
-      this.removeItemById(item.id);
-      // if ((this.cartService.getGrandTotal() < this.voucher.voucher_cart_amount)) {
-      //   this.voucher = {} as Voucher;
-      //   this.cartService.removeVoucher();
-      // }
-    } else {
-      this.removeItemFromCart(item);
-    }
+    // console.log(item);
+    this.removeItemById(item.store_product_mapping_id);
+    // if (item.quantity > 1) {
+    //   this.removeItemById(item.store_product_mapping_id);
+    // //   // if ((this.cartService.getGrandTotal() < this.voucher.voucher_cart_amount)) {
+    // //   //   this.voucher = {} as Voucher;
+    // //   //   this.cartService.removeVoucher();
+    // //   // }
+    // } else {
+    // //   this.removeItemFromCart(item);
+    // }
   }
 
   addAddress() {
     this.router.navigate(['/', 'delivery-address', 'add-delivery-address',
       { addressId: '', storeId: this.storeId, prevPage: 'cartpage' }]);
+  }
+
+  removeOutOfStockProduct() {
+    // console.log('removeOutOfStockProduct');
+    console.log(this.storeId);
+    this.storeService.storeClosingStatus(this.storeId).subscribe(async (optiondata: any) => {
+      // console.log(optiondata);
+      if (+optiondata.status === 200) {
+        if (+optiondata.storeInfo[0].closed === 1) {
+          this.isLoading = false;
+          this.alertCtrl
+            .create({
+              header: 'Store Information',
+              message: 'Store is closed. Please try from another store',
+              buttons: [
+                {
+                  text: 'Okay',
+                  handler: () => {
+                    if (+this.categoryId === 0) {
+                      this.navCtrl.navigateRoot(['/home/tabs/categories']);
+                    } else {
+                      this.router.navigate(['/', 'categories', this.categoryId, 'stores']);
+                    }
+                    // this.router.navigate(['/', 'categories', this.categoryId, 'stores']);
+                  }
+                }
+              ]
+            })
+            .then(alertEl => alertEl.present());
+        } else {
+          if (this.auth.isauthenticated == null || this.auth.isauthenticated === false) {
+            this.isLoading = false;
+            this.auth.redirectUrl = 'cartpage';
+            this.router.navigate(['/', 'auth', 'login']);
+          } else {
+            const customerId = localStorage.getItem('customerid');
+            const cartData = await Storage.get({ key: 'cartList' });
+            const cart_id = JSON.parse(cartData.value).cart_id;
+            const deliveryInstructions = JSON.parse(cartData.value).deliveryInstructions;
+            const parsedcartData = JSON.parse(cartData.value);
+            const cartArray = [];
+            if (parsedcartData != null) {
+              const parsedcartDataItems = parsedcartData.items;
+              const selectedAddress = this.selectedAddress;
+              if (parsedcartDataItems != null && Array.isArray(parsedcartDataItems)
+                && parsedcartDataItems && parsedcartDataItems.length > 0) {
+                const stockparsedcartDataItems = parsedcartDataItems.filter((e) => {
+                  return e.stock > 0;
+                });
+                stockparsedcartDataItems.forEach(data => {
+                  const obj: any = {};
+                  obj.store_id = data.store_id;
+                  obj.quantity = data.quantity;
+                  obj.store_product_mapping_id = data.store_product_mapping_id;
+                  obj.store_selling_price = data.store_selling_price;
+                  cartArray.push(obj);
+                });
+                // console.log(cartArray);
+                this.cartService.syncCartProducts(cartArray, cart_id, deliveryInstructions, selectedAddress.delivery_address_id)
+                .subscribe((data: any) => {
+                  if (data.status === 200) {
+                    // console.log(data);
+                    const cartObj: any = {};
+                    const newcartProductData = data.customerCart;
+                    const newcartInfo = data.cartInfo;
+                    cartObj.chargeableDeliveryCost = newcartInfo.delivery_cost === null ? 0 : newcartInfo.delivery_cost;
+                    cartObj.count = newcartProductData.length;
+                    cartObj.items = newcartProductData;
+                    cartObj.paymentMode = null;
+                    cartObj.cart_id = data.cart_id;
+                    cartObj.deliveryInstructions = newcartInfo.instructions;
+                    cartObj.slot = newcartInfo.slot;
+                    cartObj.total = newcartProductData.reduce((sum, current) => {
+                      return sum + (current.store_selling_price * current.quantity);
+                    }, 0);
+                    this.cartService.setCartObject(cartObj);
+                    this.cartService.getAllCartItems().subscribe((data1) => {
+                      this.cartList = JSON.parse(data1.value).items;
+                      this.outOfStockProductExist = this.cartList.some((data12: any) => +data12.stock === 0);
+                      // console.log(this.outOfStockProductExist);
+                      if (!this.outOfStockProductExist) {
+                        this.router.navigate(['/', 'delivery-address', 'delivery-options', {
+                          storeId: this.storeId,
+                          categoryId: this.categoryId
+                        }]);
+                      }
+                    });
+                  }
+                  this.isLoading = false;
+                });
+              }
+            } else {
+
+            }
+          }
+        }
+      }
+    });
   }
 
   removeVoucher(voucherid) {
@@ -185,31 +302,105 @@ export class CartPage implements OnInit, OnDestroy {
     let amount = 0;
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < cartList.length; i++) {
-      const productPrice: any = cartList[i].price;
+      const productPrice: any = cartList[i].store_selling_price;
       amount += (productPrice * cartList[i].quantity);
     }
     this.totalAmount = amount;
   }
 
+  deleteCart() {
+    this.alertCtrl
+      .create({
+        header: 'Confirm Delete',
+        message: 'Are you sure you want to remove the cart',
+        buttons: [
+          {
+            text: 'Cancel',
+            cssClass: 'cancelcss',
+            handler: () => {
+              console.log('Cancel clicked');
+            }
+          },
+          {
+            text: 'YES',
+            cssClass: 'removecss',
+            handler: () => {
+              console.log('delete cart');
+              this.cartList = this.cartService.removeAllCartItems();
+            }
+          }]
+      })
+      .then(alertEl => alertEl.present());
+  }
+
+  async setAndGetCart(parsedData) {
+    let ret1 = await Storage.get({ key: 'cartList' });
+    let parsedCartData = JSON.parse(ret1.value);
+
+    if (parsedData === null) {
+      const cartList: any = {};
+      cartList.count = 0;
+      cartList.total = 0;
+      cartList.chargeableDeliveryCost = 0;
+      cartList.items = [];
+      cartList.deliveryInstructions = '';
+      cartList.paymentMode = 0;
+      cartList.uniqueSkuInCart = 0;
+      cartList.slot = {};
+      this.cartService.setCartObject(cartList);
+      ret1 = await Storage.get({ key: 'cartList' });
+      parsedCartData = JSON.parse(ret1.value);
+    }
+
+    const cartId = JSON.parse(ret1.value).cart_id;
+    this.deliveryInstructions = JSON.parse(ret1.value).deliveryInstructions;
+    const cartObj: any = {};
+    cartObj.chargeableDeliveryCost = this.chargeableDeliveryCost;
+    cartObj.deliveryInstructions = this.deliveryInstructions;
+    cartObj.count = parsedData.length;
+    cartObj.items = parsedData;
+    if (cartId) {
+      cartObj.cart_id = cartId;
+    }
+    if (this.deliveryInstructions) {
+      cartObj.deliveryInstructions = this.deliveryInstructions;
+    } else {
+      cartObj.deliveryInstructions = '';
+    }
+    if (this.slot && Object.keys(this.slot).length > 0 && this.slot.constructor === Object) {
+      cartObj.slot = this.slot;
+    } else {
+      cartObj.slot = {};
+    }
+    cartObj.paymentMode = null;
+    cartObj.total = parsedData.reduce((sum, current) => {
+      return sum + (current.store_selling_price * current.quantity);
+    }, 0);
+    this.cartService.setCartObject(cartObj);
+    this.cartService.getAllCartItems().subscribe((data1) => {
+      this.cartList = JSON.parse(data1.value).items;
+      this.calculateTotalAmount(this.cartList);
+      if ((this.cartList.length < 1) || (this.getTotal() < this.voucher.voucher_cart_amount)) {
+        this.voucher = {} as Voucher;
+        this.cartService.removeVoucher();
+      }
+    });
+  }
+
   addItemsToCart(product, quantity = 1) {
-    console.log(product);
     this.cartService.getAllCartItems().subscribe((data) => {
-      const id = product.id;
+      const id = product.store_product_mapping_id;
       const list: Array<CartItem> = [];
       const parsedData = JSON.parse(data.value);
-      console.log(parsedData);
+      // console.log(parsedData);
       if (parsedData !== null) {
+        const cartData = JSON.parse(data.value).items;
         // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < parsedData.length; i++) {
-          if (parsedData[i].id === id) {
-            parsedData[i].quantity += quantity;
+        for (let i = 0; i < cartData.length; i++) {
+          if (cartData[i].store_product_mapping_id === id) {
+            cartData[i].quantity += quantity;
             product.quantity += 1;
-            this.cartService.setCartObject(parsedData);
-            this.cartService.getAllCartItems().subscribe((data1) => {
-              console.log(JSON.parse(data1.value));
-              // this.cartList = JSON.parse(data1.value);
-              this.calculateTotalAmount(JSON.parse(data1.value));
-            });
+            this.setAndGetCart(cartData);
           }
         }
       }
@@ -238,18 +429,7 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   getTotal(): number {
-    console.log(this.totalAmount);
-    // this.cartService.getAllCartItems().subscribe((data) => {
-    //   let amount = 0;
-    //   const parsedData = JSON.parse(data.value);
-    //   // tslint:disable-next-line:prefer-for-of
-    //   for (let i = 0; i < parsedData.length; i++) {
-    //     const productPrice: any = parsedData[i].price;
-    //     amount += (productPrice * parsedData[i].quantity);
-    //   }
-    //   this.totalAmount = amount;
-    // });
-    // this.totalAmount = this.cartService.getGrandTotal();
+    // console.log(this.totalAmount);
     return this.totalAmount;
   }
 
@@ -258,7 +438,7 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   getVoucherAmount() {
-    console.log(this.voucher);
+    // console.log(this.voucher);
     return this.cartService.getvoucherAmount();
   }
 
@@ -276,7 +456,8 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   quantityPlus(item) {
-    if (item.quantity >= 10) {
+    // console.log(item);
+    if (item.quantity >= 5) {
       this.alertCtrl
         .create({
           header: 'Cart',
@@ -306,7 +487,7 @@ export class CartPage implements OnInit, OnDestroy {
             text: 'Remove',
             cssClass: 'removecss',
             handler: () => {
-              this.removeItemById(item.id);
+              this.removeItemById(item.store_product_mapping_id);
               // this.cartService.getAllCartItems().subscribe((data) => {
               //   this.cartList = JSON.parse(data.value);
               //   if ((this.cartList.length < 1) || (this.getTotal() < this.voucher.voucher_cart_amount)) {
@@ -326,10 +507,10 @@ export class CartPage implements OnInit, OnDestroy {
 
   removeItemById(id) {
     this.cartService.getAllCartItems().subscribe((data) => {
-      const parsedData = JSON.parse(data.value);
+      const parsedData = JSON.parse(data.value).items;
       // tslint:disable-next-line:prefer-for-of
       for (let i = 0; i < parsedData.length; i++) {
-        if (parsedData[i].id === id) {
+        if (parsedData[i].store_product_mapping_id === id) {
           if (parsedData[i].quantity === 1) {
             parsedData.splice(i, 1);
           } else {
@@ -339,28 +520,31 @@ export class CartPage implements OnInit, OnDestroy {
         }
       }
       this.cartService.sendMessage(parsedData);
-      this.cartService.setCartObject(parsedData);
-      this.cartService.getAllCartItems().subscribe((data1) => {
-        this.cartList = JSON.parse(data1.value);
-        this.calculateTotalAmount(JSON.parse(data1.value));
-        if ((this.cartList.length < 1) || (this.getTotal() < this.voucher.voucher_cart_amount)) {
-          this.voucher = {} as Voucher;
-          this.cartService.removeVoucher();
-        } else if ((this.getTotal() < this.voucher.voucher_cart_amount)) {
-          this.voucher = {} as Voucher;
-          this.cartService.removeVoucher();
-        }
-      });
+      this.setAndGetCart(parsedData);
+      // const cartObj: any = {};
+      // cartObj.chargeableDeliveryCost = 0;
+      // cartObj.count = parsedData.length;
+      // cartObj.items = parsedData;
+      // cartObj.paymentMode = null;
+      // cartObj.total = parsedData.reduce((sum, current) => {
+      //   return sum + current.store_selling_price;
+      // }, 0);
+      // this.cartService.setCartObject(cartObj);
+      // this.cartService.getAllCartItems().subscribe((data1) => {
+      //   this.cartList = JSON.parse(data1.value).items;
+      //   this.calculateTotalAmount(this.cartList);
+      // });
     });
 
   }
 
-  addDeliveryOptions() {
-    this.storeService.storeClosingStatus(this.storeId).subscribe((optiondata: any) => {
-      console.log(optiondata);
-      console.log(this.categoryId);
-      if (optiondata.status === 200) {
+  checkout() {
+    this.isLoading = true;
+    this.storeService.storeClosingStatus(this.storeId).subscribe(async (optiondata: any) => {
+      if (+optiondata.status === 200) {
         if (+optiondata.storeInfo[0].closed === 1) {
+          console.log('inside');
+          this.isLoading = false;
           this.alertCtrl
             .create({
               header: 'Store Information',
@@ -382,17 +566,73 @@ export class CartPage implements OnInit, OnDestroy {
             .then(alertEl => alertEl.present());
         } else {
           if (this.auth.isauthenticated == null || this.auth.isauthenticated === false) {
+            this.isLoading = false;
             this.auth.redirectUrl = 'cartpage';
             this.router.navigate(['/', 'auth', 'login']);
           } else {
-            this.router.navigate(['/', 'delivery-address', 'delivery-options', { storeId: this.storeId, categoryId: this.categoryId }]);
+            const customerId = localStorage.getItem('customerid');
+            const cartData = await Storage.get({ key: 'cartList' });
+            const parsedCartData =  JSON.parse(cartData.value);
+            if (parsedCartData && Object.keys(parsedCartData).length > 0 && parsedCartData.constructor === Object) {
+              console.log('inside1');
+              const parsedData = JSON.parse(cartData.value).items;
+              const cart_id = JSON.parse(cartData.value).cart_id;
+              const deliveryInstructions = JSON.parse(cartData.value).deliveryInstructions;
+              const cartArray = [];
+              const selectedAddress = this.selectedAddress;
+              if (parsedData != null && Array.isArray(parsedData) && parsedData && parsedData.length > 0) {
+                parsedData.forEach(data => {
+                  const obj: any = {};
+                  obj.store_id = data.store_id;
+                  obj.quantity = data.quantity;
+                  obj.store_product_mapping_id = data.store_product_mapping_id;
+                  obj.store_selling_price = data.store_selling_price;
+                  cartArray.push(obj);
+                });
+                this.cartService.syncCartProducts(cartArray, cart_id, deliveryInstructions, selectedAddress.delivery_address_id)
+                .subscribe((data: any) => {
+                  if (data.status === 200) {
+                    console.log(data);
+                    const newcartProductData = data.customerCart;
+                    const newcartInfo = data.cartInfo;
+                    const cartObj: any = {};
+                    // cartObj.chargeableDeliveryCost = newcartInfo.delivery_cost;
+                    cartObj.chargeableDeliveryCost = newcartInfo.delivery_cost === null ? 0 : newcartInfo.delivery_cost;
+                    cartObj.count = newcartProductData.length;
+                    cartObj.items = newcartProductData;
+                    cartObj.paymentMode = null;
+                    cartObj.cart_id = data.cart_id;
+                    cartObj.deliveryInstructions = newcartInfo.instructions;
+                    cartObj.slot = newcartInfo.slot === null ? {} : newcartInfo.slot;
+                    cartObj.total = newcartProductData.reduce((sum, current) => {
+                      return sum + (current.store_selling_price * current.quantity);
+                    }, 0);
+                    this.cartService.setCartObject(cartObj);
+                    this.cartService.getAllCartItems().subscribe((data1) => {
+                      this.cartList = JSON.parse(data1.value).items;
+                      this.outOfStockProductExist = this.cartList.some((data12: any) => +data12.stock === 0);
+                      this.isLoading = false;
+                      if (!this.outOfStockProductExist) {
+                        this.router.navigate(['/', 'delivery-address', 'delivery-options', {
+                          storeId: this.storeId,
+                          categoryId: this.categoryId
+                        }]);
+                      }
+                    });
+                  }
+                });
+              }
+            } else  {
+              this.navCtrl.navigateRoot(['/home/tabs/categories']);
+            }
           }
         }
       }
     });
+
   }
 
-  public ngOnDestroy(): void {
+  ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 

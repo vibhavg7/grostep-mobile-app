@@ -34,7 +34,7 @@ export class HomePage implements OnInit, OnDestroy {
   ngOnInit() {
     this.subscription = this.cartService.getMessage().subscribe((message: any) => {
       this.cartCount = message.text;
-      console.log(this.cartCount);
+      // console.log(this.cartCount);
     });
   }
 

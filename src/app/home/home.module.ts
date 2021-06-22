@@ -12,13 +12,13 @@ import { HomeRoutingModule } from './home-routing.module';
     CommonModule,
     HomeRoutingModule,
     FormsModule,
-    IonicModule,
-    RouterModule.forChild([
-      {
-        path: '',
-        component: HomePage
-      }
-    ])
+    IonicModule
+    // RouterModule.forChild([
+    //   {
+    //     path: '',
+    //     component: HomePage
+    //   }
+    // ])
   ],
   declarations: [HomePage]
 })

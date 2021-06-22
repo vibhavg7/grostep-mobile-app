@@ -1,0 +1,66 @@
+.innerCartWrap {
+  width: 200px;
+  text-align: center;
+}
+
+.outer_empty_cart_wrap {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  /* align horizontal */
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  /* align vertical */
+  width: 100%;
+  height: 100%;
+}
+
+.vouchercss {
+  color: black;
+  /* font-weight: bold; */
+  /* margin-left: 51px; */
+  font-size: 14px;
+  width: 180px;
+  border: 1px solid #edf7e3;
+  padding: 10px;
+  margin-left: -4px;
+  outline: none;
+  background: #edf7e3;
+  border-radius: 5px 5px;
+}
+
+.line {
+  width: 95%;
+  /* height: 47px; */
+  border-bottom: 1px solid #d8d8d8;
+  position: absolute;
+}
+
+.applyenabledcss {
+  float: right;
+  font-weight: 600;
+  color: #6fa833;
+  font-size: 16px;
+}
+
+.applydisabledcss {
+  float: right;
+  color: #c4c4c4;
+  font-size: 16px;
+}
+
+.noliveordericon {
+  color: #b61671;
+  display: block;
+  /* text-align: center; */
+  /* align-items: center; */
+  margin: auto;
+  font-size: 50px;
+}
+/*# sourceMappingURL=offer-list.component.css.map */

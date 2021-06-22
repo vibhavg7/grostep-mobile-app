@@ -10,6 +10,7 @@ import {
 } from '@capacitor/core';
 const { Storage } = Plugins;
 import { Subscription } from 'rxjs';
+import { concatMap } from 'rxjs/operators';
 @Component({
   selector: 'app-add-delivery-address',
   templateUrl: './add-delivery-address.page.html',
@@ -30,7 +31,8 @@ export class AddDeliveryAddressPage implements OnInit {
   registerCredentials = {
     customer_name: '', address_type: '', landmark: '',
     address2: '', city: '', state: '', country: '', latitude: '', longitude: '', customer_id: '',
-    flatNumber: '', address: '', pincode: '', phone: '', status: '', locality: ''
+    flatNumber: '', address: '', pincode: '', phone: '', status: '', locality: '', stateShortName: '',
+    countryShortName: ''
   };
   addressId: any = '';
   constructor(
@@ -58,27 +60,42 @@ export class AddDeliveryAddressPage implements OnInit {
   get f() { return this.addAddressForm.controls; }
 
   public ngOnInit() {
-    // this.subscription = this.router.events.subscribe((event: any) => {
-    //   this.locateUser();
-    // });
   }
 
   async locateUser() {
-    this.lat = this.authService.Lat;
-    this.lng = this.authService.Long;
-    if ((this.lat === '' || this.lat === undefined || this.lat === null || !this.lat) &&
-      (this.lng === '' || this.lng === undefined || this.lng === null || !this.lng)) {
-      const ret = await Storage.get({ key: 'usertempaddress1' });
-      this.lat = JSON.parse(ret.value).lat;
-      this.lng = JSON.parse(ret.value).long;
-      console.log(this.lat);
-      console.log(this.lng);
-    }
+    const ret = await Storage.get({ key: 'usertempaddress1' });
+    this.lat = JSON.parse(ret.value).lat;
+    this.lng = JSON.parse(ret.value).long;
+
+    const completeaddress = JSON.parse(ret.value).completeaddress;
+    const locationaddress = JSON.parse(ret.value).locationaddress;
+    const city = JSON.parse(ret.value).city;
+    const state = JSON.parse(ret.value).state;
+    const country = JSON.parse(ret.value).country;
+    const locality = JSON.parse(ret.value).locality;
+    const stateShortName = JSON.parse(ret.value).stateShortName;
+    const countryShortName = JSON.parse(ret.value).countryShortName;
+    const zipcode = JSON.parse(ret.value).zipcode;
+
     this.registerCredentials.latitude = this.lat;
     this.registerCredentials.longitude = this.lng;
-    this.authService.getAddress(this.lat, this.lng).subscribe(((data: any) => {
-      this.filterAddress(data.results, this.lat, this.lng);
-    }));
+
+    this.registerCredentials.address = completeaddress;
+    this.registerCredentials.address2 = locationaddress;
+    this.registerCredentials.city = city;
+    this.registerCredentials.state = state;
+    this.registerCredentials.country = country;
+    this.registerCredentials.locality = locality;
+    this.registerCredentials.stateShortName = stateShortName;
+    this.registerCredentials.countryShortName = countryShortName;
+    this.registerCredentials.pincode = zipcode;
+
+    console.log(this.registerCredentials);
+
+    // this.authService.getAddress(this.lat, this.lng).subscribe(((data: any) => {
+    //   // console.log(data);
+    //   this.filterAddress(data.suggestedLocations.results, this.lat, this.lng);
+    // }));
   }
   ionViewWillEnter() {
     this.platform.backButton.subscribeWithPriority(0, () => {
@@ -87,7 +104,9 @@ export class AddDeliveryAddressPage implements OnInit {
     this.addressId = this.activatedRoute.snapshot.paramMap.get('addressId');
     this.prevPage = this.activatedRoute.snapshot.paramMap.get('prevPage');
     this.storeId = this.activatedRoute.snapshot.paramMap.get('storeId');
-    this.locateUser();
+    // console.log(this.storeId);
+    // console.log(this.prevPage);
+    // console.log(this.addressId);
     if (this.addressId !== '') {
       this.customerAddressData = this.activatedRoute.snapshot.data.resolvedAddress.customerAddress;
       console.log(this.customerAddressData);
@@ -107,9 +126,21 @@ export class AddDeliveryAddressPage implements OnInit {
       this.registerCredentials.flatNumber = this.customerAddressData.flatNumber;
       this.registerCredentials.status = this.customerAddressData.status;
       this.registerCredentials.locality = this.customerAddressData.locality;
+      this.registerCredentials.stateShortName = this.customerAddressData.stateShortName;
+      this.registerCredentials.countryShortName = this.customerAddressData.countryShortName;
       this.registerCredentials.customer_id = localStorage.getItem('customerid');
       //   });
+    } else {
+      this.locateUser();
     }
+  }
+
+  ionViewWillLeave() {
+    // console.log('ionViewWillLeave');
+  }
+
+  ionViewDidLeave() {
+    // console.log('ionViewDidLeave');
   }
 
   addDelievryAddress() {
@@ -149,28 +180,23 @@ export class AddDeliveryAddressPage implements OnInit {
       this.isLoading = true;
       this.buttonSubmitted = true;
       this.registerCredentials.customer_id = localStorage.getItem('customerid');
-      this.authService.addDelievryAddress(this.registerCredentials).subscribe(data => {
-        if (data.status === 200) {
+      this.authService.addDelievryAddress(this.registerCredentials).pipe(
+        concatMap(response => this.authService.getUserProfile()))
+        .subscribe((data: any) => {
+          if (data.status === 200) {
+            this.presentToast('Address successfully updated');
+          } else {
+            this.presentToast('Unable to update address');
+          }
           if (this.prevPage === 'cartpage') {
-            // this.navCtrl.navigateBack(`/cart/${this.storeId}`);
             this.navCtrl.pop();
           } else {
             this.navCtrl.navigateRoot('/home/tabs/profile');
           }
-          this.presentToast('Address successfully updated');
-        } else {
-          if (this.prevPage === 'cartpage') {
-            // this.navCtrl.navigateBack('/cart');
-            this.navCtrl.pop();
-          } else {
-            this.navCtrl.navigateRoot('/home/tabs/profile');
-          }
-          this.presentToast('Unable to update address');
-        }
-        this.isLoading = false;
-        this.submitted = false;
-        this.buttonSubmitted = false;
-      });
+          this.isLoading = false;
+          this.submitted = false;
+          this.buttonSubmitted = false;
+        });
     }
   }
 
@@ -183,34 +209,33 @@ export class AddDeliveryAddressPage implements OnInit {
 
   }
 
-  filterAddress(result, lat, lng) {
-    let zipcode; let city; let state; let country; let locationaddress; let completeaddress = ''; let routeaddress; let locality;
-    result.forEach(data => {
+  filterAddress(results, lat, lng) {
+    let zipcode; let city; let state; let country; let locationaddress; let completeaddress = ''; let locality;
+    let stateShortName; let countryShortName;
+    console.log(results);
+    results.forEach(data => {
       if (data.types.indexOf('postal_code') !== -1) {
         zipcode = data.address_components[0].long_name;
-        this.registerCredentials.pincode = zipcode;
       }
       if (data.types.indexOf('sublocality_level_2') !== -1) {
       }
       if (data.types.indexOf('sublocality_level_1') !== -1) {
         locationaddress = data.address_components[0].long_name;
       }
-      if (data.types.indexOf('locality') !== -1) {
-        locality = data.address_components[0].long_name;
-      }
       if (data.types.indexOf('route') !== -1) {
         locationaddress = data.address_components[0].long_name + data.address_components[2].long_name;
-        completeaddress = data.address_components[0].long_name + ',' +
-          data.address_components[1].long_name + ',' +
-          data.address_components[2].long_name + ',' + data.address_components[3].long_name + ',' +
-          data.address_components[4].long_name + ',';
-        routeaddress = data.address_components[1].long_name;
+        // routeaddress = data.address_components[1].long_name;
       }
-      if (data.types.indexOf('administrative_area_level_2') !== -1) {
+      if (data.types.indexOf('street_address') !== -1) {
+        completeaddress = data.formatted_address;
+      }
+      if (data.types.indexOf('locality') !== -1 && data.types.indexOf('political') !== -1) {
         city = data.address_components[0].long_name;
-        state = data.address_components[1].long_name;
-        country = data.address_components[2].long_name;
-        completeaddress += city + ',' + state + ',' + country;
+        locality = data.address_components[1].long_name;
+        state = data.address_components[2].long_name;
+        stateShortName = data.address_components[2].short_name;
+        country = data.address_components[3].long_name;
+        countryShortName = data.address_components[3].short_name;
       }
     });
     this.registerCredentials.address = completeaddress;
@@ -219,6 +244,9 @@ export class AddDeliveryAddressPage implements OnInit {
     this.registerCredentials.state = state;
     this.registerCredentials.country = country;
     this.registerCredentials.locality = locality;
+    this.registerCredentials.stateShortName = stateShortName;
+    this.registerCredentials.countryShortName = countryShortName;
+    console.log(this.registerCredentials);
   }
 
   private showMessageAlert() {
@@ -229,7 +257,9 @@ export class AddDeliveryAddressPage implements OnInit {
   }
 
   changeAddress() {
-    this.navCtrl.navigateForward(['/changedeliverylocation']);
+    // console.log('ggggg');
+    // this.navCtrl.navigateForward(['/changedeliverylocation']);
+    this.router.navigate(['/', 'changedeliverylocation', { page: 'adddeliveryaddress' }]);
   }
 
   backToHome() {

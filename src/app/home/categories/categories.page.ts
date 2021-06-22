@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
 import { NavController, Platform } from '@ionic/angular';
 import { Plugins } from '@capacitor/core';
+import { CartService } from '../../cart/cart.service';
 
 const { Storage } = Plugins;
 @Component({
@@ -34,7 +35,7 @@ export class CategoriesPage implements OnInit, OnEnter, OnDestroy {
     // virtualTranslate: true,
   };
 
-  sliderOptions1  = {
+  sliderOptions1 = {
     zoom: false,
     slidesPerView: 1.4,
     // slidesPerColumn: 1.5,
@@ -54,56 +55,82 @@ export class CategoriesPage implements OnInit, OnEnter, OnDestroy {
     private platform: Platform,
     private navCtrl: NavController,
     private ref: ApplicationRef,
+    private cartService: CartService,
     private categoryService: CategoriesService) { }
 
-  public async ngOnInit(): Promise<void> {
+  public ngOnInit() {
     this.isLoading = true;
     this.skeletonStoreCount = new Array(1);
-    await this.onEnter();
-    await this.getObject();
-    this.subscription = this.router.events.subscribe((event: any) => {
-      if (event instanceof NavigationEnd && event.url === '/home/tabs/categories') {
-        this.onEnter();
-        this.getObject();
-      }
-    });
   }
 
   async getObject() {
     const ret = await Storage.get({ key: 'usertempaddress1' });
     this.usertempaddress = JSON.parse(ret.value).locationaddress !== undefined ?
-                          JSON.parse(ret.value).locationaddress : JSON.parse(ret.value).locality;
+      JSON.parse(ret.value).locationaddress : JSON.parse(ret.value).locality;
   }
 
   public async onEnter(): Promise<void> {
     const ret = await Storage.get({ key: 'usertempaddress1' });
-    setTimeout(() => {
-      this.categoryService.storeDataCatData(JSON.parse(ret.value).city)
-      .subscribe((data) => {
-        this.isLoading = false;
-        this.categoryImages = data[0].store_categories;
-        this.bannerImages = data[1].banners.filter(b => {
-          return b.banner_type === 1;
-        });
-        this.noContactbannerImages = data[1].banners.filter(b => {
-          return b.banner_type === 2;
-        });
-        this.cityWisebannerImages = data[1].banners.filter(b => {
-          return b.banner_type === 3;
-        });
-        this.customerliveorderscount = data[2].customer_liveorders_count.customer_liveorders_count;
-        this.customerInfo = data[3].customer_info[0];
-        if (this.customerInfo !== undefined && this.customerInfo.customer_name !== undefined
-            && this.customerInfo.customer_name != null) {
-          this.customerInfo.customer_name = this.titleCase(this.customerInfo.customer_name);
-        } else {
-        }
-        this.ref.tick();
-      }, (error) => {
-        this.errorMessage = error;
-      });
-    }, 500);
+    const parsedData = JSON.parse(ret.value);
+    if (parsedData && Object.keys(parsedData).length > 0 && parsedData.constructor === Object) {
+      if (parsedData.locationaddress) {
+        this.usertempaddress = parsedData.locationaddress;
+        setTimeout(() => {
+          this.categoryService.storeDataCatData(JSON.parse(ret.value).city)
+            .subscribe((data) => {
+              this.isLoading = false;
+              this.categoryImages = data[0].store_categories;
+              this.bannerImages = data[1].banners.filter(b => {
+                return b.banner_type === 1;
+              });
+              this.noContactbannerImages = data[1].banners.filter(b => {
+                return b.banner_type === 2;
+              });
+              this.cityWisebannerImages = data[1].banners.filter(b => {
+                return b.banner_type === 3;
+              });
+              this.customerliveorderscount = (data[2].length > 0) ? data[2].customer_liveorders_count.customer_liveorders_count : 0;
+              this.customerInfo = data[3].customer_info[0];
+              this.checkandCreateCart();
+              if (this.customerInfo !== undefined && this.customerInfo.customer_name !== undefined
+                && this.customerInfo.customer_name != null) {
+                this.customerInfo.customer_name = this.titleCase(this.customerInfo.customer_name);
+              } else {
+              }
+              this.ref.tick();
+            }, (error) => {
+              this.errorMessage = error;
+            });
+        }, 500);
+      } else {
+        this.usertempaddress = parsedData.locality;
+      }
+    } else {
+      this.navCtrl.navigateRoot(['/home/tabs/categories']);
+    }
+
     this.ref.tick();
+  }
+
+  async checkandCreateCart() {
+    // console.log('hey');
+    const ret = await Storage.get({ key: 'cartList' });
+    const parsedCartData = JSON.parse(ret.value);
+    // console.log(parsedCartData);
+    // const cart = JSON.parse(ret.value);
+    if (parsedCartData === null) {
+      const cartList: any = {};
+      cartList.count = 0;
+      cartList.total = 0;
+      cartList.chargeableDeliveryCost = 0;
+      cartList.slot = {};
+      cartList.pricingDetails = {};
+      cartList.items = [];
+      cartList.paymentMode = 0;
+      cartList.uniqueSkuInCart = 0;
+      cartList.deliveryInstructions = '';
+      this.cartService.setCartObject(cartList);
+    }
   }
 
   selectItem(item) {
@@ -136,11 +163,20 @@ export class CategoriesPage implements OnInit, OnEnter, OnDestroy {
     slides.startAutoplay();
   }
 
-  ionViewWillEnter() {
+  async ionViewWillEnter() {
     this.platform.backButton.subscribeWithPriority(0, () => {
       // tslint:disable-next-line:no-string-literal
       navigator['app'].exitApp();
     });
+    console.log('hello');
+    await this.onEnter();
+    this.subscription = this.router.events.subscribe((event: any) => {
+      if (event instanceof NavigationEnd && event.url === '/home/tabs/categories') {
+        console.log('Hey');
+        this.onEnter();
+      }
+    });
+
   }
 
 }

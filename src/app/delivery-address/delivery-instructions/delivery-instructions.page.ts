@@ -1,7 +1,8 @@
-import { Component, OnInit, ViewChild, ElementRef  } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DeliveryAddressService } from '../delivery-address.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NavController, ToastController } from '@ionic/angular';
+import { CartService } from '../../cart/cart.service';
 
 @Component({
   selector: 'app-delivery-instructions',
@@ -13,15 +14,16 @@ export class DeliveryInstructionsPage implements OnInit {
   storeId: any;
   categoryId: any;
   submitted = false;
-  @ViewChild('comment', {static: false}) comment: any;
+  @ViewChild('comment', { static: false }) comment: any;
   // @ViewChild('input', {}) myInput: ElementRef;
 
   constructor(
-      private deliveryService: DeliveryAddressService,
-      private activatedRoute: ActivatedRoute,
-      private navCtrl: NavController,
-      private toastCtrl: ToastController,
-      private router: Router) { }
+    private deliveryService: DeliveryAddressService,
+    private cartService: CartService,
+    private activatedRoute: ActivatedRoute,
+    private navCtrl: NavController,
+    private toastCtrl: ToastController,
+    private router: Router) { }
 
   ngOnInit() {
     this.storeId = +this.activatedRoute.snapshot.paramMap.get('storeId');
@@ -31,10 +33,18 @@ export class DeliveryInstructionsPage implements OnInit {
   addDeliveryInstructions(value) {
     this.submitted = true;
     if (value !== '') {
-      this.deliveryService.addDeliveryInstructions(value);
-      this.navCtrl.pop();
-      this.presentToast('Delivery instructions successfully added');
-      this.submitted = false;
+      this.cartService.getAllCartItems().subscribe((cartData: any) => {
+        const parsedCartData = JSON.parse(cartData.value);
+        if (parsedCartData && Object.keys(parsedCartData).length > 0 && parsedCartData.constructor === Object) {
+          parsedCartData.deliveryInstructions = value;
+          this.cartService.setCartObject(parsedCartData);
+          this.navCtrl.pop();
+          this.presentToast('Delivery instructions successfully added');
+          this.submitted = false;
+        } else {
+          this.navCtrl.navigateRoot(['/home/tabs/categories']);
+        }
+      });
     } else {
       setTimeout(() => {
         this.comment.setFocus();

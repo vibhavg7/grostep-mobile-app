@@ -11,6 +11,8 @@ import { OfferListComponent } from '../../shared/offer-list/offer-list.component
 import { Plugins } from '@capacitor/core';
 const { Storage } = Plugins;
 import * as moment from 'moment';
+import * as _ from 'lodash';
+
 @Component({
   selector: 'app-payment-options',
   templateUrl: './payment-options.page.html',
@@ -78,41 +80,44 @@ export class PaymentOptionsPage implements OnInit {
         this.navCtrl.navigateBack('/home/tabs/categories');
         return;
       }
-      // this.storeId = +data.get('storeId');
       this.storeId = +this.activatedRoute.snapshot.paramMap.get('storeId');
       this.categoryId = +this.activatedRoute.snapshot.paramMap.get('categoryId');
     });
   }
 
   ionViewWillEnter() {
-    // this.confirmedOrder = true;
-    // this.cartList = this.cartService.getAllCartItems();
     this.isLoading = true;
     this.cartService.getAllCartItems().subscribe((data) => {
-      this.cartList = JSON.parse(data.value);
-      this.calculateTotalAmount(this.cartList);
-    });
-    this.deliveryCharge = this.cartService.getDeliveryCharge();
-    this.deliveryService.getDeliveryInstructions().subscribe((data) => {
-      this.deliveryInstructions = data.value;
-    });
-    this.cartService.getAppliedVoucher().subscribe((voucherData) => {
-      const voucher = JSON.parse(voucherData.value);
-      console.log(voucher);
-      if (voucher != null) {
-        this.voucher = voucher;
-      } else {
-        this.voucher = {};
+      const parsedCartData = JSON.parse(data.value);
+      if (parsedCartData) {
+        this.cartList = parsedCartData.items;
+        console.log(this.cartList);
+        if (this.cartList !== null && this.cartList.length > 0) {
+          this.calculateTotalAmount(this.cartList);
+          this.deliveryCharge = this.cartService.getDeliveryCharge();
+          this.deliveryService.getDeliveryInstructions().subscribe((data1) => {
+            this.deliveryInstructions = data1.value;
+          });
+          this.cartService.getAppliedVoucher().subscribe((voucherData) => {
+            const voucher = JSON.parse(voucherData.value);
+            console.log(voucher);
+            if (voucher != null) {
+              this.voucher = voucher;
+            } else {
+              this.voucher = {};
+            }
+          });
+          this.getObject();
+        }
       }
     });
-    this.getObject();
   }
 
   calculateTotalAmount(cartList) {
     let amount = 0;
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < cartList.length; i++) {
-      const productPrice: any = cartList[i].price;
+      const productPrice: any = cartList[i].store_selling_price;
       amount += (productPrice * cartList[i].quantity);
     }
     this.totalAmount = amount;
@@ -145,7 +150,6 @@ export class PaymentOptionsPage implements OnInit {
       }
       this.storeService.storeClosingStatus(this.storeId).subscribe((data1: any) => {
         if (data1.status === 200) {
-          console.log(data1);
           this.isLoading = false;
           this.storeClosingStatus = +data1.storeInfo[0].closed;
         }
@@ -219,9 +223,9 @@ export class PaymentOptionsPage implements OnInit {
         obj.customerid = +localStorage.getItem(this.CUSTOMER_ID);
         obj.storeid = this.cartList[0].store_id;
         obj.deliverypersonid = '';
-        obj.voucherid = this.voucher.voucher_id ? this.voucher.voucher_id : 0;
+        obj.voucherid = _.isEmpty(this.voucher) ? 0 : this.voucher.voucher_id;
         obj.totalamount = this.totalAmount;
-        obj.discountamount = this.cartService.getvoucherAmount();
+        obj.discountamount = this.getVoucherAmount();
         obj.deliveryfee = this.cartService.getDeliveryCharge();
         obj.payableamount = this.totalAmount + this.getDeliveryCharge() - this.getVoucherAmount();
         obj.paymentmode = this.checkedIdx;
@@ -299,8 +303,7 @@ export class PaymentOptionsPage implements OnInit {
   }
 
   getVoucherAmount() {
-    // return this.cartService.getvoucherAmount();
-    return this.voucher.voucher_amount;
+    return _.isEmpty(this.voucher) ? 0 : this.voucher.voucher_amount;
   }
 
   // availableCouponCode() {

@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AACA,AAAA,aAAa,CAAA;EACT,gBAAgB,EAAC,kBAAkB;EACnC,KAAK,EAAC,KACR;CAAC;;AAED,AAAA,aAAa,CAAC;EACZ,KAAK,EAAC,EAAE;EACR,MAAM,EAAC,IAAI;EACX,UAAU,EAAC,KAAK;EAChB,UAAU,EAAE,CAAC;EACb,QAAQ,EAAE,QAAQ;EAClB,WAAW,EAAE,GAAG;CACjB;;AAED,AAAA,WAAW,CAAA;EACT,sBAAsB,CAAA,MAAC;CAC1B",
+    "sources": [
+        "payment-status.page.scss"
+    ],
+    "names": [],
+    "file": "payment-status.page.css"
+}

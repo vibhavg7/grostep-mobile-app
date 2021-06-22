@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, NgZone } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { AlertController, NavController, ToastController, Platform, IonInfiniteScroll } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -6,6 +6,8 @@ import {
   Plugins,
   Capacitor
 } from '@capacitor/core';
+import { CartService } from '../cart/cart.service';
+import { switchMap } from 'rxjs/operators';
 const { Storage } = Plugins;
 @Component({
   selector: 'app-delivery-address',
@@ -15,6 +17,7 @@ const { Storage } = Plugins;
 export class DeliveryAddressPage implements OnInit {
 
   addressListCount: any;
+  cartList: any;
   addressIsSelected = false;
   city: any = '';
   errorMessage: any;
@@ -34,6 +37,8 @@ export class DeliveryAddressPage implements OnInit {
     private navCtrl: NavController,
     private activatedRoute: ActivatedRoute,
     private router: Router,
+    private cartService: CartService,
+    private zone: NgZone,
     private auth: AuthService) { }
 
   ngOnInit() {
@@ -55,70 +60,115 @@ export class DeliveryAddressPage implements OnInit {
     this.addressListCount = 0;
     this.prevPage = this.activatedRoute.snapshot.paramMap.get('prevPage');
     this.storeId = this.activatedRoute.snapshot.paramMap.get('storeId');
-    console.log(this.prevPage);
     setTimeout(() => {
       this.getObject();
     }, 500);
   }
 
   async getObject(event?) {
-      const ret = await Storage.get({ key: 'usertempaddress1' });
+    this.cartService.getAllCartItems().subscribe((data) => {
+      this.cartList = JSON.parse(data.value);
+      const deliveryAddress = JSON.parse(localStorage.getItem('customeraddress'));
       if (this.prevPage === 'cartpage') {
-        this.city = JSON.parse(ret.value).city;
-      } else {
-        this.city = '';
-      }
-      this.auth.getCustomerAddressesById(this.city, this.currentPage, this.pageSize).subscribe((data) => {
-        console.log(data);
-        this.addressList = this.addressList.concat(data.addressInfo);
-        this.addressListCount = data.customer_address_count[0].customer_address_count;
-        this.totalPages = Math.ceil(this.addressListCount / this.pageSize);
-        this.isLoading = false;
-        if (event) {
-          event.target.complete();
+        if (deliveryAddress.length > 0 && this.cartList && this.cartList.items.length > 0) {
+          this.city = this.cartList.items[0].store_city.trim();
+          this.addressList = deliveryAddress.filter((address) => {
+            return address.city.trim().toLowerCase() === this.city.toLowerCase();
+          });
+          this.addressListCount = this.addressList.length;
+          this.totalPages = Math.ceil(this.addressListCount / this.pageSize);
         }
-      }, (error) => {
-        this.errorMessage = error;
         this.isLoading = false;
-      });
+      } else {
+        if (deliveryAddress.length > 0) {
+          this.addressList = deliveryAddress;
+        } else {
+          this.addressList = [];
+        }
+        this.isLoading = false;
+      }
+    });
   }
 
   addressSelected(address: any) {
-    if (!this.addressIsSelected && this.prevPage === 'cartpage') {
-      this.addressIsSelected = true;
-      this.isLoading = true;
-      this.auth.selectDeliveryAddress(address.delivery_address_id, this.city)
-      .subscribe((data1: any) => {
-        if (data1.status === 200) {
-          const data: any = data1.address[0][0];
-          this.checkServiceLocation(data.city, data.state, data.country, data.pincode, data.latitude, data.longitude,
-            data.address2, data.address, '', data.locality);
+    if (this.prevPage === 'cartpage') {
+      this.checkServiceLocation(address.city, address.state, address.country, address.pincode).subscribe((data) => {
+        this.isLoading = false;
+        if (+data.locationresponse.servicable_area_check === 1) {
+          if (this.cartList !== null && this.cartList.items != null && this.cartList.items.length > 0) {
+            const storeLatLong = [];
+            const customerLatLong = [];
+            const storeLat = this.cartList.items[0].store_latitude;
+            const storeLong = this.cartList.items[0].store_longitude;
+            customerLatLong.push(new google.maps.LatLng(address.latitude, address.longitude));
+            storeLatLong.push(new google.maps.LatLng(storeLat, storeLong));
+            this.checkDistanceBetwenStoreAndCustomer(address.city, address.state, address.country, address.pincode,
+              customerLatLong, storeLatLong, address.address2, address.address, address.locality,
+              address.latitude, address.longitude, address.delivery_address_id);
+          } else {
+
+          }
+        } else {
+          this.isLoading = false;
+          this.router.navigate(['/', 'notservicablepage', { page: this.prevPage }]);
         }
       });
     }
   }
 
-  checkServiceLocation(city, state, country, zipcode, lat, long, locationaddress, completeaddress, routeaddress, locality) {
-    // console.log(city, state, country, zipcode, lat, long, locationaddress, completeaddress, routeaddress);
-    this.auth.checkServiceLocation(city, state, country, zipcode).subscribe((data) => {
-      if (data.locationresponse.servicable_area_check === 0) {
-        this.navCtrl.navigateRoot(['/notservicablepage']);
-      } else {
-        this.setObject(city, state, country, zipcode, lat, long, locationaddress, completeaddress, routeaddress, locality);
-        if (this.prevPage === 'cartpage') {
-          // this.navCtrl.navigateBack(`/cart/${this.storeId}`);
-          // this.navCtrl.navigateBack(['/cart', { storeId: this.storeId }]);
-          this.navCtrl.pop();
-        } else {
-          this.navCtrl.navigateRoot('/home/tabs/profile');
-        }
+
+  checkDistanceBetwenStoreAndCustomer(city, state, country, zipcode, customerLatLong, storeLatLong,
+                                      locationaddress, completeaddress, locality, lat, lng, deliveryAddressId?) {
+    console.log(deliveryAddressId);
+    this.isLoading = true;
+    new google.maps.DistanceMatrixService().getDistanceMatrix({
+      origins: customerLatLong,
+      destinations: storeLatLong,
+      travelMode: google.maps.TravelMode.DRIVING,
+      unitSystem: google.maps.UnitSystem.METRIC,
+    }, (results: any) => {
+      this.zone.run(() => {
         this.isLoading = false;
-        this.presentToast('Delivery address successfully changed');
-        this.addressIsSelected = false;
-        // this.navCtrl.navigateRoot(['/home/tabs/categories']);
-        // this.presentToast('Delivery address successfully updated');
-      }
+        const distanceData = results.rows;
+        const distanceFromCustomer = distanceData[0].elements[0].distance.value;
+        if (distanceFromCustomer >= 15000) {
+          // tslint:disable-next-line:max-line-length
+          this.showMessageAlert('Location is too far', 'The location is too far away from the store for grostep to Deliver. Please pick a location near to your store');
+        } else {
+          if (deliveryAddressId) {
+            this.auth.selectDeliveryAddress(deliveryAddressId, city).pipe(
+              switchMap((data: any) => {
+                const selectedAddressData: any = data.address[0][0];
+                console.log(selectedAddressData);
+                this.setObject(selectedAddressData.city, selectedAddressData.state, selectedAddressData.country,
+                  selectedAddressData.pincode, selectedAddressData.latitude, selectedAddressData.longitude,
+                  selectedAddressData.address2, selectedAddressData.address, selectedAddressData.locality,
+                  selectedAddressData.stateShortName, selectedAddressData.countryShortName);
+                return this.auth.getUserProfile();
+              })
+            ).subscribe ( (data1: any) => {
+              if (data1.status === 200) {
+                this.presentToast('Address successfully updated');
+              } else {
+                this.presentToast('Unable to update address');
+              }
+              if (this.prevPage === 'cartpage') {
+                this.navCtrl.pop();
+              } else {
+                this.navCtrl.navigateRoot('/home/tabs/profile');
+              }
+              this.isLoading = false;
+              this.presentToast('Delivery address successfully changed');
+            });
+          }
+        }
+      });
     });
+  }
+
+  checkServiceLocation(city, state, country, zipcode) {
+    this.isLoading = true;
+    return this.auth.checkServiceLocation(city, state, country, zipcode);
   }
 
   deleteDeliveryAddress(address) {
@@ -146,8 +196,17 @@ export class DeliveryAddressPage implements OnInit {
                   .subscribe((data: any) => {
                     console.log(data);
                     if (data.status === 200) {
-                      this.navCtrl.navigateRoot('/home/tabs/profile');
+                      const itemIndex = this.addressList.findIndex(item => item.delivery_address_id ===
+                        address.delivery_address_id);
+                      if (itemIndex > -1) {
+                        this.addressList.splice(itemIndex, 1);
+                        this.addressListCount = this.addressList.length;
+                        localStorage.setItem('customeraddress', JSON.stringify(this.addressList));
+                      }
+                      // this.navCtrl.navigateRoot('/home/tabs/profile');
                       this.presentToast('Address deleted successfully');
+                    } else {
+                      this.presentToast('Unable to delete address');
                     }
                   });
 
@@ -159,12 +218,21 @@ export class DeliveryAddressPage implements OnInit {
   }
 
   addNewAddress() {
-    this.router.navigate(['/delivery-address/add-delivery-address', { addressId: '', prevPage: this.prevPage, storeId: this.storeId }]);
+    const prevPage = this.prevPage;
+    const storeId = this.storeId;
+    const obj = { addressId: '' };
+    Object.assign(obj, prevPage === null ? null : { prevPage });
+    Object.assign(obj, storeId === null ? null : { storeId });
+    this.router.navigate(['/delivery-address/add-delivery-address', obj]);
   }
 
   editDeliveryAddress(address) {
-    this.router.navigate(['/delivery-address/add-delivery-address', { addressId: address.delivery_address_id,
-                          prevPage: this.prevPage, storeId: this.storeId }]);
+    const prevPage = this.prevPage;
+    const storeId = this.storeId;
+    const obj = { addressId: address.delivery_address_id };
+    Object.assign(obj, prevPage === null ? null : { prevPage });
+    Object.assign(obj, storeId === null ? null : { storeId });
+    this.router.navigate(['/delivery-address/add-delivery-address', obj]);
   }
 
   async presentToast(msg) {
@@ -181,7 +249,7 @@ export class DeliveryAddressPage implements OnInit {
       this.navCtrl.navigateRoot(['/home/tabs/profile']);
     }
   }
-  async setObject(city, state, country, zipcode, lat, long, locationaddress, completeaddress, routeaddress, locality) {
+  async setObject(city, state, country, zipcode, lat, long, locationaddress, completeaddress, locality, stateShortName, countryShortName) {
     await Storage.set({
       key: 'usertempaddress1',
       value: JSON.stringify({
@@ -193,26 +261,43 @@ export class DeliveryAddressPage implements OnInit {
         long,
         locationaddress,
         completeaddress,
-        routeaddress,
-        locality
+        locality,
+        stateShortName, countryShortName
       })
     });
   }
 
-  loadMore(event) {
-    console.log(event);
-    if (this.currentPage === this.totalPages) {
-      event.target.disabled = true;
-    } else {
-      this.currentPage++;
-      this.getObject(event);
-    }
+  private showMessageAlert(header, message) {
+    this.alertCtrl.create({
+      header,
+      message,
+      buttons: [
+        {
+          text: 'Okay',
+          handler: () => {
+            // this.router.navigate(['/', 'categories', this.categoryId, 'stores']);
+            // this.router.navigate(['']);
+          }
+        }
+      ]
+    }).then(alertCtrl => alertCtrl.present());
   }
 
+
+  // loadMore(event) {
+  //   console.log(event);
+  //   if (this.currentPage === this.totalPages) {
+  //     event.target.disabled = true;
+  //   } else {
+  //     this.currentPage++;
+  //     this.getObject(event);
+  //   }
+  // }
+
   ionViewWillLeave() {
-    console.log('ionViewWillLeave');
-    this.infiniteScroll.disabled = false;
-    this.infiniteScroll.position = 'bottom';
+    // console.log('ionViewWillLeave');
+    // this.infiniteScroll.disabled = false;
+    // this.infiniteScroll.position = 'bottom';
   }
 
 }

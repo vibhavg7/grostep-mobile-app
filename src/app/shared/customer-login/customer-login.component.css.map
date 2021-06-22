@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "",
+    "sources": [
+        "customer-login.component.scss"
+    ],
+    "names": [],
+    "file": "customer-login.component.css"
+}

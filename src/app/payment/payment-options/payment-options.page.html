@@ -19,15 +19,15 @@
         <div *ngIf="showDetails">
           <ion-item *ngFor="let product of cartList" style="--ion-background-color:#fff">
             <ion-thumbnail slot="start">
-              <ion-img *ngIf="product?.product_img" [src]="product.product_img"></ion-img>
-              <ion-img *ngIf="!product?.product_img" src="assets/images/default_image.jpg"></ion-img>
+              <ion-img *ngIf="product?.image_url" [src]="product.image_url"></ion-img>
+              <ion-img *ngIf="!product?.image_url" src="assets/images/default_image.jpg"></ion-img>
             </ion-thumbnail>
             <ion-label>
-              <h2 style="padding-top:0;white-space: pre-line">{{product?.title}}</h2>
+              <h2 style="padding-top:0;white-space: pre-line">{{product?.product_name}}</h2>
               <p style="font-weight:bold;">{{product?.weight + ' ' + product?.weight_text }}</p>
               <p>
                 <span style="font-weight:bold;">
-                  &#8377; {{product?.price }} x {{product?.quantity}} = &#8377; {{product?.price * product?.quantity| number : '1.2-2'}}
+                  &#8377; {{product?.store_selling_price }} x {{product?.quantity}} = &#8377; {{product?.store_selling_price * product?.quantity| number : '1.2-2'}}
                 </span>
               </p>
             </ion-label>

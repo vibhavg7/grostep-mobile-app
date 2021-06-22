@@ -1,0 +1,20 @@
+.pay-button-enabled {
+  background-color: #6fa833 !important;
+  color: #fff !important;
+  --color-activated: #fff;
+}
+
+.pay-button-disabled {
+  background-color: #e5e5e5;
+  color: #191919;
+  --color-activated: #191919;
+}
+
+ion-content {
+  --ion-background-color: #FFF;
+}
+
+#skeleton {
+  display: block;
+}
+/*# sourceMappingURL=delivery-options.page.css.map */

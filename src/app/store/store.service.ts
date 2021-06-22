@@ -26,6 +26,14 @@ export class StoreService {
     this.storeInfo = storeData;
   }
 
+  get SelectedDeliverySlotId() {
+    return this.selectedDeliverySlotId;
+  }
+
+  set SelectedDeliverySlotId(value) {
+    this.selectedDeliverySlotId = value;
+  }
+
   get StoreCategory() {
     return this.storeCategory;
   }
@@ -40,10 +48,10 @@ export class StoreService {
     obj.categoryId = categoryId;
     obj.storeId = storeId;
     obj.storedCity = storedCity.toLowerCase();
-    if (filterBy.length < 3) {
-      const obj1: any = {status: 500, message: 'no information', store: [], products: [] };
-      return of(obj1);
-    }
+    // if (filterBy.length < 3) {
+    //   const obj1: any = {status: 500, message: 'no information', store: [], products: [] };
+    //   return of(obj1);
+    // }
     console.log(obj);
     return this.httpClient.post<any[]>(`${this.storeServiceUrl}storeinfo/searchStoreAndProductsBasedOnName`, obj)
       .pipe(
@@ -70,7 +78,7 @@ export class StoreService {
 
   fetchAllStoresBasedOnCity(city: any, filterBy: any, categoryId: any, pagenumber: number, pagesize: number): Observable<any> {
     const obj: any = {};
-    obj.zipcode = city;
+    obj.city = city;
     obj.filterBy = filterBy;
     obj.page_number = pagenumber;
     obj.page_size = pagesize;
@@ -118,7 +126,7 @@ export class StoreService {
     obj.page_number = pagenumber;
     obj.page_size = pagesize;
     obj.sub_category_id = subCategoryId;
-    console.log(obj);
+    // console.log(obj);
     return this.httpClient.post<any[]>(`${this.storeServiceUrl}storeinfo/storeproductscategorywise`, obj)
       .pipe(
         tap((data: any) => {

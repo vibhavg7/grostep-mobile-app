@@ -1,0 +1,10 @@
+.address-button-enabled {
+  --background:#6fa833 !important;
+  --color:white;
+}
+
+.address-button-disabled {
+  --background: #d0e9b6 !important;
+  --color: #000;
+}
+/*# sourceMappingURL=add-delivery-address.page.css.map */

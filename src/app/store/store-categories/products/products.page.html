@@ -71,7 +71,7 @@
                   </p>
                   <p>
                     <span style="font-weight:bold;"> &#8377; {{product?.store_selling_price }} </span>
-                    <button *ngIf="!product?.added && product?.stock && loadedStore?.closed === 0" class="addButton" 
+                    <button *ngIf="!product?.added && product?.stock" class="addButton" 
                       (click)="addProduct(product)">
                       <span style="color: #fff;font-size:16px;outline:none"> ADD</span>
                       <!-- <ion-icon name="add"></ion-icon> -->
@@ -86,7 +86,7 @@
                         <span style="color: #fff;">OUT OF STOCK</span>
                       </button> -->
 
-                    <span *ngIf="product?.added && product?.stock && loadedStore?.closed === 0" 
+                    <span *ngIf="product?.added && product?.stock" 
                     style="width: 120px;height: 35px;float:right;color:white">
                       <span *ngIf="product?.added" (click)="removeItemfromCart(product)" style="width:45px;background-color:#8fc951;
                                         border-radius: 5px 0px 0px 5px;
@@ -145,7 +145,7 @@
   </div>
 </ion-content>
 
-<ion-footer *ngIf="cartList?.length" class="footer_color">
+<ion-footer *ngIf="cartList?.length > 0" class="footer_color">
   <ion-row>
     <ion-col size="6">
       <ion-button style="--color-activated: #fff;" expand="full" (click)="viewCart()" fill="clear">

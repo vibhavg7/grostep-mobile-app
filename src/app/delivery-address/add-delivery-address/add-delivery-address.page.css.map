@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,uBAAuB,CAAC;EAIpB,YAAY,CAAA,kBAAC;EACb,OAAO,CAAA,KAAC;CAET;;AAED,AAAA,wBAAwB,CAAC;EAIvB,YAAY,CAAA,mBAAC;EAEb,OAAO,CAAA,KAAC;CAET",
+    "sources": [
+        "add-delivery-address.page.scss"
+    ],
+    "names": [],
+    "file": "add-delivery-address.page.css"
+}

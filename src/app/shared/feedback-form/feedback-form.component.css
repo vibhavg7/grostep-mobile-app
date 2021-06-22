@@ -1,0 +1,10 @@
+.user-info-button-enabled {
+  --background: #6fa833;
+  --color: #fff;
+}
+
+.user-info-button-disabled {
+  --background: lightgrey;
+  --color: #000;
+}
+/*# sourceMappingURL=feedback-form.component.css.map */

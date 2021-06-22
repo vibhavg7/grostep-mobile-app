@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,aAAa,CAAA;EACT,gBAAgB,EAAC,kBAAkB;EACnC,KAAK,EAAC,KACV;CAAC;;AAED,AAAA,UAAU,CAAC;EACP,iBAAiB,CAAA,KAAC;CACrB",
+    "sources": [
+        "delivery-instructions.page.scss"
+    ],
+    "names": [],
+    "file": "delivery-instructions.page.css"
+}

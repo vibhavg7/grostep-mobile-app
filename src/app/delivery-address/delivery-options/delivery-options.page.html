@@ -36,12 +36,12 @@
     <ion-row style="margin:5px 0px" *ngIf="!isLoading">
       <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center" style="background-color: #fff;">
         <ion-list style="background-color: #f5f5f5;">
-          <ion-item style="--background: #f5f5f5;" *ngIf="deliveryIntructions==''" (click)="adddeliveryInstructions()" lines="none">
+          <ion-item style="--background: #f5f5f5;" *ngIf="deliveryInstructions==''" (click)="adddeliveryInstructions()" lines="none">
             <ion-icon slot="start" name="paper"></ion-icon>
             <ion-label>Any Delivery Instructions</ion-label>
           </ion-item>
-          <ion-item style="--background: #f5f5f5;" *ngIf="deliveryIntructions!=''" lines="none">
-            <ion-label>{{deliveryIntructions}}</ion-label>
+          <ion-item style="--background: #f5f5f5;" *ngIf="deliveryInstructions!=''" lines="none">
+            <ion-label>{{deliveryInstructions}}</ion-label>
             <ion-button (click)="removeInstructions()">
               Remove
               <ion-icon name="close"></ion-icon>

@@ -1,0 +1,9 @@
+.footer_color {
+  background-color: #6fa833 !important;
+  color: white;
+}
+
+ion-button {
+  --color-activated: #fff;
+}
+/*# sourceMappingURL=delivery-instructions.page.css.map */

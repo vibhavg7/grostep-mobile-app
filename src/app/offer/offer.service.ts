@@ -11,19 +11,20 @@ export class OfferService {
   private CUSTOMER_ID = 'customerid';
   constructor(private httpClient: HttpClient) { }
   private offerServiceUrl = 'https://api.grostep.com/vouchersapi/';
+
   fetchAllOffers() {
     const customerId = +localStorage.getItem(this.CUSTOMER_ID);
     return this.httpClient.get<any[]>(`${this.offerServiceUrl}customeroffers/${customerId}`)
-    .pipe(
-      tap((data: any) => {
-        // this.offers = data.store_categories;
-        // console.log(this.storeCategories);
-      })
-      , map((data) => {
-        return data;
-      })
-      , catchError(this.handleError)
-    );
+      .pipe(
+        tap((data: any) => {
+          // this.offers = data.store_categories;
+          // console.log(this.storeCategories);
+        })
+        , map((data) => {
+          return data;
+        })
+        , catchError(this.handleError)
+      );
   }
 
   searchVoucherByName(voucherCode, cartAmount) {
@@ -32,15 +33,15 @@ export class OfferService {
     obj.cartAmount = cartAmount;
     console.log(obj);
     return this.httpClient.post<any[]>(`${this.offerServiceUrl}searchVoucherByName`, obj)
-    .pipe(
-      tap((data: any) => {
-      })
-      , map((data) => {
-        console.log(data);
-        return data;
-      })
-      , catchError(this.handleError)
-    );
+      .pipe(
+        tap((data: any) => {
+        })
+        , map((data) => {
+          console.log(data);
+          return data;
+        })
+        , catchError(this.handleError)
+      );
   }
 
   private handleError(err: HttpErrorResponse) {

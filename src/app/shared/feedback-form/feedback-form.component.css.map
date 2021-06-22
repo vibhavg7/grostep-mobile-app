@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,yBAAyB,CAAC;EAItB,YAAY,CAAA,QAAC;EACb,OAAO,CAAA,KAAC;CAET;;AAED,AAAA,0BAA0B,CAAC;EAIzB,YAAY,CAAA,UAAC;EACb,OAAO,CAAA,KAAC;CAET",
+    "sources": [
+        "feedback-form.component.scss"
+    ],
+    "names": [],
+    "file": "feedback-form.component.css"
+}

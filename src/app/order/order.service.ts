@@ -92,15 +92,15 @@ export class OrderService {
         const obj: any = {};
         obj.status = orderStatus;
         return this.httpClient.put<any>(`${this.customerServiceUrl}updateOrder/${orderId}`, obj)
-        .pipe(
-          tap(data => {
-            // console.log(data);
-          })
-          , map((data) => {
-            return data;
-          })
-          , catchError(this.handleError)
-        );
+            .pipe(
+                tap(data => {
+                    // console.log(data);
+                })
+                , map((data) => {
+                    return data;
+                })
+                , catchError(this.handleError)
+            );
     }
     placeOrder(orderObj: any) {
         return this.httpClient.post(`${this.orderServiceUrl}placeorder`, orderObj)
@@ -119,15 +119,15 @@ export class OrderService {
         const obj: any = {};
         obj.status = orderStatus;
         return this.httpClient.put<any>(`${this.orderServiceUrl}cancelOrderByCustomer/${orderId}`, obj)
-        .pipe(
-          tap(data => {
-            // console.log(data);
-          })
-          , map((data) => {
-            return data;
-          })
-          , catchError(this.handleError)
-        );
+            .pipe(
+                tap(data => {
+                    // console.log(data);
+                })
+                , map((data) => {
+                    return data;
+                })
+                , catchError(this.handleError)
+            );
     }
 
     private handleError(err: HttpErrorResponse) {

@@ -49,6 +49,88 @@
           </ion-item>
         </ion-col>
       </ion-row>
+
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">MRP</ion-label>
+            <ion-input readonly maxlength="6" (keypress)="numberOnly($event)" type="text" name="product_marked_price" [(ngModel)]="registerCredentials.product_marked_price"
+              [formControl]="addStoreProductForm.controls['product_marked_price']"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-text *ngIf="submitted && f.product_marked_price.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.product_marked_price.errors.required">MRP is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.product_marked_price.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.product_marked_price.errors.pattern">Please enter valid MRP</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">SP</ion-label>
+            <ion-input readonly maxlength="6" (keypress)="numberOnly($event)" type="text" name="store_selling_price" [(ngModel)]="registerCredentials.store_selling_price"
+              [formControl]="addStoreProductForm.controls['store_selling_price']"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-text *ngIf="submitted && f.store_selling_price.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.store_selling_price.errors.required">SP is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.store_selling_price.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.store_selling_price.errors.pattern">Please enter valid SP</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Discount</ion-label>
+            <ion-input readonly maxlength="6" (keypress)="numberOnly($event)" type="text" name="store_discount" [(ngModel)]="registerCredentials.store_discount"
+              [formControl]="addStoreProductForm.controls['store_discount']"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-text *ngIf="submitted && f.store_discount.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.store_discount.errors.required">Discount is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.store_discount.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.store_discount.errors.pattern">Please enter valid Discount</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+
+
+      <ion-row>
+        <ion-col size="12">
+          <ion-item>
+            <ion-label position="floating">Product Caping</ion-label>
+            <ion-input readonly maxlength="6" (keypress)="numberOnly($event)" type="text" name="store_product_caping" [(ngModel)]="registerCredentials.store_product_caping"
+              [formControl]="addStoreProductForm.controls['store_product_caping']">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-text *ngIf="submitted && f.store_product_caping.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.store_product_caping.errors.required">Caping is required</span>
+          </ion-text>
+          <ion-text *ngIf="submitted && f.store_product_caping.errors" style="color:red;margin-left:10px">
+            <span *ngIf="f.store_product_caping.errors.pattern">Please enter valid number</span>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+
       <ion-row>
         <ion-col size="12">
           <ion-text *ngIf="submitted && f.customer_name.errors" style="color:red;margin-left:10px">
@@ -63,7 +145,7 @@
         <ion-col size="12">
           <ion-item>
             <ion-label position="floating">Pincode</ion-label>
-            <ion-input maxlength="6" (keypress)="numberOnly($event)" type="text" name="pincode" [(ngModel)]="registerCredentials.pincode"
+            <ion-input readonly maxlength="6" (keypress)="numberOnly($event)" type="text" name="pincode" [(ngModel)]="registerCredentials.pincode"
               [formControl]="addAddressForm.controls['pincode']"></ion-input>
           </ion-item>
         </ion-col>
@@ -125,13 +207,19 @@
       </ion-row>
       <ion-row>
         <ion-col size="12">
-            <!-- (click)="changeAddress()" -->
           <ion-item>
-            <ion-label position="floating">Address</ion-label>
-            <ion-textarea type="text" name="address" [(ngModel)]="registerCredentials.address" autocomplete="on" 
+            <ion-label position="floating">
+                Address
+            </ion-label>
+            <ion-textarea readonly type="text" name="address" [(ngModel)]="registerCredentials.address" autocomplete="on" 
               autocorrect="on" [formControl]="addAddressForm.controls['address']"></ion-textarea>
           </ion-item>
         </ion-col>
+        <!-- <ion-col size="2">
+          <ion-text *ngIf="addressId == ''" (click)="changeAddress()" style="margin-left: -15px;color: #6fa833;font-weight: bold;">
+            Change
+          </ion-text>
+        </ion-col> -->
       </ion-row>
       <ion-row>
         <ion-col size="12">
@@ -144,7 +232,7 @@
         <ion-col size="12">
           <ion-item>
             <ion-label position="floating">Phone Number</ion-label>
-            <ion-input maxlength="10" (keypress)="numberOnly($event)" type="tel" name="phone" [(ngModel)]="registerCredentials.phone"
+            <ion-input maxlength="10" autocomplete="off" (keypress)="numberOnly($event)" type="tel" name="phone" [(ngModel)]="registerCredentials.phone"
               [formControl]="addAddressForm.controls['phone']"></ion-input>
           </ion-item>
         </ion-col>
@@ -161,10 +249,8 @@
       </ion-row>
       <ion-row>
         <ion-col size="12">
-            <!-- !addAddressForm.valid || submitted -->
-          <ion-button type="submit" expand="block" [disabled]="submitted && buttonSubmitted"
-          [ngClass]="{'address-button-enabled': !!addAddressForm.valid, 'address-button-disabled': !addAddressForm.valid }"
-            >
+          <!-- !addAddressForm.valid || submitted -->
+          <ion-button type="submit" expand="block" [disabled]="submitted && buttonSubmitted" [ngClass]="{'address-button-enabled': !!addAddressForm.valid, 'address-button-disabled': !addAddressForm.valid }">
             <span *ngIf="addressId == ''">
               ADD ADDRESS
             </span>

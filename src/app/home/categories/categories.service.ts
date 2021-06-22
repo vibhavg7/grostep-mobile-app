@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, throwError, forkJoin } from 'rxjs';
+import { Observable, throwError, forkJoin, of } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { tap, catchError, map } from 'rxjs/operators';
 import { OrderService } from '../../order/order.service';
@@ -13,6 +13,7 @@ export class CategoriesService {
   private categoryServiceUrl = 'https://api.grostep.com/categoryapi';
   private bannerServiceUrl = 'https://api.grostep.com/bannerapi';
   private storecategories: any = [];
+  private TOKEN_KEY = 'token';
   constructor(
     private httpClient: HttpClient,
     private authService: AuthService,
@@ -30,7 +31,7 @@ export class CategoriesService {
     obj1.filterBy = city;
     const response1 = this.httpClient.post(`${this.categoryServiceUrl}/storecategories/citywise`, obj1);
     const response2 = this.httpClient.post(`${this.bannerServiceUrl}/bannerinfo/citywise`, obj);
-    const response3 = this.orderService.fetchCustomerLiveOrderCount();
+    const response3 = (!!localStorage.getItem(this.TOKEN_KEY) ? this.orderService.fetchCustomerLiveOrderCount() : of([]));
     const response4 = this.authService.getUserProfile();
     return forkJoin([response1, response2, response3, response4])
     .pipe(tap((d) => {

@@ -1,0 +1,136 @@
+.cancelcss {
+  color: #000 !important;
+}
+
+ion-content {
+  --ion-background-color: #F8F8F8;
+}
+
+.removecss {
+  color: red !important;
+}
+
+.spin{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+ion-spinner {
+  top:50%;
+    left:50%;
+    position: fixed;
+    transform: translate(-50%, -50%);
+  width: 38px;
+  height: 38px;
+  stroke: #444;
+  fill: #222;
+}
+
+
+
+ /* .spin{
+  text-align: center;
+}
+ion-spinner {
+  width: 28px;
+  height: 28px;
+  stroke: #444;
+  fill: #222;
+} */
+ 
+
+
+.outofstockButton {
+  background-color: Transparent !important;
+  color: black !important;
+  float: right;
+  border-radius: 2px;
+  padding: 6px;
+  height: 35px;
+  overflow: hidden;
+  border: 1px solid black !important;
+}
+
+.freedeliveryspancss {
+  text-align: center;
+  padding-top: 43px;
+  color: #6fa833;
+  font-weight: bold;
+}
+
+.footer_color {
+  background-color: #6fa833 !important;
+  color: white;
+}
+
+.noliveordericon {
+  color: #b61671;
+  display: block;
+  /* text-align: center; */
+  /* align-items: center; */
+  margin: auto;
+  font-size: 50px;
+}
+
+.open-storeclass {
+  --ion-background-color:#fff;
+}
+
+.close-storeclass {
+  --ion-background-color:#E0E0E0;
+}
+
+.innerCartWrap {
+  width: 200px;
+  text-align: center;
+}
+
+.outer_empty_cart_wrap {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  /* align horizontal */
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  /* align vertical */
+  width: 100%;
+  height: 80%;
+}
+
+.inner_continue_shopping_button {
+  background-color: Transparent !important;
+  color: #8fc951 !important;
+  border: 1px solid #8fc951 !important;
+  --color-activated: #8fc951 !important;
+}
+
+.outer_continue_shopping_button {
+  width: 100%;
+  height: 20%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  /* align horizontal */
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.cart-button-class {
+  color: #fff !important;
+}
+
+ion-button {
+  --color-activated: #fff;
+}
+/*# sourceMappingURL=cart.page.css.map */

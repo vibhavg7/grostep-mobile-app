@@ -1,0 +1,44 @@
+input[type="radio"] {
+  vertical-align: baseline;
+  width: 1.2em;
+  height: 2em;
+  pointer-events: none;
+  opacity: 0.8;
+  margin-left: -10px;
+}
+
+label {
+  display: block;
+  margin: -27px 0px 0px 20px;
+  font-weight: 600;
+  color: #535665;
+  font-size: 14px;
+}
+
+.verticalLine {
+  border-left: thick solid #8fc951;
+}
+
+.footer_color {
+  background-color: #6fa833 !important;
+  color: white;
+}
+
+.liveorder_footer_color {
+  background-color: #ff8080 !important;
+  color: white;
+}
+
+.cancelcss {
+  color: #ff8080;
+}
+
+ion-button {
+  --color-activated: #fff;
+}
+
+agm-map {
+  height: 220px;
+  /* height is required */
+}
+/*# sourceMappingURL=live-order-tracking-detail.page.css.map */

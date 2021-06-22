@@ -30,7 +30,8 @@ export class NotServicablePagePage implements OnInit, AfterViewInit {
   }
 
   editLocation() {
-    this.navCtrl.navigateForward(['/changedeliverylocation']);
+    // this.navCtrl.navigateForward(['/changedeliverylocation']);
+    this.navCtrl.pop();
   }
 
 }

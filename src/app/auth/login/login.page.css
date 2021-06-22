@@ -1,0 +1,69 @@
+#wrapper {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+ion-content {
+  --ion-background-color: #f8f8f8;
+  --padding-start: 10px;
+  --padding-end: 10px;
+}
+
+.footer_color {
+  background-color: #d2e9b9 !important;
+}
+
+.login-button-enabled {
+  border-radius: 5px 5px;
+  height: 42px;
+  outline: none;
+  width: 85px;
+  font-size: 16px;
+  margin: auto;
+  background-color: #8fc951;
+  color: #fff;
+}
+
+.login-button-disabled {
+  border-radius: 5px 5px;
+  height: 42px;
+  width: 85px;
+  outline: none;
+  font-size: 16px;
+  margin: auto;
+  background-color: #c1c1c1;
+  color: #000;
+}
+
+input {
+  background: #f2f2f2;
+  outline: none;
+  text-align: center;
+  -webkit-appearance: none;
+  -webkit-box-shadow: none !important;
+          box-shadow: none !important;
+  border: 1px solid lightgrey;
+  height: 45px;
+  font-size: 18px;
+  border-radius: 5px 5px;
+  width: 270px;
+  margin: auto;
+}
+
+.my-grid {
+  height: 100% !important;
+}
+
+.parent-row {
+  height: 70% !important;
+  -webkit-box-align: center !important;
+      -ms-flex-align: center !important;
+          align-items: center !important;
+  -webkit-box-pack: center !important;
+      -ms-flex-pack: center !important;
+          justify-content: center !important;
+}
+/*# sourceMappingURL=login.page.css.map */

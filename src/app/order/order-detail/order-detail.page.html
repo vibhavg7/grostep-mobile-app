@@ -105,7 +105,10 @@
             Total Payable Amount
           </ion-col>
           <ion-col size="6" style="font-weight:bold;">
-            &#8377; {{orderInfo?.final_amount}}
+            &#8377; {{orderInfo?.final_amount}} 
+            <span *ngIf="orderInfo?.is_order_edit">
+              (Order was edited)
+            </span>
           </ion-col>
         </ion-row>
         <ion-row *ngIf="orderInfo?.cust_delivery_address">

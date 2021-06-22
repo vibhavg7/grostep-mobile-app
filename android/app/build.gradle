@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.grostep.customersapp"
         minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 12
+        targetSdkVersion 29
+        versionCode 21
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

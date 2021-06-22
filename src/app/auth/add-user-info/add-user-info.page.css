@@ -1,0 +1,10 @@
+.user-info-button-enabled {
+  --background: #6fa833;
+  --color: #fff;
+}
+
+.user-info-button-disabled {
+  --background: #d0e9b6 !important;
+  --color: #000;
+}
+/*# sourceMappingURL=add-user-info.page.css.map */

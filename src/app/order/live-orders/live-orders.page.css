@@ -1,0 +1,56 @@
+.outer_empty_cart_wrap {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  /* align horizontal */
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  /* align vertical */
+  width: 100%;
+  height: 80%;
+}
+
+ion-content {
+  --ion-background-color: #Ffff;
+}
+
+#skeleton {
+  display: block;
+}
+
+.inner_continue_shopping_button {
+  background-color: Transparent !important;
+  color: #8fc951 !important;
+  border: 1px solid #8fc951 !important;
+}
+
+.outer_continue_shopping_button {
+  width: 100%;
+  height: 20%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  /* align horizontal */
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.noliveordericon {
+  color: #b61671;
+  display: block;
+  /* text-align: center; */
+  /* align-items: center; */
+  margin: auto;
+  font-size: 40px;
+}
+/*# sourceMappingURL=live-orders.page.css.map */

@@ -3,7 +3,7 @@ import { Observable, throwError, forkJoin, of, Subject } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { tap, map } from 'rxjs/operators';
 import { catchError } from 'rxjs/internal/operators/catchError';
-import { CartService } from '../cart/cart.service';
+import { CartService, CartItem } from '../cart/cart.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,10 +19,13 @@ export class AuthService {
   private subject = new Subject<any>();
   private CUSTOMER_ID = 'customerid';
   private CUSTOMER_PHONE = 'customerphone';
+  private CUSTOMER_ADDRESS = 'customeraddress';
+  private CUSTOMER_PROFILE = 'customerprofile';
   private customerdeliveryInfo: any = [];
   customerProfile: any;
-  private customerServiceUrl = 'https://api.grostep.com/customerapi/';
+  private customerServiceUrl = 'http://localhost:3000/customerapi/';
   private orderServiceUrl = 'https://api.grostep.com/ordersapi/';
+  private mapServiceUrl = 'https://api.grostep.com/mapsapi/';
   constructor(private httpClient: HttpClient, private cartService: CartService) { }
 
   get isLoggedIn() {
@@ -94,9 +97,12 @@ export class AuthService {
     const obj: any = {};
     obj.phone_number = phone;
     obj.otp_number = otp;
+    // obj.cartData = cartValue;
+    console.log(obj);
     return this.httpClient.post<any[]>(`${this.customerServiceUrl}validate`, obj)
       .pipe(
         tap(data => {
+          // console.log(data);
         })
         , map((data) => {
           return this.authenticate(data);
@@ -152,6 +158,8 @@ export class AuthService {
       .pipe(tap((data: any) => {
         this.customerdeliveryInfo = data.customer_delivery_addresses;
         this.customerProfile = data.customer_info[0];
+        localStorage.setItem(this.CUSTOMER_ADDRESS, JSON.stringify(this.customerdeliveryInfo));
+        localStorage.setItem(this.CUSTOMER_PROFILE, JSON.stringify(this.customerProfile));
       }), map((data) => {
         return data;
       }),
@@ -208,15 +216,6 @@ export class AuthService {
     const obj: any = {};
     obj.city = city1;
     const customerId = +localStorage.getItem(this.CUSTOMER_ID);
-    // return this.httpClient.post<any>(`${this.customerServiceUrl}customerselectedaddresscitywise/${customerId}`, obj)
-    //   .pipe(
-    //     tap(data => {
-    //     })
-    //     , map((data) => {
-    //       return data;
-    //     })
-    //     , catchError(this.handleError)
-    //   );
     const response1 = this.httpClient.post<any>(`${this.customerServiceUrl}customerselectedaddresscitywise/${customerId}`, obj);
     const response2 = this.cartService.getAppliedVoucher();
     return forkJoin([response1, response2])
@@ -252,6 +251,7 @@ export class AuthService {
   }
 
   addDelievryAddress(address) {
+    console.log(address);
     return this.httpClient.post<any>(`${this.customerServiceUrl}customeraddress`, address)
       .pipe(
         tap(data => {
@@ -282,11 +282,13 @@ export class AuthService {
   checkServiceLocation(city, state, country, zipcode) {
     const obj: any = {};
     obj.city = city; obj.state = state; obj.country = country; obj.zipcode = zipcode;
+    console.log(obj);
     return this.httpClient.post<any>(`${this.customerServiceUrl}authenticateservicelocation`, obj)
       .pipe(
         tap(data => {
         })
         , map((data) => {
+          console.log(data);
           return data;
         })
         , catchError(this.handleError)
@@ -294,13 +296,15 @@ export class AuthService {
   }
 
   getAddress(lat: number, lng: number) {
+    // https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyDFFx3DtmgkvXsMfIO08Z4MT0bBeSLbX-c&sensor=true
     return this.httpClient
       .get<any>(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyDFFx3DtmgkvXsMfIO08Z4MT0bBeSLbX-c&sensor=true`
+        `${this.mapServiceUrl}reverse-geocode?lat=${lat}&lng=${lng}`
       )
       .pipe(
-        map(geoData => {
-          if (!geoData || !geoData.results || geoData.results.length === 0) {
+        map((geoData: any) => {
+          console.log(geoData);
+          if (!geoData || !geoData.suggestedLocations.results || geoData.suggestedLocations.results.length === 0) {
             return null;
           }
           return geoData;
@@ -321,10 +325,11 @@ export class AuthService {
   }
 
   logout() {
-    this.cartService.removeAllCartItems();
+    // this.cartService.removeAllCartItems();
     localStorage.removeItem(this.CUSTOMER_ID);
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.CUSTOMER_PHONE);
+    localStorage.removeItem(this.CUSTOMER_PROFILE);
   }
 
   saveToken() {
@@ -341,11 +346,24 @@ export class AuthService {
   }
 
   authenticate(response: any): any {
-    if (response.status) {
+    const list: Array<CartItem> = [];
+    if (+response.status === 200) {
       const token = response.token;
       const customer_id = response.customerData.customer_id;
       const phone = response.customerData.phone;
       if (token) {
+        // console.log(response.customerCart);
+        // this.cartService.removeAllCartItems();
+        // if (response.customerCart != null && Array.isArray(response.customerCart) && response.customerCart.length > 0) {
+        //   response.customerCart.forEach(element => {
+        //     list.push(new CartItem(element, element.quantity_purchased));
+        //   });
+        //   this.cartService.setCartObject(list);
+        //   // this.cartService.sendMessage(list);
+        // }
+
+
+        // this.cartService.setCartObject(parsedData);
         localStorage.setItem(this.TOKEN_KEY, token);
         localStorage.setItem(this.CUSTOMER_ID, customer_id);
         localStorage.setItem(this.CUSTOMER_PHONE, phone);
@@ -365,7 +383,7 @@ export class AuthService {
         message: 'We would love to hear from you. You can reach us at one of our contact numbers' +
                   ' or at head office or through our email id provided.',
         email: 'gscutomercare@gmail.com',
-        phone: [9821757754, 9458421001],
+        phone: [7300740050, 9821757754, 8979375569],
         timing: '9AM - 10PM',
         address: 'Indirapuram, Ghaziabad'
       }

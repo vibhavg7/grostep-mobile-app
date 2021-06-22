@@ -59,6 +59,7 @@ export class StorePage implements OnInit, OnDestroy {
       this.categoryId = +data.get('categoryId');
     });
     const storeCategories: any = this.categoryService.StoreCategories;
+    // console.log(storeCategories);
     const d1: any = storeCategories.filter(d => d.store_category_id === this.categoryId);
     this.categoryName = d1[0].store_category_name;
   }
@@ -69,6 +70,7 @@ export class StorePage implements OnInit, OnDestroy {
 
 
   ionViewWillEnter() {
+    // console.log('ionViewWillEnter');
     this.platform.backButton.subscribeWithPriority(0, () => {
         this.navCtrl.pop();
     });
@@ -108,6 +110,7 @@ export class StorePage implements OnInit, OnDestroy {
 
   clickStore(storeId: number, closed: number) {
       const loadedStore = this.loadedStores.filter(data => data.store_id === +storeId);
+      // console.log(loadedStore);
       this.storeService.StoreInfo = loadedStore[0];
       this.router.navigate(['/', 'categories', this.categoryId, 'stores', storeId, 'storecategories']);
   }
@@ -132,7 +135,7 @@ export class StorePage implements OnInit, OnDestroy {
     setTimeout(() => {
       this.storeService.fetchAllStoresBasedOnCity(this.city, '', this.categoryId, this.currentPage, this.pageSize)
       .subscribe((data: any) => {
-        console.log(data);
+        // console.log(data);
         this.isLoading = false;
         customerLatLong.push(new google.maps.LatLng(this.authService.Lat, this.authService.Long));
         this.loadedStores = this.loadedStores.concat(data.store);
@@ -144,15 +147,19 @@ export class StorePage implements OnInit, OnDestroy {
           storeLatLong.push(new google.maps.LatLng(store.latitude, store.longitude));
         });
         new google.maps.DistanceMatrixService().getDistanceMatrix({
-          origins: storeLatLong, destinations: customerLatLong,
+          origins: storeLatLong,
+          destinations: customerLatLong,
           travelMode: google.maps.TravelMode.DRIVING,
           unitSystem: google.maps.UnitSystem.METRIC,
         }, (results: any) => {
           const distanceData = results.rows;
+          // console.log(distanceData);
           if (distanceData.length > 0) {
             for (let i = 0; i < distanceData.length; i++) {
               this.loadedStores[i].distanceFromCustomer = distanceData[i].elements[0].distance.text;
+              this.loadedStores[i].distanceFromCustomerValue = distanceData[i].elements[0].distance.value;
               this.loadedStores[i].timeFromCustomer = distanceData[i].elements[0].duration.text;
+              this.loadedStores[i].timeFromCustomerValue = distanceData[i].elements[0].duration.value;
             }
           }
           this.ref.tick();

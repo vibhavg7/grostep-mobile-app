@@ -18,37 +18,16 @@ export class OfferListComponent implements OnInit, AfterViewInit {
   isLoading = false;
 
   constructor(private modalCtrl: ModalController,
-    private activatedRoute: ActivatedRoute,
-    private navCtrl: NavController,
-    private platform: Platform,
-    private cartService: CartService,
-    private toastCtrl: ToastController,
-    private offerService: OfferService) { }
+              private activatedRoute: ActivatedRoute,
+              private navCtrl: NavController,
+              private platform: Platform,
+              private cartService: CartService,
+              private toastCtrl: ToastController,
+              private offerService: OfferService) { }
 
   ngOnInit() {
     this.isLoading = true;
-    this.cartService.getAllCartItems().subscribe((data1) => {
-      const parsedData = JSON.parse(data1.value);
-      this.calculateTotalAmount(parsedData);
-      this.offerService.fetchAllOffers().subscribe((data) => {
-        console.log(data);
-        if (data.status === 200) {
-          this.offers = data.vouchers;
-          this.isLoading = false;
-          this.offers.forEach((offerData: any) => {
-            if (this.totalAmount >= offerData.voucher_cart_amount
-              && offerData.customer_daily_usage_count < offerData.voucher_max_usage_count
-              && offerData.customer_used_count < offerData.voucher_max_limit_user
-              && (this.prevPage === 'cartpage' || this.prevPage === 'paymentoptionspage')) {
-              offerData.applyButton = true;
-            } else {
-              offerData.applyButton = false;
-            }
-          });
-          console.log(this.offers);
-        }
-      });
-    });
+    
   }
 
   calculateTotalAmount(cartList) {

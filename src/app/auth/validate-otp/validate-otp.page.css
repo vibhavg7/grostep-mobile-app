@@ -1,0 +1,55 @@
+.otp {
+  color: #191919;
+  border-style: none;
+  width: 130px;
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+}
+
+ion-content {
+  --padding-top: 12px;
+}
+
+td {
+  border: 2px solid #191919;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+.btn-wrapper {
+  text-align: center;
+}
+
+.validate-button-enabled {
+  --background:#6fa833 !important;
+  --color:white;
+  width: 80%;
+  margin: auto;
+}
+
+.validate-button-disabled {
+  --background: #e5e5e5;
+  --color: #191919;
+  width: 80%;
+  margin: auto;
+}
+
+ion-content {
+  --ion-background-color: #F8F8F8;
+}
+
+.resend-button-enabled {
+  font-weight: 550;
+  font-size: 18px;
+  color: #8fc951;
+}
+
+.resend-button-disabled {
+  font-weight: 500;
+  font-size: 18px;
+  color: #797979;
+}
+/*# sourceMappingURL=validate-otp.page.css.map */

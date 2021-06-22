@@ -118,7 +118,7 @@ export class ProfilePage implements OnInit, OnEnter, OnDestroy {
           handler: () => {
             console.log('Confirm Okay');
             this.auth.logout();
-            this.cartService.removeAllCartItems();
+            // this.cartService.removeAllCartItems();
             this.cartService.removeVoucher();
             this.deliveryAddressService.removeDeliveryInstructions();
             this.navCtrl.navigateRoot(['/home/tabs/categories']);

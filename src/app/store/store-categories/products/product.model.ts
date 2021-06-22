@@ -26,4 +26,21 @@ export class Product {
     store_name: any;
     // tslint:disable-next-line:variable-name
     store_city: any;
+
+    // tslint:disable-next-line:variable-name
+    store_latitude: string;
+
+    // tslint:disable-next-line:variable-name
+    store_longitude: string;
+
+
+
+    // tslint:disable-next-line:variable-name
+    store_product_caping: any;
+    // tslint:disable-next-line:variable-name
+    store_product_status: number;
+    // tslint:disable-next-line:variable-name
+    product_marked_price: number;
+    stock: number;
+
 }

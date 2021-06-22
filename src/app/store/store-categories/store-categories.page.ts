@@ -6,6 +6,7 @@ import { CategoriesService } from '../../home/categories/categories.service';
 import { AuthService } from '../../auth/auth.service';
 import { Plugins } from '@capacitor/core';
 import { CartItem, CartService } from '../../cart/cart.service';
+import { forkJoin } from 'rxjs';
 const { Storage } = Plugins;
 @Component({
   selector: 'app-store-categories',
@@ -14,6 +15,10 @@ const { Storage } = Plugins;
 })
 export class StoreCategoriesPage implements OnInit {
 
+  timeFromCustomer: any;
+  distanceFromCustomer: any;
+  timeFromCustomerValue: any;
+  distanceFromCustomerValue: any;
   errorMessage: any;
   storeId: number;
   categoryId: number;
@@ -22,16 +27,16 @@ export class StoreCategoriesPage implements OnInit {
   storeCategories: any = [];
   cartList: Array<CartItem>;
   constructor(private activatedRoute: ActivatedRoute,
-              private categoryService: CategoriesService,
-              private cartService: CartService,
-              private router: Router,
-              private ref: ApplicationRef,
-              private zone: NgZone,
-              private platform: Platform,
-              private authService: AuthService,
-              private navCtrl: NavController,
-              private alertCtrl: AlertController,
-              private storeService: StoreService) { }
+    private categoryService: CategoriesService,
+    private cartService: CartService,
+    private router: Router,
+    private ref: ApplicationRef,
+    private zone: NgZone,
+    private platform: Platform,
+    private authService: AuthService,
+    private navCtrl: NavController,
+    private alertCtrl: AlertController,
+    private storeService: StoreService) { }
   ngOnInit() {
     this.activatedRoute.paramMap.subscribe((data: any) => {
       if (!data.has('categoryId') || !data.has('storeId')) {
@@ -40,37 +45,46 @@ export class StoreCategoriesPage implements OnInit {
       }
       this.storeId = +data.get('storeId');
       this.categoryId = +data.get('categoryId');
-      this.isLoading = true;
-      this.storeService.fetchStoreInfoById(this.storeId)
-      .subscribe((data1: any) => {
-        this.storeService.StoreInfo = data1.store[0];
-        this.loadedStore = this.storeService.StoreInfo;
-        if (this.loadedStore.distanceFromCustomer === null ||
-          this.loadedStore.distanceFromCustomer === '' ||
-          this.loadedStore.distanceFromCustomer === undefined) {
-          this.getStoreDistanceAndTime(this.loadedStore);
-        }
-      }, (error) => {
-        this.errorMessage = error;
-      });
     });
   }
 
   ionViewWillEnter() {
     this.platform.backButton.subscribeWithPriority(0, () => {
-        this.navCtrl.pop();
+      this.navCtrl.pop();
     });
-    this.cartService.getAllCartItems().subscribe((data) => {
-      this.cartList = JSON.parse(data.value);
-    });
-    this.storeService.fetchStoreCategories(this.storeId)
-      .subscribe((data: any) => {
-        console.log(data);
-        this.storeCategories = data.store_categories;
+    this.isLoading = true;
+    this.loadedStore = this.storeService.StoreInfo;
+
+    this.distanceFromCustomer = (this.loadedStore && this.loadedStore.distanceFromCustomer
+      ? this.loadedStore.distanceFromCustomer : '');
+    this.timeFromCustomer = (this.loadedStore && this.loadedStore.timeFromCustomer ? this.loadedStore.timeFromCustomer : '');
+
+
+    this.distanceFromCustomerValue = (this.loadedStore && this.loadedStore.distanceFromCustomerValue
+      ? this.loadedStore.distanceFromCustomerValue : '');
+    this.timeFromCustomerValue = (this.loadedStore && this.loadedStore.timeFromCustomerValue ? this.loadedStore.timeFromCustomerValue : '');
+
+    // if (this.loadedStore && Object.keys(this.loadedStore).length === 0 && this.loadedStore.constructor === Object) {
+    forkJoin(this.storeService.fetchStoreInfoById(this.storeId), this.cartService.getAllCartItems()).subscribe((data) => {
+      this.cartList = JSON.parse(data[1].value);
+      this.storeService.StoreInfo = data[0].store[0];
+      this.loadedStore = this.storeService.StoreInfo;
+      this.storeCategories = data[0].store_categories;
+      if (!this.distanceFromCustomerValue) {
+        this.getStoreDistanceAndTime(this.loadedStore);
+      } else {
+        this.loadedStore.distanceFromCustomer = this.distanceFromCustomer;
+        this.loadedStore.timeFromCustomer = this.timeFromCustomer;
+        this.loadedStore.distanceFromCustomerValue = this.distanceFromCustomerValue;
+        this.loadedStore.timeFromCustomerValue = this.timeFromCustomerValue;
         this.isLoading = false;
-      }, (error) => {
-        this.errorMessage = error;
-      });
+      }
+    }, (error) => {
+      this.errorMessage = error;
+    });
+    // } else {
+    //   this.isLoading = false;
+    // }
   }
 
   async getStoreDistanceAndTime(storeInfo) {
@@ -91,9 +105,11 @@ export class StoreCategoriesPage implements OnInit {
       this.zone.run(() => {
         const distanceData = results.rows;
         this.loadedStore.distanceFromCustomer = distanceData[0].elements[0].distance.text;
+        this.loadedStore.distanceFromCustomerValue = distanceData[0].elements[0].distance.value;
         this.loadedStore.timeFromCustomer = distanceData[0].elements[0].duration.text;
-        // this.isLoading = false;
-        // this.ref.tick();
+        this.loadedStore.timeFromCustomerValue = distanceData[0].elements[0].duration.value;
+        this.isLoading = false;
+        this.ref.tick();
       });
     });
   }

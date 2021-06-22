@@ -8,8 +8,11 @@
 </ion-header>
 
 <ion-content>
+
   <ion-col size="12" size-md="8" offset-md="2" class="ion-text-center" *ngIf="isLoading">
-    <ion-spinner color="primary"></ion-spinner>
+      <div class="spin" *ngIf="isLoading">
+          <ion-spinner name="bubbles"></ion-spinner>
+      </div>    
   </ion-col>
   <div *ngIf="!cartList?.length && !isLoading" class="outer_empty_cart_wrap">
     <div class="innerCartWrap">
@@ -27,26 +30,45 @@
           <ion-item-divider *ngIf="cartStoreName" style="font-weight: 400;
             color: #191919;
             font-size: 16px;
-            padding: 2px 0px 8px 14px;" [ngClass]="{'open-storeclass': storeClosingStatus == 0, 'close-storeclass':storeClosingStatus == 1 }">
-            <span>{{cartStoreName}}</span>
-            <div style="font-weight: bold;margin: 0 auto;">
-              {{ storeClosingStatus == 1 ? 'CLOSED' : 'OPEN' }}
+            padding: 2px 0px 8px 0px;" [ngClass]="{'open-storeclass': storeClosingStatus == 0, 'close-storeclass':storeClosingStatus == 1 }">
+            <!-- <div id="myTable">
+              <span style="background: red">one</span>
+              <span style="background: yellow">two</span>
+              <span style="background: red">three</span>
+          </div>           -->
+            <!-- <span>{{cartStoreName}}</span>
+          <div style="font-weight: bold;margin: 0 auto;">
+            {{ storeClosingStatus == 1 ? 'CLOSED' : 'OPEN' }}
+          </div> -->
+            <div style="width:100%">
+              <div style="float:left; width:40%;">{{cartStoreName}}</div>
+              <div style="float:left;font-weight: bold;width:40%">{{ storeClosingStatus == 1 ? 'CLOSED' : 'OPEN' }}</div>
+              <div style="float:left; width:20%;" (click)="deleteCart()">
+                <ion-icon style="font-size: 18px; color: red; border: 1px solid; padding: 1px;" name="trash">
+                </ion-icon>
+              </div>
             </div>
+            <!-- <span>{{cartStoreName}}</span>
+            <span>{{ storeClosingStatus == 1 ? 'CLOSED' : 'OPEN' }}</span>
+            <span><ion-icon name="trash"></ion-icon></span> -->
+            <!-- <div style="font-weight: bold;margin: 0 auto;">
+              {{ storeClosingStatus == 1 ? 'CLOSED' : 'OPEN' }}
+            </div> -->
           </ion-item-divider>
           <ion-item lines="none" [ngClass]="{'open-storeclass': storeClosingStatus == 0, 'close-storeclass':storeClosingStatus == 1 }"
             *ngFor="let product of cartList">
             <ion-thumbnail slot="start">
-              <ion-img *ngIf="product?.product_img" [src]="product.product_img"></ion-img>
-              <ion-img *ngIf="!product?.product_img" src="../../../../assets/images/default_image.jpg"></ion-img>
+              <ion-img *ngIf="product?.image_url" [src]="product.image_url"></ion-img>
+              <!-- <ion-img *ngIf="!product?.image_url" src="../../../../assets/images/default_image.jpg"></ion-img> -->
             </ion-thumbnail>
             <ion-label>
               <h2 style="padding-top:0;display:inline">
-                {{product?.title}}
+                {{product?.product_name}}
               </h2>
               <p>Quantity : {{product?.weight + ' ' + product?.weight_text}}</p>
-              <p style="font-weight:bold">Price : &#8377; {{product?.price}} x {{product?.quantity}} = &#8377; {{product?.price * product?.quantity|
-                number : '1.2-2'}}
-                <span *ngIf="storeClosingStatus == 0" style="width: 120px;height: 35px;float:right;color:white">
+              <p style="font-weight:bold">Price : &#8377; {{product?.store_selling_price}} x {{product?.quantity}} = &#8377; {{product?.store_selling_price
+                * product?.quantity| number : '1.2-2'}}
+                <span *ngIf="product?.stock && storeClosingStatus == 0" style="width: 120px;height: 35px;float:right;color:white">
                   <span (click)="quantityMinus(product)" style="width:45px;background-color:#8fc951;
                                           border-radius: 5px 0px 0px 5px;
                                           line-height: 35px;text-align:center;display: inline-block;height: 35px;font-size:1.2em;">
@@ -64,13 +86,14 @@
                     +
                   </span>
                 </span>
+                <span expand="block" fill="clear" *ngIf="!product?.stock && storeClosingStatus == 0" class="outofstockButton">OUT OF STOCK</span>
               </p>
             </ion-label>
           </ion-item>
         </ion-list>
       </ion-col>
     </ion-row>
-    <ion-row *ngIf="cartList?.length">
+    <!-- <ion-row *ngIf="cartList?.length">
       <ion-col size-sm="8" offset-sm="2" class="ion-text-center" [ngClass]="{'open-storeclass': storeClosingStatus == 0, 'close-storeclass':storeClosingStatus == 1 }">
         <ion-list>
           <ion-item *ngIf="(voucher | json) === '{}'" (click)="applyVoucher()" lines="none" style="background-color:whitesmoke">
@@ -86,7 +109,7 @@
           </ion-item>
         </ion-list>
       </ion-col>
-    </ion-row>
+    </ion-row> -->
 
     <ion-row style="flex-grow: 1;">
       <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center" [ngClass]="{'open-storeclass': storeClosingStatus == 0, 'close-storeclass':storeClosingStatus == 1 }">
@@ -113,9 +136,10 @@
   </ion-grid>
 </ion-content>
 
-<ion-footer *ngIf="!storeClosingStatus && cartList?.length && !isLoading">
+
+<ion-footer *ngIf="!storeClosingStatus && !isLoading && cartList?.length ">
   <ion-grid>
-    <ion-row *ngIf="addressCount > 0">
+    <ion-row *ngIf="!!currentuser && addressCount > 0">
       <ion-col size="7">
         <p>
           <span style="display: block;font-weight: bold;">
@@ -133,17 +157,21 @@
         <ion-button [disabled]="storeClosingStatus" (click)="addAddress()" expand="block" fill="clear" color="primary"> Add Address </ion-button>
       </ion-col>
     </ion-row>
-    <!-- [disabled]="storeClosingStatus" -->
     <ion-row class="footer_color" *ngIf="!!currentuser">
       <ion-col size="12">
-        <!-- {{!!currentuser && addressCount > 0 && cartList?.length > 0}} -->
-        <ion-button *ngIf="!!currentuser && addressCount > 0 && cartList?.length > 0" expand="full" (click)="addDeliveryOptions()"
+        <ion-button *ngIf="!!currentuser && addressCount > 0 && cartList?.length > 0 && !outOfStockProductExist" expand="full" (click)="checkout()"
           fill="clear" class="cart-button-class">
-          Add Delivery Options
+          Checkout
           <ion-icon name="arrow-forward"></ion-icon>
         </ion-button>
-        <ion-button *ngIf="!!currentuser && addressCount == 0" expand="full" (click)="addAddress()" fill="clear" class="cart-button-class">
+        <ion-button *ngIf="!!currentuser && addressCount == 0 && !outOfStockProductExist" expand="full" (click)="addAddress()" fill="clear"
+          class="cart-button-class">
           Add Delivery Address
+          <ion-icon name="arrow-forward"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="!!currentuser && addressCount > 0 && outOfStockProductExist" expand="full" (click)="removeOutOfStockProduct()"
+          fill="clear" class="cart-button-class">
+          Remove Out of Stock Product and continue
           <ion-icon name="arrow-forward"></ion-icon>
         </ion-button>
       </ion-col>

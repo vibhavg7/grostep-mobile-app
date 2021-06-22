@@ -2,7 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavController, ToastController } from '@ionic/angular';
 import { AuthService } from '../auth.service';
-
+import { CartService } from '../../cart/cart.service';
+import {
+  Plugins
+} from '@capacitor/core';
+import { concatMap } from 'rxjs/operators';
+const { Storage } = Plugins;
 @Component({
   selector: 'app-validate-otp',
   templateUrl: './validate-otp.page.html',
@@ -10,6 +15,7 @@ import { AuthService } from '../auth.service';
 })
 export class ValidateOtpPage implements OnInit {
 
+  cartList: any;
   hidevalue = false;
   phonenumber: any;
   storeId: number;
@@ -20,6 +26,7 @@ export class ValidateOtpPage implements OnInit {
   isLoading = false;
   @ViewChild('input', { static: false }) input;
   constructor(private activatedRoute: ActivatedRoute,
+              private cartService: CartService,
               private authService: AuthService,
               private toastCtrl: ToastController,
               private router: Router,
@@ -65,32 +72,33 @@ export class ValidateOtpPage implements OnInit {
     }, 1000);
   }
 
-  validateOTP(phoneOTP: any) {
-    if (phoneOTP === undefined || phoneOTP === '' || phoneOTP.length < 4) {
-
-    } else if (phoneOTP !== undefined && phoneOTP !== '' && phoneOTP.length === 4) {
+  async validateOTP(phoneOTP: any) {
+    if (phoneOTP !== undefined && phoneOTP !== '' && phoneOTP.length === 4) {
+      const cartData  = await Storage.get({ key: 'cartList' });
+      const parsedData = JSON.parse(cartData.value).items;
+      const cartArray = [];
+      if (parsedData != null && Array.isArray(parsedData) && parsedData && parsedData.length > 0) {
+        parsedData.forEach(data => {
+          const obj: any = {};
+          obj.store_id = data.store_id;
+          obj.quantity = data.quantity;
+          obj.store_product_mapping_id = data.store_product_mapping_id;
+          obj.store_selling_price = data.store_selling_price;
+          cartArray.push(obj);
+        });
+      }
       this.isLoading = true;
-      this.authService.loginCustomer(this.phonenumber, phoneOTP)
+      this.authService.loginCustomer(this.phonenumber, phoneOTP).pipe(
+        concatMap(response => this.authService.getUserProfile())
+        // concatMap(response => this.cartService.syncCartProducts(response.customerData.customer_id, cartArray))
+      )
         .subscribe((data: any) => {
-          if (data.status === 200) {
+          if (+data.status === 200) {
             if (this.authService.redirectUrl === 'cartpage') {
-              // this.router.navigate(['/cart', { storeId: this.storeId, categoryId: 0, storecategoryId: 0 }]);
-              // this.navCtrl.navigateBack(['/cart', { storeId: this.storeId }]);
               this.navCtrl.pop().then(() => this.navCtrl.pop());
             } else {
               this.navCtrl.navigateRoot(['/home/tabs/profile']);
             }
-            // if (data.customerData.personal_info_added === 1) {
-            //   if (this.authService.redirectUrl === 'cartpage') {
-            //     // this.router.navigate(['/cart', { storeId: this.storeId, categoryId: 0, storecategoryId: 0 }]);
-            //     // this.navCtrl.navigateBack(['/cart', { storeId: this.storeId }]);
-            //     this.navCtrl.pop().then(() => this.navCtrl.pop());
-            //   } else {
-            //     this.navCtrl.navigateRoot(['/home/tabs/profile']);
-            //   }
-            // } else {
-            //   this.router.navigate(['/auth/add-user-info', { storeId: this.storeId }]);
-            // }
           } else {
             this.presentToast('Please enter valid OTP');
           }
@@ -108,7 +116,6 @@ export class ValidateOtpPage implements OnInit {
         this.isLoading = true;
         this.authService.resendOTP(this.customerId)
           .subscribe((data: any) => {
-            // console.log(data);
             if (data.status === 400) {
               this.presentToast('Unable to resend otp.Please try again later');
             } else if (data.status === 200) {
@@ -116,7 +123,6 @@ export class ValidateOtpPage implements OnInit {
               this.maxTime = 60;
               this.StartTimer();
               this.presentToast('OTP sent successfully');
-              // this.router.navigate(['/', 'auth', 'validate-otp', data.customer_id, { storeId: this.storeId }]);
             }
             this.isLoading = false;
           });

@@ -1,8 +1,8 @@
-import { Component, OnInit, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ApplicationRef, AfterContentChecked } from '@angular/core';
 import { NavController, AlertController, Platform } from '@ionic/angular';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { StoreService } from '../store.service';
-import { distinctUntilChanged, tap, debounceTime, switchMap } from 'rxjs/operators';
+import { distinctUntilChanged, tap, debounceTime, switchMap, filter } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CartItem, CartService } from '../../cart/cart.service';
 import { DeliveryAddressService } from '../../delivery-address/delivery-address.service';
@@ -11,13 +11,16 @@ import {
   Plugins,
   Capacitor
 } from '@capacitor/core';
+import { catchError } from 'rxjs/internal/operators/catchError';
+import { HttpErrorResponse } from '@angular/common/http';
+import { throwError, of } from 'rxjs';
 const { Storage } = Plugins;
 @Component({
   selector: 'app-store-search',
   templateUrl: './store-search.page.html',
   styleUrls: ['./store-search.page.scss'],
 })
-export class StoreSearchPage implements OnInit {
+export class StoreSearchPage implements OnInit, AfterContentChecked {
   storedCity: any;
   totalAmount: number;
   storeId: number;
@@ -54,7 +57,6 @@ export class StoreSearchPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    console.log('store search page');
     this.platform.backButton.subscribeWithPriority(0, () => {
       if (+this.categoryId === 0) {
         this.navCtrl.navigateRoot(['/home/tabs/search']);
@@ -92,6 +94,10 @@ export class StoreSearchPage implements OnInit {
     }
   }
 
+  ngAfterContentChecked() {
+
+  }
+
 
   async ngOnInit() {
     this.activatedRoute.paramMap.subscribe((data: any) => {
@@ -101,17 +107,25 @@ export class StoreSearchPage implements OnInit {
       }
       this.getDeliveryLocationCity(data);
     });
-    this.queryField.valueChanges.pipe(
+    this.searchCriteriaForm.get('searchCriteria').valueChanges.pipe(
       tap((data) => {
         console.log(data);
-        this.isLoading = true;
-        console.log(this.storedCity);
       }),
       debounceTime(500),
+      filter((term: any) => term.length > 3),
       distinctUntilChanged(),
-      switchMap((query) => this.storeService.searchStoreAndProductsBasedOnName('', query, this.categoryId, this.storeId, this.storedCity))
+      switchMap((query) => {
+        this.isLoading = true;
+        return this.storeService.searchStoreAndProductsBasedOnName('', query, this.categoryId, this.storeId, this.storedCity).pipe(
+          catchError((error) => {
+            this.isLoading = false;
+            return [];
+          })
+        );
+      })
     )
       .subscribe((response: any) => {
+        console.log(response);
         this.loadedStores = response.store;
         this.loadedStoreProducts = response.products;
         this.loadedStoreProducts.forEach(storeData => {
@@ -124,6 +138,7 @@ export class StoreSearchPage implements OnInit {
         this.storeproductsloaded = true;
         this.ref.tick();
       }, (error: any) => {
+        console.log(error);
         this.isLoading = false;
         this.storeproductsloaded = true;
       });
@@ -374,6 +389,23 @@ export class StoreSearchPage implements OnInit {
     // this.router.navigate(['/cart', { storeId: this.storeId, categoryId: 0, storecategoryId: 0 }]);
     // this.router.navigate(['/home/tabs/cart']);
     //  this.router.navigate(['/', 'cart', this.storeId]);
+  }
+
+  private handleError(err: HttpErrorResponse) {
+    // in a real world app, we may send the server to some remote logging infrastructure
+    // instead of just logging it to the console
+    let errorMessage = '';
+    if (err.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      errorMessage = `An error occurred: ${err.error.message}`;
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong,
+      errorMessage = `Server returned code: ${err.status}, error message is: ${err.message}`;
+    }
+    console.log(errorMessage);
+    // console.error(errorMessage);
+    return throwError(errorMessage);
   }
 
   backToSearch() {
