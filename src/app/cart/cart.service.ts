@@ -87,7 +87,7 @@ export class CartService {
   private voucher: Voucher = {} as Voucher;
   private voucherAmount = 0;
   private CUSTOMER_ID = 'customerid';
-  private cartServiceUrl = 'http://localhost:3000/cartapi/';
+  private cartServiceUrl = 'https://api.grostep.com/cartapi/';
   constructor(
     private httpClient: HttpClient) {
     this.list = [];

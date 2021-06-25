@@ -78,14 +78,15 @@ export class ValidateOtpPage implements OnInit {
       const parsedData = JSON.parse(cartData.value).items;
       const cartArray = [];
       if (parsedData != null && Array.isArray(parsedData) && parsedData && parsedData.length > 0) {
-        parsedData.forEach(data => {
-          const obj: any = {};
-          obj.store_id = data.store_id;
-          obj.quantity = data.quantity;
-          obj.store_product_mapping_id = data.store_product_mapping_id;
-          obj.store_selling_price = data.store_selling_price;
-          cartArray.push(obj);
-        });
+        console.log(parsedData);
+        // parsedData.forEach(data => {
+        //   const obj: any = {};
+        //   obj.store_id = data.store_id;
+        //   obj.quantity = data.quantity;
+        //   obj.store_product_mapping_id = data.store_product_mapping_id;
+        //   obj.store_selling_price = data.store_selling_price;
+        //   cartArray.push(obj);
+        // });
       }
       this.isLoading = true;
       this.authService.loginCustomer(this.phonenumber, phoneOTP).pipe(

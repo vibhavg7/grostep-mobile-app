@@ -164,9 +164,8 @@ export class ChangeDeliveryLocationPage implements OnInit, AfterViewInit {
       }
     });
     this.checkServiceLocation(city, stateShortName, countryShortName, zipcode).subscribe((data) => {
-      // alert (city + '' + stateShortName + '' + countryShortName + '' + zipcode);
-      // alert (data.locationresponse.servicable_area_check);
       if (+data.locationresponse.servicable_area_check === 1) {
+        const serviceable_area_id = data.locationresponse.serviceable_area_id;
         if (this.cartList !== null && this.cartList.items != null && this.cartList.items.length > 0) {
           const storeLatLong = [];
           const customerLatLong = [];
@@ -175,10 +174,10 @@ export class ChangeDeliveryLocationPage implements OnInit, AfterViewInit {
           customerLatLong.push(new google.maps.LatLng(lat, lng));
           storeLatLong.push(new google.maps.LatLng(storeLat, storeLong));
           this.checkDistanceBetwenStoreAndCustomer(city, state, country, zipcode, customerLatLong, storeLatLong,
-            locationaddress, completeaddress, locality, lat, lng, stateShortName, countryShortName );
+            locationaddress, completeaddress, locality, lat, lng, stateShortName, countryShortName, '', serviceable_area_id);
         } else {
           this.setObject(city, state, country, zipcode, lat, lng,
-            locationaddress, completeaddress, locality, stateShortName, countryShortName);
+            locationaddress, completeaddress, locality, stateShortName, countryShortName, serviceable_area_id);
           if (this.page === 'adddeliveryaddress') {
             this.navCtrl.pop();
           } else {
@@ -198,6 +197,7 @@ export class ChangeDeliveryLocationPage implements OnInit, AfterViewInit {
     this.checkServiceLocation(address.city, address.state, address.country, address.pincode).subscribe((data) => {
       this.isLoading1 = false;
       if (+data.locationresponse.servicable_area_check === 1) {
+        const serviceable_area_id = data.locationresponse.serviceable_area_id;
         if (this.cartList !== null && this.cartList.items != null && this.cartList.items.length > 0) {
           const storeLatLong = [];
           const customerLatLong = [];
@@ -207,7 +207,7 @@ export class ChangeDeliveryLocationPage implements OnInit, AfterViewInit {
           storeLatLong.push(new google.maps.LatLng(storeLat, storeLong));
           this.checkDistanceBetwenStoreAndCustomer(address.city, address.state, address.country, address.pincode,
             customerLatLong, storeLatLong, address.address2, address.address, address.locality,
-            address.lat, address.lng, address.stateShortName, address.stateShortName, address.delivery_address_id);
+            address.lat, address.lng, address.stateShortName, address.stateShortName, address.delivery_address_id, serviceable_area_id);
         } else {
           if (address.delivery_address_id) {
             this.auth.selectDeliveryAddress(address.delivery_address_id, address.city)
@@ -217,7 +217,7 @@ export class ChangeDeliveryLocationPage implements OnInit, AfterViewInit {
                   this.setObject(selectedAddressData.city, selectedAddressData.state, selectedAddressData.country,
                     selectedAddressData.pincode, selectedAddressData.latitude, selectedAddressData.longitude,
                     selectedAddressData.address2, selectedAddressData.address, selectedAddressData.locality,
-                    selectedAddressData.stateShortName, selectedAddressData.countryShortName);
+                    selectedAddressData.stateShortName, selectedAddressData.countryShortName, serviceable_area_id);
                   if (this.page === 'adddeliveryaddress') {
                     this.navCtrl.pop();
                   } else {
@@ -236,8 +236,8 @@ export class ChangeDeliveryLocationPage implements OnInit, AfterViewInit {
   }
 
   checkDistanceBetwenStoreAndCustomer(city, state, country, zipcode, customerLatLong, storeLatLong,
-                                      locationaddress, completeaddress, locality, lat, lng, stateShortName?,
-                                      countryShortName?, deliveryAddressId?) {
+    locationaddress, completeaddress, locality, lat, lng, stateShortName,
+    countryShortName, deliveryAddressId, serviceableAreaId?) {
     console.log(deliveryAddressId);
     new google.maps.DistanceMatrixService().getDistanceMatrix({
       origins: customerLatLong,
@@ -262,7 +262,7 @@ export class ChangeDeliveryLocationPage implements OnInit, AfterViewInit {
                   this.setObject(selectedAddressData.city, selectedAddressData.state, selectedAddressData.country,
                     selectedAddressData.pincode, selectedAddressData.latitude, selectedAddressData.longitude,
                     selectedAddressData.address2, selectedAddressData.address,
-                    selectedAddressData.locality, stateShortName, countryShortName);
+                    selectedAddressData.locality, stateShortName, countryShortName, serviceableAreaId);
                   if (this.page === 'adddeliveryaddress') {
                     this.navCtrl.pop();
                   } else {
@@ -270,10 +270,10 @@ export class ChangeDeliveryLocationPage implements OnInit, AfterViewInit {
                   }
                   this.presentToast('Delivery address successfully updated');
                 }
-                });
+              });
           } else {
             this.setObject(city, state, country, zipcode, lat, lng,
-              locationaddress, completeaddress, locality, stateShortName, countryShortName);
+              locationaddress, completeaddress, locality, stateShortName, countryShortName, serviceableAreaId);
             if (this.page === 'adddeliveryaddress') {
               this.navCtrl.pop();
             } else {
@@ -295,7 +295,8 @@ export class ChangeDeliveryLocationPage implements OnInit, AfterViewInit {
     this.navCtrl.pop();
   }
 
-  async setObject(city, state, country, zipcode, lat, long, locationaddress, completeaddress, locality, stateShortName, countryShortName) {
+  async setObject(city, state, country, zipcode, lat, long,
+                  locationaddress, completeaddress, locality, stateShortName, countryShortName, serviceableAreaId) {
     await Storage.set({
       key: 'usertempaddress1',
       value: JSON.stringify({
@@ -310,7 +311,8 @@ export class ChangeDeliveryLocationPage implements OnInit, AfterViewInit {
         // routeaddress,
         locality,
         stateShortName,
-        countryShortName
+        countryShortName,
+        serviceableAreaId
       })
     });
   }
@@ -400,65 +402,6 @@ export class ChangeDeliveryLocationPage implements OnInit, AfterViewInit {
       this.filterAddress(data.suggestedLocations.results, this.locationCoords.latitude, this.locationCoords.longitude);
     }));
   }
-
-  // async emptyCartProducts(city, state, country, zipcode, lat, long, locationaddress, completeaddress, routeaddress, locality) {
-  //   if (this.cartList != null && this.cartList.length > 0) {
-  //     const ret = await Storage.get({ key: 'cartList' });
-  //     const storeCity = JSON.parse(ret.value)[0].store_city;
-  //     if (storeCity.toLowerCase() !== city.toLowerCase()) {
-  //       this.isLoading1 = false;
-  //       this.alertCtrl
-  //         .create({
-  //           header: 'Remove cart item?',
-  //           message: 'Are you sure you want to remove items from previous city',
-  //           buttons: [
-  //             {
-  //               text: 'Cancel',
-  //               cssClass: 'cancelcss',
-  //               handler: () => {
-  //               }
-  //             },
-  //             {
-  //               text: 'Remove',
-  //               cssClass: 'removecss',
-  //               handler: () => {
-  //                 // this.cartList = this.cartService.removeAllCartItems();
-  //                 this.cartService.removeVoucher();
-  //                 this.deliveryAddressService.removeDeliveryInstructions();
-  //                 this.setObject(city, state, country, zipcode, lat, long, locationaddress, completeaddress, routeaddress, locality);
-  //                 if (this.page === 'adddeliveryaddress') {
-  //                   this.navCtrl.pop();
-  //                 } else {
-  //                   this.navCtrl.navigateRoot(['/home/tabs/categories']);
-  //                 }
-  //                 this.presentToast('Delivery address successfully updated');
-  //               }
-  //             }
-  //           ]
-  //         })
-  //         .then(alertEl => alertEl.present());
-  //     } else {
-  //       this.setObject(city, state, country, zipcode, lat, long, locationaddress, completeaddress, routeaddress, locality);
-  //       this.isLoading1 = false;
-  //       if (this.page === 'adddeliveryaddress') {
-  //         this.navCtrl.pop();
-  //       } else {
-  //         this.navCtrl.navigateRoot(['/home/tabs/categories']);
-  //       }
-  //       // this.navCtrl.navigateRoot(['/home/tabs/categories']);
-  //       this.presentToast('Delivery address successfully updated');
-  //     }
-  //   } else {
-  //     this.setObject(city, state, country, zipcode, lat, long, locationaddress, completeaddress, routeaddress, locality);
-  //     this.isLoading1 = false;
-  //     if (this.page === 'adddeliveryaddress') {
-  //       this.navCtrl.pop();
-  //     } else {
-  //       this.navCtrl.navigateRoot(['/home/tabs/categories']);
-  //     }
-  //     this.presentToast('Delivery address successfully updated');
-  //   }
-  // }
 
   loadMore(event) {
     if (this.currentPage === this.totalPages) {

@@ -9,7 +9,7 @@ import { CustomerLoginComponent } from '../shared/customer-login/customer-login.
     providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-    private TOKEN_KEY = 'token';
+    private TOKEN_KEY = 'bearertoken';
     constructor(private authService: AuthService,
                 // private modalCtrl: ModalController,
                 private router: Router) { }

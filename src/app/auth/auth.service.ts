@@ -14,7 +14,7 @@ export class AuthService {
   lat: any;
   redirectUrl: any;
   customerInfo: any;
-  private TOKEN_KEY = 'token';
+  private TOKEN_KEY = 'bearertoken';
   private city: any;
   private subject = new Subject<any>();
   private CUSTOMER_ID = 'customerid';
@@ -23,7 +23,7 @@ export class AuthService {
   private CUSTOMER_PROFILE = 'customerprofile';
   private customerdeliveryInfo: any = [];
   customerProfile: any;
-  private customerServiceUrl = 'http://localhost:3000/customerapi/';
+  private customerServiceUrl = 'http://localhost:3000/v2/customerapi/';
   private orderServiceUrl = 'https://api.grostep.com/ordersapi/';
   private mapServiceUrl = 'https://api.grostep.com/mapsapi/';
   constructor(private httpClient: HttpClient, private cartService: CartService) { }
@@ -288,7 +288,6 @@ export class AuthService {
         tap(data => {
         })
         , map((data) => {
-          console.log(data);
           return data;
         })
         , catchError(this.handleError)

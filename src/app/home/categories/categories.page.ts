@@ -72,31 +72,33 @@ export class CategoriesPage implements OnInit, OnEnter, OnDestroy {
   public async onEnter(): Promise<void> {
     const ret = await Storage.get({ key: 'usertempaddress1' });
     const parsedData = JSON.parse(ret.value);
+
     if (parsedData && Object.keys(parsedData).length > 0 && parsedData.constructor === Object) {
       if (parsedData.locationaddress) {
         this.usertempaddress = parsedData.locationaddress;
         setTimeout(() => {
-          this.categoryService.storeDataCatData(JSON.parse(ret.value).city)
-            .subscribe((data) => {
+          this.categoryService.storeDataCatData(JSON.parse(ret.value).serviceableAreaId)
+            .subscribe((data: any) => {
               this.isLoading = false;
+              console.log(data);
               this.categoryImages = data[0].store_categories;
-              this.bannerImages = data[1].banners.filter(b => {
+              this.bannerImages = data[0].banners.filter(b => {
                 return b.banner_type === 1;
               });
-              this.noContactbannerImages = data[1].banners.filter(b => {
+              this.noContactbannerImages = data[0].banners.filter(b => {
                 return b.banner_type === 2;
               });
-              this.cityWisebannerImages = data[1].banners.filter(b => {
+              this.cityWisebannerImages = data[0].banners.filter(b => {
                 return b.banner_type === 3;
               });
-              this.customerliveorderscount = (data[2].length > 0) ? data[2].customer_liveorders_count.customer_liveorders_count : 0;
-              this.customerInfo = data[3].customer_info[0];
+              this.customerliveorderscount = (data[1].length > 0) ? data[1].customer_liveorders_count.customer_liveorders_count : 0;
+              // this.customerInfo = data[3].customer_info[0];
               this.checkandCreateCart();
-              if (this.customerInfo !== undefined && this.customerInfo.customer_name !== undefined
-                && this.customerInfo.customer_name != null) {
-                this.customerInfo.customer_name = this.titleCase(this.customerInfo.customer_name);
-              } else {
-              }
+              // if (this.customerInfo !== undefined && this.customerInfo.customer_name !== undefined
+              //   && this.customerInfo.customer_name != null) {
+              //   this.customerInfo.customer_name = this.titleCase(this.customerInfo.customer_name);
+              // } else {
+              // }
               this.ref.tick();
             }, (error) => {
               this.errorMessage = error;
@@ -116,7 +118,7 @@ export class CategoriesPage implements OnInit, OnEnter, OnDestroy {
     // console.log('hey');
     const ret = await Storage.get({ key: 'cartList' });
     const parsedCartData = JSON.parse(ret.value);
-    // console.log(parsedCartData);
+    console.log(parsedCartData);
     // const cart = JSON.parse(ret.value);
     if (parsedCartData === null) {
       const cartList: any = {};

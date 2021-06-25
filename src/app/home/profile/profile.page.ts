@@ -18,7 +18,7 @@ export class ProfilePage implements OnInit, OnEnter, OnDestroy {
   errorMessage: any;
   subscription: Subscription;
   private NAME_KEY = 'name';
-  private TOKEN_KEY = 'token';
+  private TOKEN_KEY = 'bearertoken';
   public user: any;
   constructor(
     private router: Router,

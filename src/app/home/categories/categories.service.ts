@@ -12,8 +12,9 @@ export class CategoriesService {
 
   private categoryServiceUrl = 'https://api.grostep.com/categoryapi';
   private bannerServiceUrl = 'https://api.grostep.com/bannerapi';
+  private servicableAreaServiceUrl = 'http://localhost:3000/v2/servicableareaapi/';
   private storecategories: any = [];
-  private TOKEN_KEY = 'token';
+  private TOKEN_KEY = 'bearertoken';
   constructor(
     private httpClient: HttpClient,
     private authService: AuthService,
@@ -24,18 +25,33 @@ export class CategoriesService {
     return this.storecategories;
   }
 
-  public storeDataCatData(city): Observable<any[]> {
+  public storeDataCatData(serviceableAreaId): Observable<any[]> {
+
     const obj: any = {};
-    obj.filterBy = city;
-    const obj1: any = {};
-    obj1.filterBy = city;
-    const response1 = this.httpClient.post(`${this.categoryServiceUrl}/storecategories/citywise`, obj1);
-    const response2 = this.httpClient.post(`${this.bannerServiceUrl}/bannerinfo/citywise`, obj);
-    const response3 = (!!localStorage.getItem(this.TOKEN_KEY) ? this.orderService.fetchCustomerLiveOrderCount() : of([]));
-    const response4 = this.authService.getUserProfile();
-    return forkJoin([response1, response2, response3, response4])
+    obj.serviceableAreaId = serviceableAreaId;
+    // return this.httpClient.post<any[]>(`${this.servicableAreaServiceUrl}areainfo/citywise`, obj)
+    //   .pipe(
+    //     tap((data: any) => {
+    //       // this.customerInfo = data;
+    //     })
+    //     , map((data) => {
+    //       return data;
+    //     })
+    //     , catchError(this.handleError)
+    //   );
+    // const obj: any = {};
+    // obj.filterBy = city;
+    // const obj1: any = {};
+    // obj1.filterBy = city;
+    // const response1 = this.httpClient.post(`${this.categoryServiceUrl}/storecategories/citywise`, obj1);
+    // const response2 = this.httpClient.post(`${this.bannerServiceUrl}/bannerinfo/citywise`, obj);
+    const response1 = this.httpClient.post(`${this.servicableAreaServiceUrl}areainfo/citywise`, obj);
+    const response2 = (!!localStorage.getItem(this.TOKEN_KEY) ? this.orderService.fetchCustomerLiveOrderCount() : of([]));
+    // // const response4 = this.authService.getUserProfile();
+    return forkJoin([response1, response2])
     .pipe(tap((d) => {
       this.storecategories = d[0].store_categories;
+      console.log(this.storecategories);
     }));
   }
   private handleError(err: HttpErrorResponse) {
